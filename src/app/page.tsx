@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { connection } from "next/server";
 import { getClusters } from "@/lib/data";
 import { KINDS, photoSrc, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
@@ -10,8 +9,10 @@ const Arrow = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="transition-transform group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
+// Pre-rendered and served from the edge; regenerated on writes (revalidateTag) or every minute.
+export const revalidate = 60;
+
 export default async function Home() {
-  await connection();
   const clusters = await getClusters();
   const open = clusters.filter((c) => c.status === "open");
   const reporters = open.reduce((n, c) => n + c.reporter_count, 0);

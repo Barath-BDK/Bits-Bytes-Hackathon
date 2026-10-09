@@ -3,7 +3,7 @@
 import { ViewTransition, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -27,8 +27,11 @@ function currentMode() {
   return document.documentElement.dataset.mode === "light" ? "light" : "dark";
 }
 
-export function MapView({ clusters, startReporting, focusId }: { clusters: Cluster[]; startReporting: boolean; focusId: string | null }) {
+export function MapView({ clusters }: { clusters: Cluster[] }) {
   const router = useRouter();
+  const params = useSearchParams();
+  const startReporting = params.get("report") === "1";
+  const focusId = params.get("c");
   const mapEl = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef(new Map<string, HTMLDivElement>());

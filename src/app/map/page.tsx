@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { connection } from "next/server";
+import { Suspense } from "react";
 import { getClusters } from "@/lib/data";
 import { MapView } from "@/components/map-view";
+import Loading from "./loading";
 
 export const metadata: Metadata = { title: "Live map" };
+export const revalidate = 60;
 
-export default async function MapPage({ searchParams }: PageProps<"/map">) {
-  await connection();
-  const [clusters, sp] = await Promise.all([getClusters(), searchParams]);
-  return <MapView clusters={clusters} startReporting={sp.report === "1"} focusId={typeof sp.c === "string" ? sp.c : null} />;
+export default async function MapPage() {
+  const clusters = await getClusters();
+  return (
+    <Suspense fallback={<Loading />}>
+      <MapView clusters={clusters} />
+    </Suspense>
+  );
 }

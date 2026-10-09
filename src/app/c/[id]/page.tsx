@@ -3,13 +3,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { getCluster } from "@/lib/data";
 import { KINDS, complaintDraft, formatDate, isOverdue, photoSrc, priorityParts, shortId, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { BlurFade } from "@/components/motion-bits";
 import { ComplaintBox } from "@/components/complaint-box";
 import { ConfirmButtons } from "@/components/confirm-buttons";
+
+export const revalidate = 60;
+// Records are pre-rendered on first visit, then served from the edge until a write invalidates them.
+export async function generateStaticParams() { return []; }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -19,7 +22,6 @@ export async function generateMetadata({ params }: PageProps<"/c/[id]">): Promis
 }
 
 export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
-  await connection();
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const d = await getCluster(id);
