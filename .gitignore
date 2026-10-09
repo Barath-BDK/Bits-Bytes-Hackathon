@@ -1,0 +1,32 @@
+# secrets - never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.vercel
+supabase/.temp
+supabase/.branches
+
+# dependencies / build
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# logs / OS / editor
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# tooling output
+graphify-out/
+.claude/settings.local.json
