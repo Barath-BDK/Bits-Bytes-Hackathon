@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
-import { Instrument_Sans, Fragment_Mono } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { ThemeControls } from "@/components/theme-controls";
-import { DEFAULT_MODE, DEFAULT_THEME, themeBootScript } from "@/lib/themes";
+import { DEFAULTS, themeBootScript } from "@/lib/themes";
 import "./globals.css";
 
 const instrument = Instrument_Sans({ variable: "--font-instrument", subsets: ["latin"] });
+const serif = Instrument_Serif({ variable: "--font-instrument-serif", weight: "400", style: ["normal", "italic"], subsets: ["latin"] });
 const fragment = Fragment_Mono({ variable: "--font-fragment", weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme={DEFAULT_THEME} data-mode={DEFAULT_MODE} suppressHydrationWarning
-      className={`${instrument.variable} ${fragment.variable} h-full antialiased`}>
+    <html lang="en" data-theme={DEFAULTS.theme} data-mode={DEFAULTS.mode} data-backdrop={DEFAULTS.backdrop} data-headline={DEFAULTS.headline}
+      data-transition={DEFAULTS.transition} suppressHydrationWarning className={`${instrument.variable} ${serif.variable} ${fragment.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>

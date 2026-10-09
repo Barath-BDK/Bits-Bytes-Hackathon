@@ -3,7 +3,9 @@ import Image from "next/image";
 import { getClusters } from "@/lib/data";
 import { KINDS, photoSrc, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
-import { BlurFade, NumberTicker, WordReveal } from "@/components/motion-bits";
+import { BlurFade, NumberTicker } from "@/components/motion-bits";
+import { Hero } from "@/components/hero";
+import { HeroBackdrop } from "@/components/backdrops/hero-backdrop";
 
 const Arrow = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="transition-transform group-hover:translate-x-0.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
@@ -19,41 +21,18 @@ export default async function Home() {
   const linked = open.filter((c) => c.near_worksite);
   const withPhotos = open.filter((c) => c.cover_photo);
   const top = open.filter((c) => c.kind !== "worksite").slice(0, 4);
+  const ticker = [...open].sort((x, y) => y.last_reported_at.localeCompare(x.last_reported_at)).slice(0, 8).map((c) =>
+    c.kind === "worksite"
+      ? `${c.department ?? "A work site"} logged as ${KINDS[c.kind].severity[c.severity_max - 1].toLowerCase()}, ${timeAgo(c.last_reported_at)}`
+      : `${c.reporter_count} ${c.reporter_count === 1 ? "resident flags" : "residents flag"} ${KINDS[c.kind].severity[c.severity_max - 1].toLowerCase()} ${KINDS[c.kind].label.toLowerCase()}, ${timeAgo(c.last_reported_at)}`);
 
   return (
     <main className="overflow-x-clip">
-      {/* Hero */}
-      <section className="relative">
-        <div className="hairline-grid pointer-events-none absolute inset-0" aria-hidden />
-        <div className="pointer-events-none absolute left-1/2 top-[-18rem] h-[36rem] w-[60rem] -translate-x-1/2 rounded-full blur-3xl" style={{ background: "radial-gradient(closest-side, var(--glow), transparent)" }} aria-hidden />
-        <div className="relative mx-auto max-w-6xl px-4 pb-10 pt-20 text-center sm:px-6 sm:pt-28">
-          <BlurFade>
-            <Link href="/map" className="group mx-auto inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pl-1 pr-3 text-[13px] text-fg-2 backdrop-blur transition hover:border-fg-3">
-              <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-fg">Live</span>
-              {open.length} open issues across Chennai
-              <Arrow />
-            </Link>
-          </BlurFade>
-          <h1 className="display mx-auto mt-7 max-w-4xl text-[clamp(2.6rem,7.2vw,5.8rem)]">
-            <WordReveal text="Who dug up your road, and when will they fix it?" delay={0.1} />
-          </h1>
-          <BlurFade delay={0.45}>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-fg-2">
-              Gullywatch puts every pothole, flooded street and work site on one public map. Reports of the same spot
-              merge into a single record, every extra neighbour pushes it up the queue, and damage beside an unfinished
-              dig is traced back to the agency that dug it.
-            </p>
-          </BlurFade>
-          <BlurFade delay={0.55}>
-            <div className="mt-9 flex flex-wrap justify-center gap-3">
-              <Link href="/map?report=1" className="group flex items-center gap-2 rounded-xl bg-fg px-5 py-3 font-medium text-bg transition hover:opacity-85">Report an issue <Arrow /></Link>
-              <Link href="/map" className="rounded-xl border border-line bg-surface/60 px-5 py-3 font-medium backdrop-blur transition hover:border-fg-3">Open the live map</Link>
-            </div>
-          </BlurFade>
-        </div>
+      <Hero openCount={open.length} ticker={ticker} />
 
-        {/* Product card */}
-        <BlurFade delay={0.7} y={30} className="relative mx-auto max-w-5xl px-4 pb-24 sm:px-6">
+      {/* Product card */}
+      <section className="relative">
+        <BlurFade delay={0.7} y={30} className="relative mx-auto max-w-5xl px-4 pb-24 pt-16 sm:px-6">
           <div className="beam rounded-3xl">
             <div className="grid overflow-hidden rounded-3xl border border-line bg-surface md:grid-cols-[1.4fr_1fr]">
               <div className="border-b border-line md:border-b-0 md:border-r">
@@ -141,7 +120,8 @@ export default async function Home() {
       </section>
 
       {/* Coordination */}
-      <section className="relative border-t border-line">
+      <section className="relative isolate overflow-hidden border-t border-line">
+        <div className="absolute inset-0 -z-10 opacity-35 [mask-image:linear-gradient(90deg,transparent,#000_55%)]"><HeroBackdrop /></div>
         <div className="stripes h-1.5 opacity-80" />
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-28 sm:px-6 lg:grid-cols-2">
           <BlurFade inView>

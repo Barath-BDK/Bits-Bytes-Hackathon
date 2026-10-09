@@ -21,16 +21,16 @@ export function BlurFade({ children, delay = 0, y = 12, className, inView = fals
   );
 }
 
-// Headline that resolves word by word.
-export function WordReveal({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
+// Headline that resolves word by word; words listed in `accent` get the theme's accent treatment.
+export function WordReveal({ text, className, delay = 0, accent = [] }: { text: string; className?: string; delay?: number; accent?: string[] }) {
   const reduce = useReducedMotion();
   return (
     <span className={className} aria-label={text}>
       {text.split(" ").map((w, i) => (
-        <motion.span key={i} aria-hidden className="inline-block whitespace-pre"
-          initial={reduce ? false : { opacity: 0, y: "0.35em", filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, delay: delay + i * 0.06, ease: EASE }}>
+        <motion.span key={i} aria-hidden className={`inline-block whitespace-pre ${accent.includes(w) ? "accent-word" : ""}`}
+          initial={reduce ? false : { opacity: 0, y: "0.4em", rotate: 2, filter: "blur(12px)" }}
+          animate={{ opacity: 1, y: 0, rotate: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, delay: delay + i * 0.07, ease: EASE }}>
           {w}{" "}
         </motion.span>
       ))}

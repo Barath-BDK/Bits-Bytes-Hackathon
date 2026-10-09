@@ -2,25 +2,40 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { DEFAULT_MODE, DEFAULT_THEME, THEMES, type Mode, type ThemeId } from "@/lib/themes";
+import { DEFAULTS, SETTINGS, THEMES, type SettingKey } from "@/lib/themes";
+
+type Key = "theme" | "mode" | SettingKey;
 
 // The <html> data attributes are the source of truth (set before paint by the boot script).
 function subscribe(cb: () => void) {
   const obs = new MutationObserver(cb);
-  obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "data-mode"] });
+  obs.observe(document.documentElement, { attributes: true });
   return () => obs.disconnect();
 }
-const readTheme = () => (document.documentElement.getAttribute("data-theme") as ThemeId) || DEFAULT_THEME;
-const readMode = () => (document.documentElement.getAttribute("data-mode") as Mode) || DEFAULT_MODE;
-
-function save(key: string, value: string) {
-  try { localStorage.setItem(key, value); } catch { /* private mode: theme just won't persist */ }
+function useSetting(key: Key) {
+  return useSyncExternalStore(subscribe, () => document.documentElement.getAttribute(`data-${key}`) || DEFAULTS[key], () => DEFAULTS[key]);
 }
+
+// Theme and mode changes ripple out from the pointer using the View Transitions API.
+function setSetting(key: Key, value: string, origin?: { x: number; y: number }) {
+  const root = document.documentElement;
+  try { localStorage.setItem(`gw-${key}`, value); } catch { /* private mode: setting just won't persist */ }
+  const apply = () => root.setAttribute(`data-${key}`, value);
+  const visual = key === "theme" || key === "mode";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!visual || reduce || !("startViewTransition" in document)) return apply();
+  if (origin) { root.style.setProperty("--vt-x", `${origin.x}px`); root.style.setProperty("--vt-y", `${origin.y}px`); }
+  root.classList.add("theme-vt");
+  const vt = document.startViewTransition(apply);
+  vt.finished.finally(() => root.classList.remove("theme-vt"));
+}
+
+const at = (e: React.MouseEvent) => ({ x: e.clientX, y: e.clientY });
 
 export function ThemeControls() {
   const [open, setOpen] = useState(false);
-  const theme = useSyncExternalStore(subscribe, readTheme, () => DEFAULT_THEME);
-  const mode = useSyncExternalStore(subscribe, readMode, () => DEFAULT_MODE);
+  const theme = useSetting("theme");
+  const mode = useSetting("mode");
   const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,18 +48,9 @@ export function ThemeControls() {
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", close); };
   }, [open]);
 
-  function applyMode(m: Mode) {
-    document.documentElement.setAttribute("data-mode", m);
-    save("gw-mode", m);
-  }
-  function applyTheme(t: ThemeId) {
-    document.documentElement.setAttribute("data-theme", t);
-    save("gw-theme", t);
-  }
-
   return (
     <div className="relative flex items-center gap-1" ref={panel}>
-      <button onClick={() => applyMode(mode === "dark" ? "light" : "dark")} aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+      <button onClick={(e) => setSetting("mode", mode === "dark" ? "light" : "dark", at(e))} aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
         className="grid h-9 w-9 place-items-center rounded-full text-fg-2 transition hover:bg-surface-2 hover:text-fg">
         <AnimatePresence mode="wait" initial={false}>
           <motion.svg key={mode} width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
@@ -66,23 +72,17 @@ export function ThemeControls() {
 
       <AnimatePresence>
         {open && (
-          <motion.div role="dialog" aria-label="Appearance"
+          <motion.div role="dialog" aria-label="Appearance" data-lenis-prevent
             initial={{ opacity: 0, y: -8, scale: 0.97, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -6, scale: 0.98, filter: "blur(4px)" }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-            className="panel absolute right-0 top-11 z-50 w-[300px] origin-top-right rounded-2xl p-3 shadow-2xl">
+            className="panel absolute right-0 top-11 z-50 max-h-[calc(100dvh-5rem)] w-[340px] origin-top-right overflow-y-auto rounded-2xl p-3 shadow-2xl">
             <p className="label px-1 text-fg-3">Mode</p>
-            <div className="relative mt-2 grid grid-cols-2 rounded-xl bg-surface-2 p-1">
-              {(["dark", "light"] as Mode[]).map((m) => (
-                <button key={m} onClick={() => applyMode(m)} className="relative z-10 rounded-lg py-1.5 text-sm capitalize">
-                  {mode === m && <motion.span layoutId="mode-pill" className="absolute inset-0 -z-10 rounded-lg bg-bg shadow" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
-                  {m}
-                </button>
-              ))}
-            </div>
+            <Segmented id="mode" value={mode} options={[["dark", "Dark"], ["light", "Light"]]} onPick={(v, e) => setSetting("mode", v, at(e))} />
+
             <p className="label mt-4 px-1 text-fg-3">Colour theme</p>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {THEMES.map((t) => (
-                <button key={t.id} onClick={() => applyTheme(t.id)} aria-pressed={theme === t.id}
+                <button key={t.id} onClick={(e) => setSetting("theme", t.id, at(e))} aria-pressed={theme === t.id}
                   className={`rounded-xl border p-2 text-left transition ${theme === t.id ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
                   <span className="flex h-6 overflow-hidden rounded-md">
                     {t.swatch.map((c) => <span key={c} className="flex-1" style={{ background: c }} />)}
@@ -92,9 +92,37 @@ export function ThemeControls() {
                 </button>
               ))}
             </div>
+
+            {(Object.keys(SETTINGS) as SettingKey[]).map((k) => <SettingRow key={k} k={k} />)}
+            <p className="mt-4 px-1 text-[11px] leading-snug text-fg-3">Trial settings while we pick the final look. Saved in this browser only.</p>
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function SettingRow({ k }: { k: SettingKey }) {
+  const value = useSetting(k);
+  return (
+    <>
+      <p className="label mt-4 px-1 text-fg-3">{SETTINGS[k].label}</p>
+      <Segmented id={k} value={value} options={SETTINGS[k].options} onPick={(v) => setSetting(k, v)} />
+    </>
+  );
+}
+
+function Segmented({ id, value, options, onPick }: {
+  id: string; value: string; options: readonly (readonly [string, string])[]; onPick: (v: string, e: React.MouseEvent) => void;
+}) {
+  return (
+    <div className={`relative mt-2 grid gap-1 rounded-xl bg-surface-2 p-1 ${options.length > 3 ? "grid-cols-3" : options.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
+      {options.map(([v, label]) => (
+        <button key={v} onClick={(e) => onPick(v, e)} aria-pressed={value === v} className="relative z-10 rounded-lg py-1.5 text-[13px]">
+          {value === v && <motion.span layoutId={`pill-${id}`} className="absolute inset-0 -z-10 rounded-lg bg-bg shadow" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
+          {label}
+        </button>
+      ))}
     </div>
   );
 }

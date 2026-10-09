@@ -95,6 +95,7 @@
   --color-alert: var(--alert);
   --font-sans: var(--font-instrument);
   --font-mono: var(--font-fragment);
+  --font-serif: var(--font-instrument-serif);
 }
 
 html {
@@ -116,22 +117,36 @@ body {
 ::selection { background: var(--accent); color: var(--accent-fg); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
-/* Linear-style display type: tight, heavy, softly graded */
-.display {
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 0.98;
-  background: linear-gradient(180deg, var(--fg) 30%, color-mix(in oklab, var(--fg) 62%, transparent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Headline colours per theme: not just black or white. */
+:root, [data-theme="lumora"][data-mode="dark"] { --display-fg: #f3efe0; --display-accent: #2fe0ea; }
+[data-theme="lumora"][data-mode="light"] { --display-fg: #031211; --display-accent: #00808a; }
+[data-theme="field"][data-mode="dark"] { --display-fg: #f0e3cb; --display-accent: #e0a65c; }
+[data-theme="field"][data-mode="light"] { --display-fg: #1e170d; --display-accent: #8f5a1f; }
+[data-theme="bloom"][data-mode="dark"] { --display-fg: #ffffff; --display-accent: #ff3b30; }
+[data-theme="bloom"][data-mode="light"] { --display-fg: #021881; --display-accent: #de1110; }
+[data-theme="mono"][data-mode="dark"] { --display-fg: #ece8d8; --display-accent: #ece8d8; }
+[data-theme="mono"][data-mode="light"] { --display-fg: #031211; --display-accent: #031211; }
+[data-theme="velora"][data-mode="dark"] { --display-fg: #ecebe4; --display-accent: #ff2d36; }
+[data-theme="velora"][data-mode="light"] { --display-fg: #181e4a; --display-accent: #c21319; }
+[data-theme="atlas"][data-mode="dark"] { --display-fg: #ebe6d2; --display-accent: #e0b872; }
+[data-theme="atlas"][data-mode="light"] { --display-fg: #0e1d61; --display-accent: #a3782f; }
+
+/* Display type: tight Linear-style sans; the accent word changes with the Headline setting */
+.display { font-weight: 600; letter-spacing: -0.045em; line-height: 0.98; color: var(--display-fg); }
+.display .accent-word { color: var(--display-accent); }
+html[data-headline="serif"] .display .accent-word {
+  font-family: var(--font-serif), Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; padding-right: 0.06em;
 }
-/* animated words get their own layer, so each carries the gradient itself */
-.display span {
-  background: inherit;
-  -webkit-background-clip: text;
-  background-clip: text;
+html[data-headline="gradient"] .display span:not(.accent-word),
+html[data-headline="gradient"] .display:not(:has(span)) {
+  background: linear-gradient(180deg, var(--display-fg) 30%, color-mix(in oklab, var(--display-fg) 58%, transparent));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
+html[data-headline="tinted"] .display, html[data-headline="tinted"] .display span {
+  background: linear-gradient(100deg, var(--display-fg) 15%, var(--display-accent) 85%);
+  background-attachment: fixed; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
 .label {
   font-family: var(--font-fragment), ui-monospace, monospace;
   font-size: 0.7rem;
@@ -198,12 +213,50 @@ html[data-mode="dark"] .maplibregl-ctrl-icon { filter: invert(1); }
 .marquee { animation: marquee 70s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
 
-/* Route transitions (React <ViewTransition>): blur-fade with a slight lift */
-::view-transition-old(.page) { animation: 160ms ease-out both vt-out; }
-::view-transition-new(.page) { animation: 360ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both vt-in; }
+/* Route transitions (React <ViewTransition default="page">), style picked in settings */
+::view-transition-old(.page) { animation: 160ms ease-out both vt-blur-out; }
+::view-transition-new(.page) { animation: 380ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both vt-blur-in; }
+html[data-transition="slide"]::view-transition-old(.page) { animation: 260ms cubic-bezier(0.4, 0, 1, 1) both vt-slide-out; }
+html[data-transition="slide"]::view-transition-new(.page) { animation: 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both vt-slide-in; }
+html[data-transition="wipe"]::view-transition-old(.page) { animation: 600ms ease both vt-dim; }
+html[data-transition="wipe"]::view-transition-new(.page) { animation: 650ms cubic-bezier(0.7, 0, 0.2, 1) both vt-wipe; }
+html[data-transition="circle"]::view-transition-old(.page) { animation: 650ms ease both vt-dim; }
+html[data-transition="circle"]::view-transition-new(.page) { animation: 700ms cubic-bezier(0.6, 0, 0.2, 1) both vt-circle; }
+html[data-transition="zoom"]::view-transition-old(.page) { animation: 240ms ease-in both vt-zoom-out; }
+html[data-transition="zoom"]::view-transition-new(.page) { animation: 460ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms both vt-zoom-in; }
+html[data-transition="none"]::view-transition-old(.page), html[data-transition="none"]::view-transition-new(.page) { animation: none; }
 ::view-transition-group(.morph) { animation-duration: 450ms; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
-@keyframes vt-out { to { opacity: 0; filter: blur(6px); transform: translateY(-6px); } }
-@keyframes vt-in { from { opacity: 0; filter: blur(8px); transform: translateY(10px); } }
+@keyframes vt-blur-out { to { opacity: 0; filter: blur(6px); transform: translateY(-6px); } }
+@keyframes vt-blur-in { from { opacity: 0; filter: blur(8px); transform: translateY(10px); } }
+@keyframes vt-slide-out { to { opacity: 0; transform: translateX(-6%); } }
+@keyframes vt-slide-in { from { opacity: 0; transform: translateX(8%); } }
+@keyframes vt-dim { to { opacity: 0.35; transform: scale(0.98); } }
+@keyframes vt-wipe { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes vt-circle { from { clip-path: circle(0% at 50% 35%); } to { clip-path: circle(140% at 50% 35%); } }
+@keyframes vt-zoom-out { to { opacity: 0; transform: scale(0.94); filter: blur(4px); } }
+@keyframes vt-zoom-in { from { opacity: 0; transform: scale(1.06); filter: blur(6px); } }
+
+/* Theme and mode changes ripple out from the control that was pressed */
+html.theme-vt::view-transition-old(root) { animation: none; }
+html.theme-vt::view-transition-new(root) { animation: 750ms cubic-bezier(0.6, 0, 0.2, 1) both theme-ripple; }
+@keyframes theme-ripple {
+  from { clip-path: circle(0px at var(--vt-x, 90%) var(--vt-y, 0px)); }
+  to { clip-path: circle(150vmax at var(--vt-x, 90%) var(--vt-y, 0px)); }
+}
+
+/* Backdrop art */
+.art-in { animation: art-in 1.2s ease both; }
+@keyframes art-in { from { opacity: 0; } }
+.etch path, path.etch { stroke-dasharray: 1; stroke-dashoffset: 1; animation: etch 2.8s cubic-bezier(0.6, 0, 0.3, 1) var(--d, 0s) forwards; }
+@keyframes etch { to { stroke-dashoffset: 0; } }
+.art-drift { animation: drift 48s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes drift { to { transform: translate(-2.5%, -1.5%) scale(1.06); } }
+.art-blip { transform-box: fill-box; transform-origin: center; animation: blip 2.4s ease-in-out 3s infinite; }
+@keyframes blip { 50% { transform: scale(1.6); opacity: 0.6; } }
+.art-spin { animation: spin 90s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.art-scan { animation: scan 9s linear infinite; }
+@keyframes scan { from { transform: translateX(-10px); } to { transform: translateX(1610px); } }
 
 @keyframes shimmer { to { background-position: -200% 0; } }
 .skeleton {
@@ -212,6 +265,7 @@ html[data-mode="dark"] .maplibregl-ctrl-icon { filter: invert(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .etch path, path.etch { stroke-dashoffset: 0; }
   *, ::before, ::after, ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
     animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;
   }
