@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
+import { CLUSTERS_TAG } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
 import { dbError, err, guardWrite, reporterHash, rpcToken } from "@/lib/api";
 
@@ -6,7 +8,7 @@ const Report = z.object({
   kind: z.enum(["pothole", "waterlogging", "worksite"]),
   lat: z.number().min(6).max(37.5),
   lng: z.number().min(68).max(97.5),
-  // pothole: small/medium/large · waterlogging: ankle/knee/waist · worksite: minor/lane blocked/road blocked
+  // pothole: small/medium/large; waterlogging: ankle/knee/waist; worksite: footpath/lane/road blocked
   severity: z.number().int().min(1).max(3),
   note: z.string().trim().max(500).optional(),
   department: z.string().trim().max(120).optional(),
@@ -36,5 +38,6 @@ export async function POST(req: Request) {
     p_reporter_hash: reporterHash(req),
   });
   if (error) return dbError(error);
+  revalidateTag(CLUSTERS_TAG, { expire: 0 }); // reporter must see their pin immediately
   return Response.json(data, { status: 201 });
 }

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
+import { CLUSTERS_TAG } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
 import { dbError, err, guardWrite, reporterHash, rpcToken } from "@/lib/api";
 
@@ -20,5 +22,6 @@ export async function POST(req: Request, ctx: RouteContext<"/api/clusters/[id]/c
     p_reporter_hash: reporterHash(req),
   });
   if (error) return dbError(error);
+  revalidateTag(CLUSTERS_TAG, { expire: 0 });
   return Response.json(data);
 }

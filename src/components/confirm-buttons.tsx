@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 
 type Counts = { fixed: number; still_there: number };
+
+function Count({ n }: { n: number }) {
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span key={n} initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} className="inline-block tabular-nums">{n}</motion.span>
+    </AnimatePresence>
+  );
+}
 
 export function ConfirmButtons({ id, initial, status }: { id: string; initial: Counts; status: "open" | "resolved" }) {
   const router = useRouter();
@@ -27,16 +36,18 @@ export function ConfirmButtons({ id, initial, status }: { id: string; initial: C
   }
 
   return (
-    <div className="mt-4">
+    <div className="mt-5">
       <div className="grid grid-cols-2 gap-2">
-        <button disabled={busy} onClick={() => vote("fixed")} className="rounded-full border-2 border-resolved py-2 font-medium text-resolved hover:bg-resolved hover:text-paper disabled:opacity-50">
-          Fixed · {counts.fixed}
-        </button>
-        <button disabled={busy} onClick={() => vote("still_there")} className="rounded-full border-2 border-ink py-2 font-medium hover:bg-ink hover:text-paper disabled:opacity-50">
-          Still there · {counts.still_there}
-        </button>
+        <motion.button whileTap={{ scale: 0.96 }} disabled={busy} onClick={() => vote("fixed")}
+          className="flex items-center justify-center gap-2 rounded-xl border border-ok/60 bg-ok/10 py-2.5 font-medium text-ok transition hover:bg-ok hover:text-bg disabled:opacity-50">
+          Fixed <Count n={counts.fixed} />
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.96 }} disabled={busy} onClick={() => vote("still_there")}
+          className="flex items-center justify-center gap-2 rounded-xl border border-line py-2.5 font-medium transition hover:bg-fg hover:text-bg disabled:opacity-50">
+          Still there <Count n={counts.still_there} />
+        </motion.button>
       </div>
-      <p className="kicker mt-3 text-ink-3" role="status">{state === "resolved" ? "Status: confirmed fixed" : "Status: open"}</p>
+      <p className="mt-3 text-sm text-fg-3" role="status">{state === "resolved" ? "Status: confirmed fixed" : "Status: open"}</p>
       {error && <p className="mt-2 text-sm text-alert" role="alert">{error}</p>}
     </div>
   );

@@ -1,149 +1,218 @@
 @import "tailwindcss";
 
-/* Civic ledger: newsprint paper, ink, and three municipal signal colours. */
-:root {
-  --paper: #f1ebdf;
-  --paper-2: #e8e0cf;
-  --paper-3: #ddd3be;
-  --ink: #18160f;
-  --ink-2: #4b463b;
-  --ink-3: #7a7365;
-  --rule: rgb(24 22 15 / 0.16);
-  --pothole: #cf4f16;      /* burnt saffron */
-  --water: #0f6b78;        /* monsoon teal */
-  --works: #e2ac1c;        /* barricade yellow */
-  --resolved: #557a45;
-  --alert: #b0261c;
-  --shadow: 0 1px 0 rgb(24 22 15 / 0.08), 0 12px 32px -18px rgb(24 22 15 / 0.35);
+/*
+  Themes: <html data-theme="lumora|field|bloom|mono|velora|atlas" data-mode="dark|light">
+  Every palette defines the same tokens; components only use the tokens.
+*/
+:root,
+[data-theme="lumora"][data-mode="dark"] {
+  --bg: #031211; --surface: #08191a; --surface-2: #0f2423; --line: rgb(232 228 211 / 0.11);
+  --fg: #e8e4d3; --fg-2: #b4b1a3; --fg-3: #7b7a71;
+  --accent: #00aebb; --accent-fg: #031211; --glow: rgb(0 174 187 / 0.22);
+  --pothole: #f08a4b; --water: #00aebb; --works: #e9c24a; --ok: #7bc48b; --alert: #ff6b5e;
 }
-
-/* Backup theme (dark editorial), switched with <html data-theme="dark">. */
-:root[data-theme="dark"] {
-  --paper: #13120e;
-  --paper-2: #1c1a15;
-  --paper-3: #26231c;
-  --ink: #efe7d6;
-  --ink-2: #c3baa6;
-  --ink-3: #8d8574;
-  --rule: rgb(239 231 214 / 0.14);
-  --pothole: #f0743a;
-  --water: #3fb0bd;
-  --works: #f2c240;
-  --resolved: #86b071;
-  --alert: #ef5b4f;
-  --shadow: 0 1px 0 rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.8);
+[data-theme="lumora"][data-mode="light"] {
+  --bg: #e8e4d3; --surface: #f1eee3; --surface-2: #dcd7c3; --line: rgb(3 18 17 / 0.13);
+  --fg: #031211; --fg-2: #34413f; --fg-3: #67716e;
+  --accent: #008a95; --accent-fg: #f1eee3; --glow: rgb(0 138 149 / 0.18);
+  --pothole: #c3511c; --water: #008a95; --works: #b58709; --ok: #3f7d4c; --alert: #b3261e;
+}
+[data-theme="field"][data-mode="dark"] {
+  --bg: #090907; --surface: #12110d; --surface-2: #1b1914; --line: rgb(237 229 214 / 0.1);
+  --fg: #ede5d6; --fg-2: #bfb4a0; --fg-3: #847a69;
+  --accent: #b89d73; --accent-fg: #090907; --glow: rgb(184 157 115 / 0.2);
+  --pothole: #d9733a; --water: #73a7ab; --works: #dbb55a; --ok: #8cb27a; --alert: #ef6a55;
+}
+[data-theme="field"][data-mode="light"] {
+  --bg: #efe8da; --surface: #f6f1e7; --surface-2: #e2d8c5; --line: rgb(9 9 7 / 0.13);
+  --fg: #090907; --fg-2: #4a4032; --fg-3: #7d7260;
+  --accent: #6c5636; --accent-fg: #f6f1e7; --glow: rgb(108 86 54 / 0.16);
+  --pothole: #b5532a; --water: #3d777d; --works: #a07a26; --ok: #52753f; --alert: #a8321f;
+}
+[data-theme="bloom"][data-mode="dark"] {
+  --bg: #020a33; --surface: #051247; --surface-2: #0b1c5e; --line: rgb(238 241 251 / 0.12);
+  --fg: #eef1fb; --fg-2: #b8c1e6; --fg-3: #7e8abd;
+  --accent: #ff2b2a; --accent-fg: #ffffff; --glow: rgb(37 93 206 / 0.35);
+  --pothole: #ff4d3d; --water: #5b8cff; --works: #f2c230; --ok: #61d29a; --alert: #ff4d3d;
+}
+[data-theme="bloom"][data-mode="light"] {
+  --bg: #f2f4fc; --surface: #ffffff; --surface-2: #e2e7f7; --line: rgb(2 24 129 / 0.12);
+  --fg: #021881; --fg-2: #2d3e8f; --fg-3: #6b78b0;
+  --accent: #de1110; --accent-fg: #ffffff; --glow: rgb(37 93 206 / 0.16);
+  --pothole: #de1110; --water: #255dce; --works: #c49305; --ok: #1f8a57; --alert: #de1110;
+}
+[data-theme="mono"][data-mode="dark"] {
+  --bg: #031211; --surface: #0a1918; --surface-2: #122221; --line: rgb(232 228 211 / 0.1);
+  --fg: #e8e4d3; --fg-2: #aeab9d; --fg-3: #75736a;
+  --accent: #e8e4d3; --accent-fg: #031211; --glow: rgb(232 228 211 / 0.1);
+  --pothole: #dc8d62; --water: #82b6b6; --works: #d9c27a; --ok: #9cc29a; --alert: #e6826f;
+}
+[data-theme="mono"][data-mode="light"] {
+  --bg: #e8e4d3; --surface: #f2efe4; --surface-2: #d9d4c0; --line: rgb(3 18 17 / 0.13);
+  --fg: #031211; --fg-2: #3a4442; --fg-3: #6e7471;
+  --accent: #031211; --accent-fg: #e8e4d3; --glow: rgb(3 18 17 / 0.08);
+  --pothole: #a8532b; --water: #2f6d6d; --works: #8f7419; --ok: #4b7046; --alert: #9e3322;
+}
+[data-theme="velora"][data-mode="dark"] {
+  --bg: #0d1130; --surface: #141940; --surface-2: #1d234f; --line: rgb(236 235 228 / 0.11);
+  --fg: #ecebe4; --fg-2: #afaea2; --fg-3: #7a7a88;
+  --accent: #d0161d; --accent-fg: #ffffff; --glow: rgb(208 22 29 / 0.22);
+  --pothole: #ee5055; --water: #739fd9; --works: #e0b84c; --ok: #79c08d; --alert: #ee5055;
+}
+[data-theme="velora"][data-mode="light"] {
+  --bg: #ecebe6; --surface: #f6f5f1; --surface-2: #dcdbd2; --line: rgb(24 30 74 / 0.13);
+  --fg: #181e4a; --fg-2: #44497a; --fg-3: #7d7f94;
+  --accent: #c21319; --accent-fg: #ffffff; --glow: rgb(194 19 25 / 0.12);
+  --pothole: #c21319; --water: #2e5aa8; --works: #a8820f; --ok: #367a4c; --alert: #c21319;
+}
+[data-theme="atlas"][data-mode="dark"] {
+  --bg: #070e33; --surface: #0d1645; --surface-2: #142056; --line: rgb(235 230 210 / 0.12);
+  --fg: #ebe6d2; --fg-2: #c2bba3; --fg-3: #8a8670;
+  --accent: #c9a56b; --accent-fg: #070e33; --glow: rgb(201 165 107 / 0.2);
+  --pothole: #e07a45; --water: #6f9be0; --works: #d8b575; --ok: #86c28f; --alert: #f06e5c;
+}
+[data-theme="atlas"][data-mode="light"] {
+  --bg: #ebe6d2; --surface: #f4f0e2; --surface-2: #ddd6bd; --line: rgb(14 29 97 / 0.13);
+  --fg: #0e1d61; --fg-2: #36438a; --fg-3: #6e76a5;
+  --accent: #0e1d61; --accent-fg: #f4f0e2; --glow: rgb(184 148 90 / 0.22);
+  --pothole: #b8572a; --water: #2b5da8; --works: #a8823f; --ok: #3e7a4a; --alert: #a8321f;
 }
 
 @theme inline {
-  --color-paper: var(--paper);
-  --color-paper-2: var(--paper-2);
-  --color-paper-3: var(--paper-3);
-  --color-ink: var(--ink);
-  --color-ink-2: var(--ink-2);
-  --color-ink-3: var(--ink-3);
-  --color-rule: var(--rule);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
   --color-pothole: var(--pothole);
   --color-water: var(--water);
   --color-works: var(--works);
-  --color-resolved: var(--resolved);
+  --color-ok: var(--ok);
   --color-alert: var(--alert);
-  --font-display: var(--font-gloock);
-  --font-sans: var(--font-atkinson);
-  --font-mono: var(--font-martian);
+  --font-sans: var(--font-instrument);
+  --font-mono: var(--font-fragment);
 }
 
 html {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--fg);
+  color-scheme: dark;
 }
-
+html[data-mode="light"] {
+  color-scheme: light;
+}
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-atkinson), system-ui, sans-serif;
-  /* faint paper grain */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-instrument), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  transition: background-color 400ms ease, color 400ms ease;
 }
 
-::selection {
-  background: var(--works);
-  color: #18160f;
-}
+::selection { background: var(--accent); color: var(--accent-fg); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+/* Linear-style display type: tight, heavy, softly graded */
+.display {
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  background: linear-gradient(180deg, var(--fg) 30%, color-mix(in oklab, var(--fg) 62%, transparent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
-
-.kicker {
-  font-family: var(--font-martian), ui-monospace, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
+/* animated words get their own layer, so each carries the gradient itself */
+.display span {
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.label {
+  font-family: var(--font-fragment), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.panel {
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+.hairline-grid {
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 75%);
+}
+.stripes { background: repeating-linear-gradient(-45deg, var(--works) 0 8px, var(--bg) 8px 16px); }
 
-/* Barricade stripe used for work sites and coordination flags */
-.stripes {
-  background: repeating-linear-gradient(-45deg, var(--works) 0 10px, #18160f 10px 20px);
+/* Border beam: a light that travels around a card's edge (after Magic UI) */
+.beam { position: relative; isolation: isolate; }
+.beam::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
+  background: conic-gradient(from var(--beam-angle), transparent 70%, var(--accent) 85%, transparent 95%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: beam 6s linear infinite;
 }
+@property --beam-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes beam { to { --beam-angle: 360deg; } }
 
-/* Map pins */
-.pin {
-  border-radius: 9999px;
-  border: 2px solid var(--paper);
-  box-shadow: 0 0 0 1px rgb(24 22 15 / 0.35), 0 4px 10px -2px rgb(24 22 15 / 0.45);
-  cursor: pointer;
-  transition: transform 160ms ease;
+/* Map markers: the root element is positioned by MapLibre, never by us */
+.gw-marker { cursor: pointer; }
+.gw-pin {
+  position: relative; display: grid; place-items: center; border-radius: 10px;
+  color: #fff; box-shadow: 0 0 0 1.5px var(--bg), 0 6px 16px -4px rgb(0 0 0 / 0.55);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 220ms;
 }
-.pin:hover,
-.pin[data-active="true"] {
-  transform: scale(1.25);
+.gw-pin[data-kind="worksite"] { color: #18160f; border-radius: 6px; }
+.gw-marker:hover .gw-pin, .gw-pin[data-active="true"] { transform: scale(1.18) translateY(-2px); }
+.gw-pin[data-status="resolved"] { opacity: 0.45; filter: grayscale(0.6); }
+.gw-count {
+  position: absolute; top: -7px; right: -8px; min-width: 18px; height: 18px; padding: 0 4px;
+  border-radius: 9px; background: var(--fg); color: var(--bg);
+  font: 600 10px/18px var(--font-fragment), monospace; text-align: center;
 }
-.pin[data-kind="worksite"] {
-  border-radius: 3px;
+.gw-pulse::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 13px; border: 2px solid currentColor;
+  color: inherit; opacity: 0; animation: gw-pulse 2.2s ease-out infinite;
 }
-.pin[data-status="resolved"] {
-  opacity: 0.55;
-}
-.pin-pulse::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border-radius: inherit;
-  border: 2px solid currentColor;
-  animation: pulse 1.8s ease-out infinite;
-}
-@keyframes pulse {
-  from { transform: scale(0.7); opacity: 0.9; }
-  to { transform: scale(1.6); opacity: 0; }
-}
+.gw-pin[data-kind="pothole"].gw-pulse::after { border-color: var(--pothole); }
+.gw-pin[data-kind="waterlogging"].gw-pulse::after { border-color: var(--water); }
+@keyframes gw-pulse { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
 
-/* Paper-toned basemap */
-.maplibregl-canvas {
-  filter: sepia(0.28) saturate(0.85) contrast(0.96);
-}
-:root[data-theme="dark"] .maplibregl-canvas {
-  filter: invert(0.92) hue-rotate(180deg) sepia(0.2) saturate(0.6);
-}
+html[data-mode="light"] .maplibregl-canvas { filter: saturate(0.55) sepia(0.12); }
+html[data-mode="dark"] .maplibregl-canvas { filter: saturate(0.8) brightness(0.92); }
+.maplibregl-ctrl-group { background: var(--surface) !important; border: 1px solid var(--line); box-shadow: none !important; }
+.maplibregl-ctrl-group button + button { border-top-color: var(--line) !important; }
+html[data-mode="dark"] .maplibregl-ctrl-icon { filter: invert(1); }
+.maplibregl-ctrl-attrib { background: color-mix(in oklab, var(--surface) 80%, transparent) !important; color: var(--fg-3); }
+.maplibregl-ctrl-attrib a { color: var(--fg-2) !important; }
 
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
-}
-.rise {
-  animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { animation: marquee 70s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
 
-@keyframes marquee {
-  to { transform: translateX(-50%); }
-}
-.marquee {
-  animation: marquee 60s linear infinite;
-}
-.marquee:hover {
-  animation-play-state: paused;
+/* Route transitions (React <ViewTransition>): blur-fade with a slight lift */
+::view-transition-old(.page) { animation: 160ms ease-out both vt-out; }
+::view-transition-new(.page) { animation: 360ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both vt-in; }
+::view-transition-group(.morph) { animation-duration: 450ms; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes vt-out { to { opacity: 0; filter: blur(6px); transform: translateY(-6px); } }
+@keyframes vt-in { from { opacity: 0; filter: blur(8px); transform: translateY(10px); } }
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 10px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rise, .marquee, .pin-pulse::after { animation: none; }
+  *, ::before, ::after, ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;
+  }
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { KINDS, type Kind } from "@/lib/issues";
+import { KindBadge } from "@/components/kind-icon";
 
 export type Submitted = { cluster_id: string; joined_existing: boolean; report_count: number; reporter_count: number };
 
@@ -11,6 +13,8 @@ type Props = {
   onCancel: () => void;
   onSubmitted: (r: Submitted) => void;
 };
+
+const EASE = [0.2, 0.8, 0.2, 1] as const;
 
 // Shrink on the device first: phone photos are often 4-8 MB and the API accepts up to 4 MB.
 async function downscale(file: File): Promise<Blob> {
@@ -23,6 +27,8 @@ async function downscale(file: File): Promise<Blob> {
   return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("encode failed"))), "image/jpeg", 0.85));
 }
 
+const field = "mt-1.5 w-full rounded-xl border border-line bg-surface-2/70 px-3 py-2.5 text-sm outline-none transition focus:border-accent";
+
 export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
   const [kind, setKind] = useState<Kind>("pothole");
   const [severity, setSeverity] = useState(2);
@@ -30,6 +36,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
   const [department, setDepartment] = useState("");
   const [promisedEnd, setPromisedEnd] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +47,20 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (p) => { setLocating(false); setError(null); onPoint({ lat: p.coords.latitude, lng: p.coords.longitude }); },
-      () => { setLocating(false); setError("Couldn't get your location. Tap the map to place the pin instead."); },
+      () => { setLocating(false); setError("Couldn't get your location. Search for the place or tap the map instead."); },
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   }
 
+  function choosePhoto(f: File | null) {
+    setPhoto(f);
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!point) return setError("Place the pin first: use your location or tap the map.");
+    if (!point) return setError("Place the pin first: use your location, search, or tap the map.");
     setBusy(true);
     setError(null);
     try {
@@ -81,101 +94,133 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
     }
   }
 
-  const panel = "rise absolute inset-x-3 bottom-3 z-20 max-h-[calc(100%-1.5rem)] overflow-y-auto rounded-2xl border border-rule bg-paper p-5 shadow-[var(--shadow)] sm:left-4 sm:right-auto sm:top-4 sm:bottom-auto sm:w-[380px]";
-
-  if (done) {
-    return (
-      <div className={panel} role="status">
-        <p className="kicker text-ink-3">{done.joined_existing ? "Merged with an existing issue" : "New issue logged"}</p>
-        <p className="mt-2 font-display text-3xl leading-tight">
-          {done.joined_existing ? `You're reporter #${done.reporter_count}.` : "You're the first to report this."}
-        </p>
-        <p className="mt-2 text-sm text-ink-2">
-          {done.joined_existing
-            ? `Your report joined ${done.report_count - 1} earlier report${done.report_count === 2 ? "" : "s"} at this spot, so its priority just went up.`
-            : "When neighbours report the same spot, it will rise up the list."}
-        </p>
-        <button onClick={() => onSubmitted(done)} className="mt-4 w-full rounded-full bg-ink py-2.5 font-medium text-paper">See it on the map</button>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={submit} className={panel} data-lenis-prevent>
-      <div className="flex items-center justify-between">
-        <p className="kicker text-ink-3">New report</p>
-        <button type="button" onClick={onCancel} className="kicker text-ink-3 hover:text-ink">Cancel ✕</button>
-      </div>
+    <motion.div data-lenis-prevent
+      initial={{ opacity: 0, x: -24, filter: "blur(8px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} exit={{ opacity: 0, x: -20, filter: "blur(6px)" }}
+      transition={{ duration: 0.4, ease: EASE }}
+      className="panel absolute inset-x-3 bottom-3 z-40 !bg-surface max-h-[70%] overflow-y-auto rounded-2xl p-5 shadow-2xl sm:bottom-3 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
+      <AnimatePresence mode="wait">
+        {done ? (
+          <motion.div key="done" role="status" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35, ease: EASE }}>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 380, damping: 18, delay: 0.1 }}
+              className="grid h-12 w-12 place-items-center rounded-2xl bg-ok text-bg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5 9-10" /></svg>
+            </motion.div>
+            <p className="label mt-5 text-fg-3">{done.joined_existing ? "Merged with an existing issue" : "New issue logged"}</p>
+            <p className="mt-2 text-3xl font-semibold leading-tight tracking-[-0.04em]">
+              {done.joined_existing ? `You're reporter number ${done.reporter_count}.` : "You're the first to report this."}
+            </p>
+            <p className="mt-2 text-sm text-fg-2">
+              {done.joined_existing
+                ? `Your report joined ${done.report_count - 1} earlier ${done.report_count === 2 ? "report" : "reports"} at this spot, so its priority just went up.`
+                : "When neighbours report the same spot, it will rise up the list."}
+            </p>
+            <button onClick={() => onSubmitted(done)} className="mt-6 w-full rounded-xl bg-fg py-3 font-medium text-bg transition hover:opacity-85">See it on the map</button>
+          </motion.div>
+        ) : (
+          <motion.form key="form" onSubmit={submit} exit={{ opacity: 0, scale: 0.98 }}>
+            <div className="flex items-center justify-between">
+              <p className="label text-fg-3">New report</p>
+              <button type="button" onClick={onCancel} className="label text-fg-3 transition hover:text-fg">Cancel</button>
+            </div>
 
-      <fieldset className="mt-3">
-        <legend className="font-display text-2xl">What did you see?</legend>
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {(Object.keys(KINDS) as Kind[]).map((k) => (
-            <label key={k} className={`cursor-pointer rounded-xl border-2 p-2.5 text-center text-sm transition ${kind === k ? "border-ink bg-paper-2" : "border-rule hover:border-ink-3"}`}>
-              <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
-              <span className={`mx-auto mb-1.5 block h-3.5 w-3.5 ${k === "worksite" ? "rounded-[3px]" : "rounded-full"}`} style={{ background: KINDS[k].color }} />
-              {KINDS[k].label}
+            <fieldset className="mt-3">
+              <legend className="text-2xl font-semibold tracking-[-0.04em]">What did you see?</legend>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {(Object.keys(KINDS) as Kind[]).map((k) => (
+                  <label key={k} className={`relative cursor-pointer rounded-xl border p-3 text-center text-sm transition ${kind === k ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
+                    <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
+                    <span className="mx-auto mb-2 block w-fit"><KindBadge kind={k} size={34} /></span>
+                    {KINDS[k].label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset className="mt-5">
+              <legend className="label text-fg-2">Where</legend>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button type="button" onClick={locate} disabled={locating}
+                  className="flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm transition hover:border-fg-3 disabled:opacity-50">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3.5" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+                  {locating ? "Locating" : "Use my location"}
+                </button>
+                <span className="text-xs text-fg-3">or search above, or tap the map</span>
+              </div>
+              <AnimatePresence>
+                {point && (
+                  <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="label mt-2 text-accent">
+                    Pinned at {point.lat.toFixed(5)}, {point.lng.toFixed(5)}. Drag to adjust.
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </fieldset>
+
+            <fieldset className="mt-5">
+              <legend className="label text-fg-2">How bad</legend>
+              <div className="relative mt-2 grid grid-cols-3 gap-1 rounded-xl bg-surface-2 p-1">
+                {KINDS[kind].severity.map((label, i) => (
+                  <label key={label} className={`relative z-10 cursor-pointer rounded-lg px-2 py-2 text-center text-[13px] transition ${severity === i + 1 ? "text-bg" : "text-fg-2"}`}>
+                    <input type="radio" name="severity" checked={severity === i + 1} onChange={() => setSeverity(i + 1)} className="sr-only" />
+                    {severity === i + 1 && <motion.span layoutId="sev-pill" className="absolute inset-0 -z-10 rounded-lg bg-fg" transition={{ type: "spring", stiffness: 480, damping: 36 }} />}
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <AnimatePresence>
+              {kind === "worksite" && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                  <label className="mt-5 block text-sm">
+                    <span className="label text-fg-2">Agency on the signboard</span>
+                    <input value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={120} placeholder="For example, Chennai Metrowater" className={field} />
+                  </label>
+                  <label className="mt-3 block text-sm">
+                    <span className="label text-fg-2">Promised completion date</span>
+                    <input type="date" value={promisedEnd} onChange={(e) => setPromisedEnd(e.target.value)} className={field} />
+                  </label>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="mt-5">
+              <span className="label text-fg-2">Photo, optional</span>
+              <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-line p-3 transition hover:border-fg-3">
+                {preview
+                  // eslint-disable-next-line @next/next/no-img-element -- local object URL preview
+                  ? <img src={preview} alt="Selected photo" className="h-14 w-14 rounded-lg object-cover" />
+                  : <span className="grid h-14 w-14 place-items-center rounded-lg bg-surface-2 text-fg-3">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>
+                    </span>}
+                <span className="text-sm">
+                  <span className="font-medium">{photo ? "Change photo" : "Add a photo"}</span>
+                  <span className="block text-xs text-fg-3">Location data is stripped before storage.</span>
+                </span>
+                <input type="file" accept="image/*" capture="environment" onChange={(e) => choosePhoto(e.target.files?.[0] ?? null)} className="sr-only" />
+              </label>
+            </div>
+
+            <label className="mt-5 block text-sm">
+              <span className="label text-fg-2">Note, optional</span>
+              <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={2} placeholder="Landmark, lane, how long it has been there" className={`${field} resize-none`} />
             </label>
-          ))}
-        </div>
-      </fieldset>
 
-      <fieldset className="mt-4">
-        <legend className="kicker text-ink-2">Where</legend>
-        <div className="mt-1.5 flex items-center gap-2">
-          <button type="button" onClick={locate} disabled={locating} className="rounded-full border border-ink px-3.5 py-1.5 text-sm hover:bg-paper-2 disabled:opacity-50">
-            {locating ? "Locating…" : "Use my location"}
-          </button>
-          <span className="text-xs text-ink-3">or tap the map, then drag the pin</span>
-        </div>
-        {point && <p className="kicker mt-2 text-ink-2">Pinned · {point.lat.toFixed(5)}, {point.lng.toFixed(5)}</p>}
-      </fieldset>
+            <AnimatePresence>
+              {error && (
+                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4 rounded-xl bg-alert/12 px-3 py-2.5 text-sm text-alert" role="alert">
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
 
-      <fieldset className="mt-4">
-        <legend className="kicker text-ink-2">How bad</legend>
-        <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-          {KINDS[kind].severity.map((label, i) => (
-            <label key={label} className={`cursor-pointer rounded-lg border px-2 py-1.5 text-center text-sm ${severity === i + 1 ? "border-ink bg-ink text-paper" : "border-rule hover:border-ink-3"}`}>
-              <input type="radio" name="severity" checked={severity === i + 1} onChange={() => setSeverity(i + 1)} className="sr-only" />
-              {label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      {kind === "worksite" && (
-        <div className="mt-4 grid gap-2">
-          <label className="text-sm">
-            <span className="kicker text-ink-2">Agency on the signboard</span>
-            <input value={department} onChange={(e) => setDepartment(e.target.value)} maxLength={120} placeholder="e.g. Chennai Metrowater"
-              className="mt-1 w-full rounded-lg border border-rule bg-paper-2 px-3 py-2 outline-none focus:border-ink" />
-          </label>
-          <label className="text-sm">
-            <span className="kicker text-ink-2">Promised completion date</span>
-            <input type="date" value={promisedEnd} onChange={(e) => setPromisedEnd(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-rule bg-paper-2 px-3 py-2 outline-none focus:border-ink" />
-          </label>
-        </div>
-      )}
-
-      <label className="mt-4 block text-sm">
-        <span className="kicker text-ink-2">Photo (optional)</span>
-        <input type="file" accept="image/*" capture="environment" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-          className="mt-1 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-paper-3 file:px-3 file:py-1.5 file:text-ink" />
-        <span className="mt-1 block text-xs text-ink-3">Location data is stripped from photos before they are stored.</span>
-      </label>
-
-      <label className="mt-4 block text-sm">
-        <span className="kicker text-ink-2">Note (optional)</span>
-        <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={2} placeholder="Landmark, lane, how long it's been there"
-          className="mt-1 w-full resize-none rounded-lg border border-rule bg-paper-2 px-3 py-2 outline-none focus:border-ink" />
-      </label>
-
-      {error && <p className="mt-3 rounded-lg bg-alert/10 px-3 py-2 text-sm text-alert" role="alert">{error}</p>}
-
-      <button disabled={busy} className="mt-4 w-full rounded-full bg-ink py-2.5 font-medium text-paper hover:opacity-90 disabled:opacity-50">
-        {busy ? "Submitting…" : "Submit report"}
-      </button>
-    </form>
+            <button disabled={busy} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-fg py-3 font-medium text-bg transition hover:opacity-85 disabled:opacity-50">
+              {busy && <span className="h-4 w-4 animate-spin rounded-full border-2 border-bg border-t-transparent" />}
+              {busy ? "Submitting" : "Submit report"}
+            </button>
+          </motion.form>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
