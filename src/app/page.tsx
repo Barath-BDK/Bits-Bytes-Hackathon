@@ -5,6 +5,8 @@ import { KINDS, photoSrc, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { BlurFade, NumberTicker } from "@/components/motion-bits";
 import { Hero } from "@/components/hero";
+import { Sheet } from "@/components/sheet";
+import { DropPin, FixedStamp, MergeBeams, PriorityLedger } from "@/components/vignettes";
 import { HeroBackdrop } from "@/components/backdrops/hero-backdrop";
 
 const Arrow = () => (
@@ -33,8 +35,8 @@ export default async function Home() {
       {/* Product card */}
       <section className="relative">
         <BlurFade delay={0.7} y={30} className="relative mx-auto max-w-5xl px-4 pb-24 pt-16 sm:px-6">
-          <div className="beam rounded-3xl">
-            <div className="grid overflow-hidden rounded-3xl border border-line bg-surface md:grid-cols-[1.4fr_1fr]">
+          <div className="sheet">
+            <div className="grid overflow-hidden md:grid-cols-[1.4fr_1fr]">
               <div className="border-b border-line md:border-b-0 md:border-r">
                 <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
                   <span className="label text-fg-3">Top of the queue today</span>
@@ -82,39 +84,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Bento */}
+      {/* How it works: four drawing sheets */}
       <section className="mx-auto max-w-6xl px-4 py-28 sm:px-6">
         <BlurFade inView>
           <p className="label text-accent">How a report becomes a priority</p>
-          <h2 className="display mt-4 max-w-3xl text-[clamp(2rem,4.5vw,3.5rem)]">One spot, one record, one queue.</h2>
+          <h2 className="display mt-4 max-w-3xl text-[clamp(2rem,4.5vw,3.5rem)]">One spot, one record, one <span className="accent-word">queue.</span></h2>
         </BlurFade>
-        <div className="mt-12 grid gap-4 md:grid-cols-6">
-          <BlurFade inView delay={0.05} className="md:col-span-3">
-            <Card title="Report in ten seconds" body="Pick a type, search or tap the map, add a photo. No login. Photos are stripped of location data before they are stored.">
-              <div className="flex gap-2">{(["pothole", "waterlogging", "worksite"] as const).map((k) => <KindBadge key={k} kind={k} size={44} />)}</div>
-            </Card>
+        <div className="mt-14 grid gap-6 md:grid-cols-2">
+          <BlurFade inView delay={0.05}>
+            <Sheet label="Report" no="01" bodyClassName="p-5">
+              <DropPin />
+              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Report in ten seconds</h3>
+              <p className="mt-2 leading-relaxed text-fg-2">Pick a type, search or tap the map, add a photo. No login. Photos are stripped of location data before they are stored.</p>
+            </Sheet>
           </BlurFade>
-          <BlurFade inView delay={0.1} className="md:col-span-3">
-            <Card title="Duplicates merge" body="A report within 25 m of an open pothole, or 75 m of a flooded stretch, joins that record instead of starting a new one.">
-              <div className="relative h-11">
-                {[0, 1, 2, 3].map((i) => (
-                  <span key={i} className="absolute top-1 h-9 w-9 rounded-[10px] border-2 border-surface" style={{ left: `${i * 22}px`, background: "var(--pothole)", opacity: 1 - i * 0.18 }} />
-                ))}
-                <span className="label absolute left-[110px] top-3 text-fg-2">4 reports, 1 record</span>
-              </div>
-            </Card>
+          <BlurFade inView delay={0.1}>
+            <Sheet label="Merge" no="02" bodyClassName="p-5">
+              <MergeBeams />
+              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Duplicates merge</h3>
+              <p className="mt-2 leading-relaxed text-fg-2">A report within 25 m of an open pothole, or 75 m of a flooded stretch, joins that record instead of starting a new one.</p>
+            </Sheet>
           </BlurFade>
-          <BlurFade inView delay={0.15} className="md:col-span-4">
-            <Card title="Neighbours raise it" body="Every point of the score is shown on the record, so anyone can see why one issue ranks above another.">
-              <code className="block rounded-xl border border-line bg-surface-2/70 p-3 font-mono text-[12.5px] leading-relaxed text-fg-2">
-                20 × severity + 8 × reporters (max 10) + 3 per day open (max 21) + 15 beside an active dig
-              </code>
-            </Card>
+          <BlurFade inView delay={0.15}>
+            <Sheet label="Priority" no="03" bodyClassName="p-5">
+              <PriorityLedger total={136} parts={[
+                { label: "Severity 3 of 3", points: 60 }, { label: "5 distinct reporters", points: 40 },
+                { label: "Open 9 days", points: 21 }, { label: "Beside an active dig", points: 15 },
+              ]} compact />
+              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Neighbours raise it</h3>
+              <p className="mt-2 leading-relaxed text-fg-2">20 per severity step, 8 per distinct reporter, 3 per day open, 15 beside an active dig. Every point is shown on the record.</p>
+            </Sheet>
           </BlurFade>
-          <BlurFade inView delay={0.2} className="md:col-span-2">
-            <Card title="Closed by neighbours" body="A fix counts only when two people nearby confirm it, and they outnumber those who say it is still there.">
-              <div className="flex items-center gap-2 text-sm"><span className="rounded-lg bg-ok/15 px-2.5 py-1 font-medium text-ok">Fixed 2</span><span className="rounded-lg bg-surface-2 px-2.5 py-1 text-fg-3">Still there 0</span></div>
-            </Card>
+          <BlurFade inView delay={0.2}>
+            <Sheet label="Close" no="04" bodyClassName="p-5">
+              <FixedStamp />
+              <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Closed by neighbours</h3>
+              <p className="mt-2 leading-relaxed text-fg-2">A fix counts only when two people nearby confirm it, and they outnumber those who say it is still there.</p>
+            </Sheet>
           </BlurFade>
         </div>
       </section>
@@ -161,16 +167,6 @@ function Figure({ n, label, accent }: { n: number; label: string; accent?: boole
       {accent && <span className="stripes absolute inset-x-0 top-0 h-1" />}
       <NumberTicker value={n} className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl" />
       <span className="label mt-1.5 text-fg-3">{label}</span>
-    </div>
-  );
-}
-
-function Card({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
-  return (
-    <div className="group h-full rounded-3xl border border-line bg-surface p-7 transition duration-500 hover:border-fg-3 hover:bg-surface-2/50">
-      {children}
-      <h3 className="mt-6 text-xl font-semibold tracking-[-0.03em]">{title}</h3>
-      <p className="mt-2 leading-relaxed text-fg-2">{body}</p>
     </div>
   );
 }

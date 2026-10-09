@@ -41,6 +41,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Submitted | null>(null);
+  const [mini, setMini] = useState(false); // phones: shrink to a bar while placing the pin
 
   function locate() {
     if (!navigator.geolocation) return setError("Location isn't available here. Tap the map to place the pin.");
@@ -94,11 +95,24 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
     }
   }
 
+  if (mini) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.3, ease: EASE }}
+        className="panel absolute inset-x-3 bottom-3 z-40 flex items-center gap-3 rounded-[10px] !bg-surface p-3 shadow-2xl">
+        <span className="min-w-0 flex-1 text-sm">
+          <span className="block font-medium">{point ? "Pin placed" : "Tap the map to place the pin"}</span>
+          <span className="block truncate text-xs text-fg-3">{point ? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}. Drag it to adjust.` : "You can also search above."}</span>
+        </span>
+        <button onClick={() => setMini(false)} className="shrink-0 rounded-lg bg-fg px-4 py-2 text-sm font-medium text-bg">{point ? "Continue" : "Back"}</button>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div data-lenis-prevent
       initial={{ opacity: 0, x: -24, filter: "blur(8px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} exit={{ opacity: 0, x: -20, filter: "blur(6px)" }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="panel absolute inset-x-3 bottom-3 z-40 !bg-surface max-h-[70%] overflow-y-auto rounded-2xl p-5 shadow-2xl sm:bottom-3 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
+      className="panel absolute inset-x-3 bottom-3 z-40 !bg-surface max-h-[72%] overflow-y-auto overscroll-contain rounded-[10px] p-5 shadow-2xl sm:bottom-3 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
       <AnimatePresence mode="wait">
         {done ? (
           <motion.div key="done" role="status" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35, ease: EASE }}>
@@ -145,7 +159,8 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3.5" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
                   {locating ? "Locating" : "Use my location"}
                 </button>
-                <span className="text-xs text-fg-3">or search above, or tap the map</span>
+                <button type="button" onClick={() => setMini(true)} className="rounded-xl border border-line px-3 py-2 text-sm transition hover:border-fg-3 sm:hidden">Pick on map</button>
+                <span className="hidden text-xs text-fg-3 sm:inline">or search above, or tap the map</span>
               </div>
               <AnimatePresence>
                 {point && (

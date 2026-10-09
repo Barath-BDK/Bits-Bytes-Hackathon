@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { DEFAULTS, SETTINGS, THEMES, type SettingKey } from "@/lib/themes";
+import { DEFAULTS, SETTINGS, SWITCH_FOR, THEMES, type SettingKey, type ThemeId } from "@/lib/themes";
 
 type Key = "theme" | "mode" | SettingKey;
 
@@ -25,6 +25,9 @@ function setSetting(key: Key, value: string, origin?: { x: number; y: number }) 
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!visual || reduce || !("startViewTransition" in document)) return apply();
   if (origin) { root.style.setProperty("--vt-x", `${origin.x}px`); root.style.setProperty("--vt-y", `${origin.y}px`); }
+  const chosen = root.getAttribute("data-switch") || DEFAULTS.switch;
+  const nextTheme = (key === "theme" ? value : root.getAttribute("data-theme") || DEFAULTS.theme) as ThemeId;
+  root.setAttribute("data-vt", chosen === "auto" ? SWITCH_FOR[nextTheme] ?? "circle" : chosen);
   root.classList.add("theme-vt");
   const vt = document.startViewTransition(apply);
   vt.finished.finally(() => root.classList.remove("theme-vt"));
@@ -116,7 +119,7 @@ function Segmented({ id, value, options, onPick }: {
   id: string; value: string; options: readonly (readonly [string, string])[]; onPick: (v: string, e: React.MouseEvent) => void;
 }) {
   return (
-    <div className={`relative mt-2 grid gap-1 rounded-xl bg-surface-2 p-1 ${options.length > 3 ? "grid-cols-3" : options.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
+    <div className={`relative mt-2 grid gap-1 rounded-xl bg-surface-2 p-1 ${options.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
       {options.map(([v, label]) => (
         <button key={v} onClick={(e) => onPick(v, e)} aria-pressed={value === v} className="relative z-10 rounded-lg py-1.5 text-[13px]">
           {value === v && <motion.span layoutId={`pill-${id}`} className="absolute inset-0 -z-10 rounded-lg bg-bg shadow" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}

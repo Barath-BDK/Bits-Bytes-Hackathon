@@ -9,6 +9,8 @@ import { KindBadge } from "@/components/kind-icon";
 import { BlurFade } from "@/components/motion-bits";
 import { ComplaintBox } from "@/components/complaint-box";
 import { ConfirmButtons } from "@/components/confirm-buttons";
+import { Sheet } from "@/components/sheet";
+import { PriorityLedger } from "@/components/vignettes";
 
 export const revalidate = 60;
 // Records are pre-rendered on first visit, then served from the edge until a write invalidates them.
@@ -62,19 +64,9 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
         </BlurFade>
         {c.kind !== "worksite" && (
           <BlurFade delay={0.15}>
-            <div className="beam rounded-2xl">
-              <div className="rounded-2xl border border-line bg-surface p-5 lg:w-72">
-                <p className="label text-fg-3">Priority score</p>
-                <p className="mt-1 text-6xl font-semibold tabular-nums tracking-[-0.06em]">{c.priority}</p>
-                <ul className="mt-4 space-y-1.5 text-sm">
-                  {parts.map((p) => (
-                    <li key={p.label} className="flex justify-between gap-3 border-t border-line pt-1.5">
-                      <span className="text-fg-2">{p.label}</span><span className="font-mono text-fg">+{p.points}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <Sheet label="Priority assessment" className="lg:w-80" bodyClassName="p-5">
+              <PriorityLedger parts={parts} total={c.priority} />
+            </Sheet>
           </BlurFade>
         )}
       </header>
@@ -143,11 +135,11 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
         <aside className="space-y-8">
           {c.kind !== "worksite" && (
             <BlurFade inView>
-              <section className="rounded-2xl border border-line bg-surface p-6">
+              <Sheet label="Neighbour check" bodyClassName="p-6">
                 <h2 className="text-xl font-semibold tracking-[-0.03em]">Is it fixed?</h2>
                 <p className="mt-1 text-sm text-fg-2">It closes only when two neighbours confirm, and more say fixed than not.</p>
                 <ConfirmButtons id={c.id} initial={d.confirmations} status={c.status} />
-              </section>
+              </Sheet>
             </BlurFade>
           )}
           <BlurFade inView delay={0.08}>

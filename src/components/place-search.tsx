@@ -64,7 +64,7 @@ export function PlaceSearch({ onPick }: { onPick: (p: Place) => void }) {
             if (e.key === "Enter") { e.preventDefault(); pick(results[active]); }
             if (e.key === "Escape") setOpen(false);
           }}
-          placeholder="Search a street or area in Chennai" aria-label="Search for a place" role="combobox" aria-expanded={shown} aria-controls="place-results"
+          placeholder="Search a street, area or landmark" aria-label="Search for a place" role="combobox" aria-expanded={shown} aria-controls="place-results"
           className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-fg-3 focus-visible:outline-none" />
         {loading ? <span className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-fg-3 border-t-transparent" />
           : <kbd className="label hidden shrink-0 rounded-md border border-line px-1.5 py-0.5 text-[10px] text-fg-3 sm:block">/</kbd>}

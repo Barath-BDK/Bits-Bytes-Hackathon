@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { DEFAULTS, type ThemeId } from "@/lib/themes";
 import { CanvasArt, type CanvasKind } from "@/components/backdrops/canvas-art";
-import { StreetPlan, SurveySheet } from "@/components/backdrops/svg-art";
+import { BlueprintPlan, DrainagePlan, StreetPlan, TransitPlan, UtilityPlan } from "@/components/backdrops/svg-art";
 
 function subscribe(cb: () => void) {
   const obs = new MutationObserver(cb);
@@ -15,15 +15,19 @@ const readTheme = attr("data-theme", DEFAULTS.theme);
 const readMode = attr("data-mode", DEFAULTS.mode);
 const readBackdrop = attr("data-backdrop", DEFAULTS.backdrop);
 
-const CANVAS: Partial<Record<ThemeId, CanvasKind>> = { lumora: "water", field: "terrain", bloom: "trails", velora: "ribbons" };
+const CANVAS: Partial<Record<ThemeId, CanvasKind>> = { lumora: "water", field: "terrain" };
+const SVG: Partial<Record<ThemeId, () => React.JSX.Element>> = {
+  mono: StreetPlan, utilities: UtilityPlan, blueprint: BlueprintPlan, drainage: DrainagePlan, transit: TransitPlan,
+};
 
 export const CAPTIONS: Record<ThemeId, string> = {
+  mono: "Fig. 1  Street plan, etched. Adyar and its lanes.",
+  utilities: "Fig. 1  Under the road. Five departments, one carriageway.",
+  blueprint: "Fig. 1  DWG 14. Junction resurfacing, Zone 13.",
+  drainage: "Fig. 1  Storm water network. Where it silts, streets flood.",
+  transit: "Fig. 1  Metro works. Phase 2 lines under construction.",
   lumora: "Fig. 1  Monsoon surface. Rain on standing water, Velachery.",
   field: "Fig. 1  Earthworks. A road that keeps getting dug up, at dusk.",
-  bloom: "Fig. 1  Night traffic. Long exposure on a diverted carriageway.",
-  mono: "Fig. 1  Street plan, etched. Adyar and its lanes.",
-  velora: "Fig. 1  Red tape, unwinding.",
-  atlas: "Fig. 1  Survey sheet. Chennai, 13°N 80°E.",
 };
 
 export function useThemeId() {
@@ -38,9 +42,10 @@ export function HeroBackdrop() {
   if (backdrop === "off") return null;
   if (backdrop === "grid") return <div className="hairline-grid absolute inset-0" />;
   const kind = CANVAS[theme];
+  const Art = SVG[theme] ?? StreetPlan;
   return (
     <div key={theme} className="art-in absolute inset-0">
-      {kind ? <CanvasArt kind={kind} revision={`${theme}-${mode}`} /> : theme === "mono" ? <StreetPlan /> : <SurveySheet />}
+      {kind ? <CanvasArt kind={kind} revision={`${theme}-${mode}`} /> : <Art />}
     </div>
   );
 }

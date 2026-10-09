@@ -54,7 +54,7 @@ export function Hero({ openCount, ticker }: { openCount: number; ticker: string[
       </motion.div>
 
       {/* Bottom rail: live ticker and the artwork caption */}
-      <BlurFade delay={1} className="relative border-t border-line bg-bg/40 backdrop-blur-md">
+      <BlurFade delay={1} className="relative border-t border-line bg-bg/80">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3 sm:px-6">
           <span className="label shrink-0 text-accent">Just in</span>
           <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">

@@ -9,7 +9,7 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { KINDS, photoSrc, timeAgo, type Cluster, type Kind } from "@/lib/issues";
 import { KindBadge, kindIconSvg } from "@/components/kind-icon";
-import { NumberTicker, listContainer, listItem } from "@/components/motion-bits";
+import { IssuePanel, applyFilters, type KindFilter, type SortBy, type StatusFilter } from "@/components/issue-list";
 import { ReportSheet, type Submitted } from "@/components/report-sheet";
 import { PlaceSearch, type Place } from "@/components/place-search";
 
@@ -18,7 +18,6 @@ maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs"); // self-hosted: bundlers can
 const STYLE = { dark: "https://tiles.openfreemap.org/styles/dark", light: "https://tiles.openfreemap.org/styles/positron" };
 const CHENNAI: [number, number] = [80.215, 13.02];
 const EASE = [0.2, 0.8, 0.2, 1] as const;
-type Filter = "all" | Kind;
 
 const pinColor = (k: Kind) => (k === "pothole" ? "var(--pothole)" : k === "waterlogging" ? "var(--water)" : "var(--works)");
 const pinSize = (c: Cluster) => 26 + Math.min(c.reporter_count, 6) * 2;
@@ -38,21 +37,27 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
   const draftMarker = useRef<maplibregl.Marker | null>(null);
   const placeMarker = useRef<maplibregl.Marker | null>(null);
 
-  const [filter, setFilter] = useState<Filter>("all");
+  const [kind, setKind] = useState<KindFilter>("all");
+  const [sort, setSort] = useState<SortBy>("priority");
+  const [status, setStatus] = useState<StatusFilter>("open");
+  const [drawer, setDrawer] = useState(false);
   const [selected, setSelected] = useState<string | null>(focusId);
   const [reporting, setReporting] = useState(startReporting);
   const [draft, setDraft] = useState<{ lat: number; lng: number } | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [sidebar, setSidebar] = useState(true);
+  // The header's Report link only changes ?report=1; open the form when that happens while already on the map.
+  const [reportParam, setReportParam] = useState(startReporting);
+  if (reportParam !== startReporting) {
+    setReportParam(startReporting);
+    if (startReporting) { setReporting(true); setSelected(null); }
+  }
   const reportingRef = useRef(reporting);
   useEffect(() => { reportingRef.current = reporting; }, [reporting]);
 
-  const visible = useMemo(() => clusters.filter((c) => filter === "all" || c.kind === filter), [clusters, filter]);
+  const visible = useMemo(() => applyFilters(clusters, kind, status, sort), [clusters, kind, status, sort]);
   const sel = clusters.find((c) => c.id === selected) ?? null;
-  const stats = useMemo(() => {
-    const open = clusters.filter((c) => c.status === "open");
-    return { open: open.length, reporters: open.reduce((n, c) => n + c.reporter_count, 0), linked: open.filter((c) => c.near_worksite).length };
-  }, [clusters]);
+  const openCount = useMemo(() => clusters.filter((c) => c.status === "open").length, [clusters]);
 
   // Create the map once; follow the site's light/dark mode.
   useEffect(() => {
@@ -141,6 +146,11 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
     m.flyTo({ center: [place.lng, place.lat], zoom: 15.5, duration: 1300, essential: true });
   }, [place]);
 
+  function pick(id: string) {
+    setSelected(id);
+    setDrawer(false);
+  }
+
   function startReport(at?: { lat: number; lng: number }) {
     setSelected(null);
     setReporting(true);
@@ -157,78 +167,66 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
 
   return (
     <div className="relative h-[calc(100dvh-3.5rem)] overflow-hidden">
-      <div className="absolute inset-0"><div ref={mapEl} className="h-full w-full" /></div>
+      {/* isolate: marker z-indexes stay inside the map layer and never cover panels */}
+      <div className="absolute inset-0 isolate z-0"><div ref={mapEl} className="h-full w-full" /></div>
 
       {/* Sidebar */}
       <AnimatePresence initial={false}>
         {sidebar && !reporting && (
           <motion.aside key="sidebar" data-lenis-prevent
             initial={{ x: -420, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -420, opacity: 0 }} transition={{ duration: 0.45, ease: EASE }}
-            className="panel absolute bottom-3 left-3 top-3 z-20 hidden w-[360px] flex-col overflow-hidden rounded-2xl shadow-2xl md:flex">
-            <div className="border-b border-line px-4 pb-3 pt-4">
-              <div className="flex items-center justify-between">
-                <p className="label text-fg-3">Chennai live ledger</p>
-                <button onClick={() => setSidebar(false)} aria-label="Collapse sidebar" className="grid h-7 w-7 place-items-center rounded-lg text-fg-3 transition hover:bg-surface-2 hover:text-fg">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m15 18-6-6 6-6" /></svg>
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                <Stat n={stats.open} label="Open" />
-                <Stat n={stats.reporters} label="Reporters" />
-                <Stat n={stats.linked} label="Near works" accent />
-              </div>
-              <div className="relative mt-3 flex gap-1 rounded-xl bg-surface-2 p-1" role="group" aria-label="Filter by type">
-                {(["all", "pothole", "waterlogging", "worksite"] as Filter[]).map((f) => (
-                  <button key={f} onClick={() => setFilter(f)} aria-pressed={filter === f}
-                    className={`relative z-10 flex-1 rounded-lg py-1.5 text-xs font-medium transition ${filter === f ? "text-fg" : "text-fg-3 hover:text-fg-2"}`}>
-                    {filter === f && <motion.span layoutId="filter-pill" className="absolute inset-0 -z-10 rounded-lg bg-bg shadow" transition={{ type: "spring", stiffness: 480, damping: 36 }} />}
-                    {f === "all" ? "All" : f === "waterlogging" ? "Water" : KINDS[f].plural}
-                  </button>
-                ))}
-              </div>
+            className="panel absolute bottom-3 left-3 top-3 z-20 hidden w-[372px] flex-col overflow-hidden rounded-[6px] shadow-2xl md:flex">
+            <div className="flex items-center justify-between px-4 pb-2 pt-3">
+              <p className="label text-fg-3">Chennai live ledger</p>
+              <button onClick={() => setSidebar(false)} aria-label="Collapse sidebar" className="grid h-7 w-7 place-items-center rounded-lg text-fg-3 transition hover:bg-surface-2 hover:text-fg">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m15 18-6-6 6-6" /></svg>
+              </button>
             </div>
-            <motion.ol key={filter} variants={listContainer} initial="hidden" animate="show" className="flex-1 overflow-y-auto p-2">
-              {visible.map((c, i) => (
-                <motion.li key={c.id} variants={listItem}>
-                  <button onClick={() => setSelected(c.id)}
-                    className={`group flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition ${c.id === selected ? "bg-surface-2" : "hover:bg-surface-2/60"}`}>
-                    <KindBadge kind={c.kind} size={34} />
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline justify-between gap-2">
-                        <span className="truncate text-[15px] font-medium tracking-[-0.01em]">{KINDS[c.kind].severity[c.severity_max - 1]} {KINDS[c.kind].label.toLowerCase()}</span>
-                        <span className={`label shrink-0 ${c.status === "resolved" ? "text-ok" : "text-fg-3"}`}>{c.status === "resolved" ? "Fixed" : `#${i + 1}`}</span>
-                      </span>
-                      <span className="mt-0.5 block truncate text-[13px] text-fg-3">
-                        {c.kind === "worksite" ? c.department : `${c.reporter_count} ${c.reporter_count === 1 ? "report" : "reports"}, ${timeAgo(c.last_reported_at)}`}
-                      </span>
-                      {c.near_worksite && c.status === "open" && (
-                        <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-works/15 px-1.5 py-0.5 text-[11px] font-medium text-works">
-                          <span className="stripes h-2 w-3 rounded-sm" /> Beside an active dig
-                        </span>
-                      )}
-                    </span>
-                  </button>
-                </motion.li>
-              ))}
-              {visible.length === 0 && <li className="p-6 text-sm text-fg-3">Nothing reported here yet.</li>}
-            </motion.ol>
+            <IssuePanel idPrefix="side" all={clusters} visible={visible} selected={selected} onSelect={pick}
+              kind={kind} setKind={setKind} sort={sort} setSort={setSort} status={status} setStatus={setStatus} />
           </motion.aside>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile: list in a bottom drawer */}
+      {!reporting && !sel && !place && (
+        <button onClick={() => setDrawer(true)} className="panel absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-2xl md:hidden">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+          {openCount} open issues, sort and filter
+        </button>
+      )}
+      <AnimatePresence>
+        {drawer && (
+          <>
+            <motion.div key="scrim" className="absolute inset-0 z-30 bg-black/40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} />
+            <motion.div key="drawer" className="panel absolute inset-x-0 bottom-0 z-40 flex max-h-[78dvh] flex-col rounded-t-[14px] !bg-surface shadow-2xl md:hidden"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: 0.4, ease: EASE }}
+              drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.6 }} onDragEnd={(_, i) => { if (i.offset.y > 90) setDrawer(false); }}>
+              <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-fg-3/50" />
+              <div className="flex items-center justify-between px-4 pb-2 pt-2">
+                <p className="label text-fg-3">Chennai live ledger</p>
+                <button onClick={() => setDrawer(false)} className="label text-fg-3">Close</button>
+              </div>
+              <IssuePanel idPrefix="drawer" all={clusters} visible={visible} selected={selected} onSelect={pick}
+                kind={kind} setKind={setKind} sort={sort} setSort={setSort} status={status} setStatus={setStatus} />
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
       {/* Top bar: expand sidebar, search, report */}
       <motion.div layout transition={{ duration: 0.45, ease: EASE }}
-        className={`absolute top-3 z-30 flex items-center gap-2 ${reporting ? "left-3 right-3 sm:left-[414px]" : sidebar ? "left-3 right-3 md:left-[384px]" : "left-3 right-3"}`}>
+        className={`absolute top-3 z-30 flex items-center gap-2 ${reporting ? "left-3 right-3 sm:left-[414px]" : sidebar ? "left-3 right-3 md:left-[396px]" : "left-3 right-3"}`}>
         {!sidebar && !reporting && (
           <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} onClick={() => setSidebar(true)} aria-label="Show list"
             className="panel hidden h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium md:flex">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
-            {stats.open} open
+            {openCount} open
           </motion.button>
         )}
         <PlaceSearch onPick={setPlace} />
         {!reporting && (
-          <button onClick={() => startReport()} className="h-11 shrink-0 rounded-xl bg-fg px-4 text-sm font-medium text-bg shadow-lg transition hover:opacity-85">
+          <button onClick={() => startReport()} className="hidden h-11 shrink-0 rounded-xl bg-fg px-4 text-sm font-medium text-bg shadow-lg transition hover:opacity-85 sm:block">
             Report
           </button>
         )}
@@ -294,11 +292,3 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
   );
 }
 
-function Stat({ n, label, accent }: { n: number; label: string; accent?: boolean }) {
-  return (
-    <div className={`rounded-xl border border-line px-2.5 py-2 ${accent ? "bg-works/12" : "bg-surface-2/60"}`}>
-      <NumberTicker value={n} className="text-2xl font-semibold tracking-[-0.04em]" />
-      <div className="label mt-0.5 text-[10px] text-fg-3">{label}</div>
-    </div>
-  );
-}

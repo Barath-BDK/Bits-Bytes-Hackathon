@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col">
         <SmoothScroll />
-        <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-xl">
+        <header className="sticky top-0 z-40 border-b border-line bg-bg/92 backdrop-blur-sm">
           <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="group flex items-center gap-2.5" aria-label="Gullywatch home">
               <Logo />
