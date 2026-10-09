@@ -30,3 +30,6 @@ Thumbs.db
 # tooling output
 graphify-out/
 .claude/settings.local.json
+
+# copied from node_modules at build time
+public/maplibre-gl-worker.mjs

@@ -11,6 +11,8 @@ const Report = z.object({
   note: z.string().trim().max(500).optional(),
   department: z.string().trim().max(120).optional(),
   promisedEnd: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  // Only URLs our own /api/photos produced are accepted.
+  photo: z.url({ protocol: /^https$/, hostname: /\.public\.blob\.vercel-storage\.com$/ }).max(200).optional(),
 });
 
 export async function POST(req: Request) {
@@ -30,7 +32,7 @@ export async function POST(req: Request) {
     p_note: r.note ?? null,
     p_department: r.kind === "worksite" ? (r.department ?? null) : null,
     p_promised_end: r.kind === "worksite" ? (r.promisedEnd ?? null) : null,
-    p_photo_path: null, // shortcut: photo upload lands in the next phase
+    p_photo_path: r.photo ?? null,
     p_reporter_hash: reporterHash(req),
   });
   if (error) return dbError(error);

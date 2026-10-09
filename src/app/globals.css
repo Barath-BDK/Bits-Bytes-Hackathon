@@ -1,26 +1,149 @@
 @import "tailwindcss";
 
+/* Civic ledger: newsprint paper, ink, and three municipal signal colours. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f1ebdf;
+  --paper-2: #e8e0cf;
+  --paper-3: #ddd3be;
+  --ink: #18160f;
+  --ink-2: #4b463b;
+  --ink-3: #7a7365;
+  --rule: rgb(24 22 15 / 0.16);
+  --pothole: #cf4f16;      /* burnt saffron */
+  --water: #0f6b78;        /* monsoon teal */
+  --works: #e2ac1c;        /* barricade yellow */
+  --resolved: #557a45;
+  --alert: #b0261c;
+  --shadow: 0 1px 0 rgb(24 22 15 / 0.08), 0 12px 32px -18px rgb(24 22 15 / 0.35);
+}
+
+/* Backup theme (dark editorial), switched with <html data-theme="dark">. */
+:root[data-theme="dark"] {
+  --paper: #13120e;
+  --paper-2: #1c1a15;
+  --paper-3: #26231c;
+  --ink: #efe7d6;
+  --ink-2: #c3baa6;
+  --ink-3: #8d8574;
+  --rule: rgb(239 231 214 / 0.14);
+  --pothole: #f0743a;
+  --water: #3fb0bd;
+  --works: #f2c240;
+  --resolved: #86b071;
+  --alert: #ef5b4f;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.4), 0 16px 40px -20px rgb(0 0 0 / 0.8);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-pothole: var(--pothole);
+  --color-water: var(--water);
+  --color-works: var(--works);
+  --color-resolved: var(--resolved);
+  --color-alert: var(--alert);
+  --font-display: var(--font-gloock);
+  --font-sans: var(--font-atkinson);
+  --font-mono: var(--font-martian);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-atkinson), system-ui, sans-serif;
+  /* faint paper grain */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--works);
+  color: #18160f;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.kicker {
+  font-family: var(--font-martian), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Barricade stripe used for work sites and coordination flags */
+.stripes {
+  background: repeating-linear-gradient(-45deg, var(--works) 0 10px, #18160f 10px 20px);
+}
+
+/* Map pins */
+.pin {
+  border-radius: 9999px;
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px rgb(24 22 15 / 0.35), 0 4px 10px -2px rgb(24 22 15 / 0.45);
+  cursor: pointer;
+  transition: transform 160ms ease;
+}
+.pin:hover,
+.pin[data-active="true"] {
+  transform: scale(1.25);
+}
+.pin[data-kind="worksite"] {
+  border-radius: 3px;
+}
+.pin[data-status="resolved"] {
+  opacity: 0.55;
+}
+.pin-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid currentColor;
+  animation: pulse 1.8s ease-out infinite;
+}
+@keyframes pulse {
+  from { transform: scale(0.7); opacity: 0.9; }
+  to { transform: scale(1.6); opacity: 0; }
+}
+
+/* Paper-toned basemap */
+.maplibregl-canvas {
+  filter: sepia(0.28) saturate(0.85) contrast(0.96);
+}
+:root[data-theme="dark"] .maplibregl-canvas {
+  filter: invert(0.92) hue-rotate(180deg) sepia(0.2) saturate(0.6);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .marquee, .pin-pulse::after { animation: none; }
 }
