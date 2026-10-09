@@ -14,7 +14,7 @@ function Count({ n }: { n: number }) {
   );
 }
 
-export function ConfirmButtons({ id, initial, status }: { id: string; initial: Counts; status: "open" | "resolved" }) {
+export function ConfirmButtons({ id, initial, status, labels = ["Fixed", "Still there"] }: { id: string; initial: Counts; status: "open" | "resolved"; labels?: [string, string] }) {
   const router = useRouter();
   const [counts, setCounts] = useState(initial);
   const [state, setState] = useState(status);
@@ -40,14 +40,14 @@ export function ConfirmButtons({ id, initial, status }: { id: string; initial: C
       <div className="grid grid-cols-2 gap-2">
         <motion.button whileTap={{ scale: 0.96 }} disabled={busy} onClick={() => vote("fixed")}
           className="flex items-center justify-center gap-2 rounded-xl border border-ok/60 bg-ok/10 py-2.5 font-medium text-ok transition hover:bg-ok hover:text-bg disabled:opacity-50">
-          Fixed <Count n={counts.fixed} />
+          {labels[0]} <Count n={counts.fixed} />
         </motion.button>
         <motion.button whileTap={{ scale: 0.96 }} disabled={busy} onClick={() => vote("still_there")}
           className="flex items-center justify-center gap-2 rounded-xl border border-line py-2.5 font-medium transition hover:bg-fg hover:text-bg disabled:opacity-50">
-          Still there <Count n={counts.still_there} />
+          {labels[1]} <Count n={counts.still_there} />
         </motion.button>
       </div>
-      <p className="mt-3 text-sm text-fg-3" role="status">{state === "resolved" ? "Status: confirmed fixed" : "Status: open"}</p>
+      <p className="mt-3 text-sm text-fg-3" role="status">{state === "resolved" ? `Status: confirmed (${labels[0].toLowerCase()})` : "Status: open"}</p>
       {error && <p className="mt-2 text-sm text-alert" role="alert">{error}</p>}
     </div>
   );

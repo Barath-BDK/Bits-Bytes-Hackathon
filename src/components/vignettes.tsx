@@ -133,3 +133,85 @@ export function FixedStamp() {
     </div>
   );
 }
+
+// A power cut spreading out from beside a trench: the dig-strike pattern.
+export function StrikeVignette() {
+  const ref = useRef<HTMLDivElement>(null);
+  const seen = useInView(ref, { once: true, margin: "-40px" });
+  return (
+    <div ref={ref} className="relative h-36 overflow-hidden rounded-[4px] border border-line bg-bg/40">
+      <Streets />
+      <motion.span className="absolute left-[46%] top-[58%] h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: "radial-gradient(closest-side, rgb(0 0 0 / 0.7), rgb(0 0 0 / 0.35) 60%, transparent)" }}
+        initial={{ scale: 0, opacity: 0 }} animate={seen ? { scale: 1, opacity: 1 } : {}} transition={{ delay: 0.7, duration: 1.4, ease: EASE }} />
+      <motion.span className="stripes absolute left-[36%] top-[50%] h-3 w-24 rounded-[2px]" initial={{ scaleX: 0 }} animate={seen ? { scaleX: 1 } : {}}
+        style={{ originX: 0 }} transition={{ delay: 0.15, duration: 0.6, ease: EASE }} />
+      <motion.span className="absolute left-[50%] top-[62%] -translate-x-1/2" initial={{ opacity: 0, scale: 0.5 }} animate={seen ? { opacity: 1, scale: 1 } : {}} transition={{ delay: 1.4, type: "spring", stiffness: 380, damping: 16 }}>
+        <KindBadge kind="outage" size={30} />
+      </motion.span>
+      <motion.span className="label absolute bottom-2 right-3 text-outage" initial={{ opacity: 0 }} animate={seen ? { opacity: 1 } : {}} transition={{ delay: 1.8 }}>
+        42 m from the trench
+      </motion.span>
+    </div>
+  );
+}
+
+// Four rows of hours filling in: power, water, works, rain.
+export function OutlookVignette() {
+  const ref = useRef<HTMLDivElement>(null);
+  const seen = useInView(ref, { once: true, margin: "-40px" });
+  const rows: [string, string, number[]][] = [
+    ["Power", "var(--outage)", [9, 10, 11, 12, 13]], ["Water", "var(--water)", [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]],
+    ["Works", "var(--works)", Array.from({ length: 24 }, (_, i) => i)], ["Rain", "var(--pothole)", [15, 16, 17]],
+  ];
+  return (
+    <div ref={ref} className="h-36 space-y-2 rounded-[4px] border border-line bg-bg/40 p-3">
+      {rows.map(([label, color, on], r) => (
+        <div key={label} className="flex items-center gap-2">
+          <span className="w-12 font-mono text-[10px] text-fg-3">{label}</span>
+          <div className="flex flex-1 gap-[2px]">
+            {Array.from({ length: 24 }, (_, i) => (
+              <motion.span key={i} className="h-5 flex-1 rounded-[1px]" style={{ background: on.includes(i) ? color : "var(--surface-2)" }}
+                initial={{ opacity: 0 }} animate={seen ? { opacity: on.includes(i) ? 0.95 : 1 } : {}} transition={{ delay: 0.2 + r * 0.15 + i * 0.015 }} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// The escalation ladder, climbing day by day.
+export function LadderVignette() {
+  const ref = useRef<HTMLDivElement>(null);
+  const seen = useInView(ref, { once: true, margin: "-40px" });
+  const steps = [["Day 0", "Zone 13 office"], ["Day 3", "Regional Deputy Commissioner"], ["Day 7", "Commissioner, GCC"], ["Day 15", "RTI for the records"]];
+  return (
+    <div ref={ref} className="flex h-36 flex-col justify-center gap-1.5 rounded-[4px] border border-line bg-bg/40 px-4">
+      {steps.map(([d, who], i) => (
+        <motion.div key={d} className="flex items-center gap-3 text-[13px]" initial={{ opacity: 0, x: -8 }} animate={seen ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.2 + i * 0.3 }}>
+          <span className={`w-12 font-mono text-[11px] ${i === 1 ? "text-accent" : "text-fg-3"}`}>{d}</span>
+          <span className={i === 1 ? "font-medium" : "text-fg-2"}>{who}</span>
+          {i === 1 && <span className="tag tag-verify ml-auto">Due now</span>}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// A record timeline with the step nobody filed: shown as missing, not as failed.
+export function GapVignette() {
+  const ref = useRef<HTMLDivElement>(null);
+  const seen = useInView(ref, { once: true, margin: "-40px" });
+  const rows = [["12 Jul", "Permission issued, ref GCC/RC/Z8/221", false], ["19 Sep", "Permission period ended", false], ["?", "Completion record not found in the sources checked", true]] as const;
+  return (
+    <div ref={ref} className="flex h-36 flex-col justify-center gap-2 rounded-[4px] border border-line bg-bg/40 px-4">
+      {rows.map(([d, t, gap], i) => (
+        <motion.div key={t} className={`flex items-center gap-3 rounded-[3px] px-2 py-1 text-[13px] ${gap ? "border border-dashed border-fg-3/60 text-fg-3" : "text-fg-2"}`}
+          initial={{ opacity: 0, y: 6 }} animate={seen ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2 + i * 0.35 }}>
+          <span className="w-12 font-mono text-[11px]">{d}</span><span>{t}</span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}

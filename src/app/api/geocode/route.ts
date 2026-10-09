@@ -4,7 +4,7 @@ import { err } from "@/lib/api";
 // Photon is fast at prefix matches; Nominatim knows abbreviations and alternate names (e.g. "IIITDM").
 // Identical queries are cached for a day, which keeps us well inside both services' fair-use policies.
 type Place = { name: string; area: string; kind: string; lat: number; lng: number };
-const UA = { "User-Agent": "gullywatch/0.1 (https://gullywatch.vercel.app)" };
+const UA = { "User-Agent": "theru/0.1 (https://theru.vercel.app)" };
 const CHENNAI = { lat: 13.04, lng: 80.22 };
 
 async function photon(q: string): Promise<Place[]> {

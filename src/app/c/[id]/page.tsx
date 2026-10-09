@@ -3,14 +3,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
-import { getCluster } from "@/lib/data";
+import { getCluster, getFindings } from "@/lib/data";
 import { KINDS, complaintDraft, formatDate, isOverdue, photoSrc, priorityParts, shortId, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { BlurFade } from "@/components/motion-bits";
-import { ComplaintBox } from "@/components/complaint-box";
 import { ConfirmButtons } from "@/components/confirm-buttons";
 import { Sheet } from "@/components/sheet";
 import { PriorityLedger } from "@/components/vignettes";
+import { WhoAnswers } from "@/components/who-answers";
+import { FindingCard } from "@/components/finding-card";
+import { departments, ladder, locate } from "@/lib/jurisdiction";
+import { streetHref } from "@/lib/links";
+import { SITE } from "@/lib/site";
+import { daysSince } from "@/lib/time";
 
 export const revalidate = 60;
 // Records are pre-rendered on first visit, then served from the edge until a write invalidates them.
@@ -20,13 +25,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function generateMetadata({ params }: PageProps<"/c/[id]">): Promise<Metadata> {
   const { id } = await params;
-  return { title: `Record GW-${id.slice(0, 8).toUpperCase()}` };
+  return { title: `Record TH-${id.slice(0, 8).toUpperCase()}` };
 }
 
 export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
   const { id } = await params;
   if (!UUID.test(id)) notFound();
-  const d = await getCluster(id);
+  const [d, findings] = await Promise.all([getCluster(id), getFindings()]);
   if (!d) notFound();
 
   const c = d.cluster;
@@ -34,7 +39,12 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
   const parts = priorityParts(c);
   const photos = d.reports.filter((r) => r.photo);
   // Fixed origin: never build links from the request's Host header.
-  const draft = complaintDraft(d, `https://gullywatch.vercel.app/c/${c.id}`);
+  const draft = complaintDraft(d, `${SITE.url}/c/${c.id}`);
+  const j = locate(c.lat, c.lng);
+  const daysOpen = daysSince(c.first_reported_at);
+  // findings about this record, or within 150 m of it
+  const near = findings.filter((f) => JSON.stringify(f.refs).includes(c.id) ||
+    Math.hypot((f.lat - c.lat) * 111_000, (f.lng - c.lng) * 111_000 * Math.cos((c.lat * Math.PI) / 180)) < 150);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6">
@@ -51,7 +61,7 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
             <span className={`label rounded-full border px-2.5 py-1 ${c.status === "resolved" ? "border-ok text-ok" : "border-line text-fg-2"}`}>
               {c.status === "resolved" ? "Confirmed fixed" : "Open"}
             </span>
-            <span className="label text-fg-3">GW-{shortId(c.id)}</span>
+            <span className="label text-fg-3">TH-{shortId(c.id)}</span>
           </div>
           <h1 className="display mt-6 max-w-3xl text-[clamp(2.2rem,5.5vw,4.4rem)]">
             {c.kind === "worksite"
@@ -136,19 +146,29 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
           {c.kind !== "worksite" && (
             <BlurFade inView>
               <Sheet label="Neighbour check" bodyClassName="p-6">
-                <h2 className="text-xl font-semibold tracking-[-0.03em]">Is it fixed?</h2>
-                <p className="mt-1 text-sm text-fg-2">It closes only when two neighbours confirm, and more say fixed than not.</p>
-                <ConfirmButtons id={c.id} initial={d.confirmations} status={c.status} />
+                <h2 className="text-xl font-semibold tracking-[-0.03em]">{c.kind === "outage" ? "Is the power back?" : "Is it fixed?"}</h2>
+                <p className="mt-1 text-sm text-fg-2">It closes only when two neighbours confirm, and they outnumber those who say otherwise.</p>
+                <ConfirmButtons id={c.id} initial={d.confirmations} status={c.status}
+                  labels={c.kind === "outage" ? ["Power is back", "Still off"] : ["Fixed", "Still there"]} />
+              </Sheet>
+            </BlurFade>
+          )}
+          {near.length > 0 && (
+            <BlurFade inView>
+              <Sheet label="What the records show" bodyClassName="space-y-6 p-5">
+                {near.map((f) => <FindingCard key={f.id} f={f} />)}
               </Sheet>
             </BlurFade>
           )}
           <BlurFade inView delay={0.08}>
-            <section>
-              <h2 className="text-xl font-semibold tracking-[-0.03em]">Complaint, ready to send</h2>
-              <p className="mt-1 text-sm text-fg-2">Filled in from this record. Paste it into the GCC grievance portal or an email.</p>
-              <ComplaintBox text={draft} />
-            </section>
+            <Sheet label="Who answers for this" bodyClassName="p-5">
+              <WhoAnswers j={j} contacts={departments(c.kind)} message={draft} subject={`${k.label} reported by ${c.reporter_count} residents, ref. TH-${shortId(c.id)}`}
+                ladder={c.status === "open" ? ladder(c.kind, j) : undefined} daysOpen={daysOpen} />
+            </Sheet>
           </BlurFade>
+          <Link href={streetHref({ lat: c.lat, lng: c.lng, name: `${k.label} on this street` })} className="block text-sm underline decoration-line underline-offset-4 hover:decoration-fg">
+            See the whole street record
+          </Link>
           <p className="font-mono text-xs text-fg-3">{c.lat.toFixed(5)}, {c.lng.toFixed(5)}</p>
         </aside>
       </div>

@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { dbError, err, guardWrite, reporterHash, rpcToken } from "@/lib/api";
 
 const Report = z.object({
-  kind: z.enum(["pothole", "waterlogging", "worksite"]),
+  kind: z.enum(["pothole", "waterlogging", "worksite", "outage"]),
   lat: z.number().min(6).max(37.5),
   lng: z.number().min(68).max(97.5),
   // pothole: small/medium/large; waterlogging: ankle/knee/waist; worksite: footpath/lane/road blocked

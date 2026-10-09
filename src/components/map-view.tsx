@@ -7,7 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { KINDS, photoSrc, timeAgo, type Cluster, type Kind } from "@/lib/issues";
+import { KINDS, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
+import { addOverlays, setNight } from "@/lib/map-layers";
 import { KindBadge, kindIconSvg } from "@/components/kind-icon";
 import { IssuePanel, applyFilters, type KindFilter, type SortBy, type StatusFilter } from "@/components/issue-list";
 import { ReportSheet, type Submitted } from "@/components/report-sheet";
@@ -19,14 +20,17 @@ const STYLE = { dark: "https://tiles.openfreemap.org/styles/dark", light: "https
 const CHENNAI: [number, number] = [80.215, 13.02];
 const EASE = [0.2, 0.8, 0.2, 1] as const;
 
-const pinColor = (k: Kind) => (k === "pothole" ? "var(--pothole)" : k === "waterlogging" ? "var(--water)" : "var(--works)");
+const pinColor = (k: Kind) => KINDS[k].color;
 const pinSize = (c: Cluster) => 26 + Math.min(c.reporter_count, 6) * 2;
 
 function currentMode() {
   return document.documentElement.dataset.mode === "light" ? "light" : "dark";
 }
 
-export function MapView({ clusters }: { clusters: Cluster[] }) {
+export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notices: Notice[] }) {
+  // power-cut reports older than six hours are history, not live pins
+  const clusters = useMemo(() => all.filter((c) => c.kind !== "outage" || c.status === "resolved" || isLiveOutage(c)), [all]);
+  const liveOutages = clusters.filter(isLiveOutage).length;
   const router = useRouter();
   const params = useSearchParams();
   const startReporting = params.get("report") === "1";
@@ -54,6 +58,13 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
   }
   const reportingRef = useRef(reporting);
   useEffect(() => { reportingRef.current = reporting; }, [reporting]);
+  const [night, setNightView] = useState(false);
+  const overlay = useRef({ notices, clusters, night });
+  useEffect(() => {
+    overlay.current = { notices, clusters, night };
+    const m = map.current;
+    if (m?.isStyleLoaded()) addOverlays(m, notices, clusters, night);
+  }, [notices, clusters, night]);
 
   const visible = useMemo(() => applyFilters(clusters, kind, status, sort), [clusters, kind, status, sort]);
   const sel = clusters.find((c) => c.id === selected) ?? null;
@@ -65,6 +76,8 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
     const m = new maplibregl.Map({ container: mapEl.current, style: STYLE[currentMode()], center: CHENNAI, zoom: 11, attributionControl: { compact: true } });
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     m.on("click", (e) => { if (reportingRef.current) setDraft({ lat: e.lngLat.lat, lng: e.lngLat.lng }); });
+    // overlays are wiped by every style change (light/dark), so re-add them each time a style loads
+    m.on("style.load", () => { const o = overlay.current; addOverlays(m, o.notices, o.clusters, o.night); });
     const open = clusters.filter((c) => c.status === "open");
     if (open.length > 1 && !focusId) {
       const b = new maplibregl.LngLatBounds();
@@ -94,7 +107,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
       root.setAttribute("aria-label", `${KINDS[c.kind].label}, ${c.reporter_count} reporters`);
       const pin = document.createElement("div");
       const s = pinSize(c);
-      pin.className = `gw-pin${c.status === "open" && c.priority >= 100 ? " gw-pulse" : ""}`;
+      pin.className = `gw-pin${c.status === "open" && (c.priority >= 100 || isLiveOutage(c)) ? " gw-pulse" : ""}`;
       pin.setAttribute("data-kind", c.kind);
       pin.setAttribute("data-status", c.status);
       Object.assign(pin.style, { width: `${s}px`, height: `${s}px`, background: pinColor(c.kind) });
@@ -166,7 +179,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
   }
 
   return (
-    <div className="relative h-[calc(100dvh-3.5rem)] overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden">
       {/* isolate: marker z-indexes stay inside the map layer and never cover panels */}
       <div className="absolute inset-0 isolate z-0"><div ref={mapEl} className="h-full w-full" /></div>
 
@@ -175,7 +188,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
         {sidebar && !reporting && (
           <motion.aside key="sidebar" data-lenis-prevent
             initial={{ x: -420, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -420, opacity: 0 }} transition={{ duration: 0.45, ease: EASE }}
-            className="panel absolute bottom-3 left-3 top-3 z-20 hidden w-[372px] flex-col overflow-hidden rounded-[6px] shadow-2xl md:flex">
+            className="panel absolute bottom-24 left-3 top-3 z-20 hidden w-[372px] flex-col overflow-hidden rounded-[6px] shadow-2xl md:flex">
             <div className="flex items-center justify-between px-4 pb-2 pt-3">
               <p className="label text-fg-3">Chennai live ledger</p>
               <button onClick={() => setSidebar(false)} aria-label="Collapse sidebar" className="grid h-7 w-7 place-items-center rounded-lg text-fg-3 transition hover:bg-surface-2 hover:text-fg">
@@ -190,7 +203,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
 
       {/* Mobile: list in a bottom drawer */}
       {!reporting && !sel && !place && (
-        <button onClick={() => setDrawer(true)} className="panel absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-2xl md:hidden">
+        <button onClick={() => setDrawer(true)} className="panel absolute bottom-[84px] left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-2xl md:hidden">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
           {openCount} open issues, sort and filter
         </button>
@@ -198,8 +211,8 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
       <AnimatePresence>
         {drawer && (
           <>
-            <motion.div key="scrim" className="absolute inset-0 z-30 bg-black/40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} />
-            <motion.div key="drawer" className="panel absolute inset-x-0 bottom-0 z-40 flex max-h-[78dvh] flex-col rounded-t-[14px] !bg-surface shadow-2xl md:hidden"
+            <motion.div key="scrim" className="absolute inset-0 z-[55] bg-black/40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} />
+            <motion.div key="drawer" className="panel absolute inset-x-0 bottom-0 z-[60] flex max-h-[78dvh] flex-col rounded-t-[14px] !bg-surface shadow-2xl md:hidden"
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ duration: 0.4, ease: EASE }}
               drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.6 }} onDragEnd={(_, i) => { if (i.offset.y > 90) setDrawer(false); }}>
               <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-fg-3/50" />
@@ -225,11 +238,13 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
           </motion.button>
         )}
         <PlaceSearch onPick={setPlace} />
-        {!reporting && (
-          <button onClick={() => startReport()} className="hidden h-11 shrink-0 rounded-xl bg-fg px-4 text-sm font-medium text-bg shadow-lg transition hover:opacity-85 sm:block">
-            Report
-          </button>
-        )}
+        <button onClick={() => { setNightView((v) => !v); if (map.current) setNight(map.current, !night); }} aria-pressed={night}
+          title="Night view: dims the city and blacks out areas where residents report no power"
+          className={`panel flex h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium transition ${night ? "!border-outage text-outage" : ""}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z" /></svg>
+          <span className="hidden sm:inline">Night view</span>
+          {liveOutages > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-outage px-1 font-mono text-[11px] text-white">{liveOutages}</span>}
+        </button>
       </motion.div>
 
       {/* Searched place: offer to report there */}
@@ -237,7 +252,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
         {place && !reporting && !sel && (
           <motion.div initial={{ opacity: 0, y: 16, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="panel absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-2xl py-2 pl-4 pr-2 shadow-2xl">
+            className="panel absolute bottom-[84px] left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-2xl py-2 pl-4 pr-2 shadow-2xl md:bottom-24">
             <span className="max-w-[46vw] truncate text-sm"><span className="font-medium">{place.name}</span> <span className="text-fg-3">{place.area}</span></span>
             <button onClick={() => startReport({ lat: place.lat, lng: place.lng })} className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-accent-fg">Report here</button>
             <button onClick={() => setPlace(null)} aria-label="Clear search" className="grid h-8 w-8 place-items-center rounded-lg text-fg-3 hover:bg-surface-2">
@@ -253,7 +268,7 @@ export function MapView({ clusters }: { clusters: Cluster[] }) {
           <motion.div key={sel.id}
             initial={{ opacity: 0, y: 24, scale: 0.98, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 16, scale: 0.98, filter: "blur(6px)" }} transition={{ duration: 0.4, ease: EASE }}
-            className="panel absolute bottom-4 right-4 z-20 w-[min(360px,calc(100%-2rem))] overflow-hidden rounded-2xl shadow-2xl">
+            className="panel absolute bottom-[84px] right-4 z-20 w-[min(360px,calc(100%-2rem))] md:bottom-24 overflow-hidden rounded-2xl shadow-2xl">
             {photoSrc(sel.cover_photo) && (
               <ViewTransition name={`photo-${sel.id}`} share="morph" default="none">
                 <div className="relative h-40 w-full bg-surface-2">

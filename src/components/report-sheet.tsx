@@ -98,7 +98,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
   if (mini) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.3, ease: EASE }}
-        className="panel absolute inset-x-3 bottom-3 z-40 flex items-center gap-3 rounded-[10px] !bg-surface p-3 shadow-2xl">
+        className="panel absolute inset-x-3 bottom-[78px] z-40 flex items-center gap-3 rounded-[10px] !bg-surface p-3 shadow-2xl">
         <span className="min-w-0 flex-1 text-sm">
           <span className="block font-medium">{point ? "Pin placed" : "Tap the map to place the pin"}</span>
           <span className="block truncate text-xs text-fg-3">{point ? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}. Drag it to adjust.` : "You can also search above."}</span>
@@ -112,7 +112,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
     <motion.div data-lenis-prevent
       initial={{ opacity: 0, x: -24, filter: "blur(8px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} exit={{ opacity: 0, x: -20, filter: "blur(6px)" }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="panel absolute inset-x-3 bottom-3 z-40 !bg-surface max-h-[72%] overflow-y-auto overscroll-contain rounded-[10px] p-5 shadow-2xl sm:bottom-3 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
+      className="panel absolute inset-x-3 bottom-[78px] z-40 !bg-surface max-h-[64%] overflow-y-auto overscroll-contain rounded-[10px] p-5 shadow-2xl sm:bottom-24 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
       <AnimatePresence mode="wait">
         {done ? (
           <motion.div key="done" role="status" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35, ease: EASE }}>
@@ -140,9 +140,9 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
 
             <fieldset className="mt-3">
               <legend className="text-2xl font-semibold tracking-[-0.04em]">What did you see?</legend>
-              <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {(Object.keys(KINDS) as Kind[]).map((k) => (
-                  <label key={k} className={`relative cursor-pointer rounded-xl border p-3 text-center text-sm transition ${kind === k ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
+                  <label key={k} className={`relative cursor-pointer rounded-xl border px-1.5 py-3 text-center text-[13px] transition ${kind === k ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
                     <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
                     <span className="mx-auto mb-2 block w-fit"><KindBadge kind={k} size={34} /></span>
                     {KINDS[k].label}

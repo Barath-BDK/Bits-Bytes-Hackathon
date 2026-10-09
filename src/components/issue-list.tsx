@@ -24,7 +24,7 @@ function Pills<T extends string>({ id, value, options, onPick }: { id: string; v
     <div className="relative flex gap-1 rounded-lg bg-surface-2 p-1" role="group">
       {options.map(([v, label]) => (
         <button key={v} onClick={() => onPick(v)} aria-pressed={value === v}
-          className={`relative z-10 flex-1 rounded-md px-1.5 py-1.5 text-xs font-medium transition ${value === v ? "text-fg" : "text-fg-3 hover:text-fg-2"}`}>
+          className={`relative z-10 flex-1 whitespace-nowrap rounded-md px-1 py-1.5 text-[11px] font-medium transition ${value === v ? "text-fg" : "text-fg-3 hover:text-fg-2"}`}>
           {value === v && <motion.span layoutId={`pill-${id}`} className="absolute inset-0 -z-10 rounded-md bg-bg shadow" transition={{ type: "spring", stiffness: 480, damping: 36 }} />}
           {label}
         </button>
@@ -51,7 +51,7 @@ export function IssuePanel({ all, visible, selected, onSelect, kind, setKind, so
           <Stat n={open.filter((c) => c.near_worksite).length} label="Near works" accent />
         </div>
         <Pills id={`${idPrefix}-kind`} value={kind} onPick={setKind} options={[
-          ["all", `All ${count("all")}`], ["pothole", `Potholes ${count("pothole")}`], ["waterlogging", `Water ${count("waterlogging")}`], ["worksite", `Works ${count("worksite")}`],
+          ["all", `All ${count("all")}`], ["pothole", `Potholes ${count("pothole")}`], ["waterlogging", `Water ${count("waterlogging")}`], ["worksite", `Works ${count("worksite")}`], ["outage", `Power ${count("outage")}`],
         ]} />
         <div className="grid grid-cols-[1.4fr_1fr] gap-2">
           <Pills id={`${idPrefix}-sort`} value={sort} onPick={setSort} options={[["priority", "Priority"], ["recent", "Recent"], ["reports", "Most"]]} />

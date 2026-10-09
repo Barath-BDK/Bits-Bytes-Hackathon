@@ -35,7 +35,7 @@ function setSetting(key: Key, value: string, origin?: { x: number; y: number }) 
 
 const at = (e: React.MouseEvent) => ({ x: e.clientX, y: e.clientY });
 
-export function ThemeControls() {
+export function ThemeControls({ up = false }: { up?: boolean }) {
   const [open, setOpen] = useState(false);
   const theme = useSetting("theme");
   const mode = useSetting("mode");
@@ -52,9 +52,9 @@ export function ThemeControls() {
   }, [open]);
 
   return (
-    <div className="relative flex items-center gap-1" ref={panel}>
+    <div className="relative flex items-center gap-0.5" ref={panel}>
       <button onClick={(e) => setSetting("mode", mode === "dark" ? "light" : "dark", at(e))} aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-        className="grid h-9 w-9 place-items-center rounded-full text-fg-2 transition hover:bg-surface-2 hover:text-fg">
+        className={`${up ? "hidden md:grid" : "grid"} h-9 w-9 place-items-center rounded-full text-fg-2 transition hover:bg-surface-2 hover:text-fg`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.svg key={mode} width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
             initial={{ rotate: -70, opacity: 0, scale: 0.6 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 70, opacity: 0, scale: 0.6 }}
@@ -76,9 +76,11 @@ export function ThemeControls() {
       <AnimatePresence>
         {open && (
           <motion.div role="dialog" aria-label="Appearance" data-lenis-prevent
-            initial={{ opacity: 0, y: -8, scale: 0.97, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -6, scale: 0.98, filter: "blur(4px)" }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-            className="panel absolute right-0 top-11 z-50 max-h-[calc(100dvh-5rem)] w-[340px] origin-top-right overflow-y-auto rounded-2xl p-3 shadow-2xl">
+            initial={{ opacity: 0, y: up ? 8 : -8, scale: 0.97, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: up ? 6 : -6, scale: 0.98, filter: "blur(4px)" }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+            className={`panel z-50 max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px] !bg-surface p-3 shadow-2xl ${up
+              ? "fixed inset-x-3 bottom-[74px] md:absolute md:inset-x-auto md:bottom-14 md:right-0 md:w-[340px] md:origin-bottom-right"
+              : "absolute right-0 top-11 w-[340px] origin-top-right"}`}>
             <p className="label px-1 text-fg-3">Mode</p>
             <Segmented id="mode" value={mode} options={[["dark", "Dark"], ["light", "Light"]]} onPick={(v, e) => setSetting("mode", v, at(e))} />
 
