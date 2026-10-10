@@ -211,7 +211,7 @@ export default async function Home() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-10 text-sm text-fg-3 sm:px-6">
-          <span><span className="font-tamil text-fg-2">{SITE.tamil}</span> {SITE.name}. {SITE.tagline}. Built in 24 hours for the CivicTech track.</span>
+          <span>{SITE.name}. {SITE.tagline}. Built in 24 hours for the CivicTech track.</span>
           <span className="flex gap-5">
             <Link href="/about" className="transition hover:text-fg">Method and sources</Link>
             <a href="https://github.com/Barath-BDK/Bits-Bytes-Hackathon" className="transition hover:text-fg">Source code</a>

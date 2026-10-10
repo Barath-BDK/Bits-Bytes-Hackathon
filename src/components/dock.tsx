@@ -5,7 +5,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { StreetSign } from "@/components/street-sign";
 import { ThemeControls } from "@/components/theme-controls";
 
 const NAV = [
@@ -23,8 +22,8 @@ export function Dock() {
   return (
     <nav aria-label="Main" className="dock fixed inset-x-0 bottom-0 z-50 md:inset-x-auto md:bottom-5 md:left-1/2 md:-translate-x-1/2">
       <div className="flex items-stretch gap-0.5 border-t border-line bg-surface/95 px-1.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-2xl backdrop-blur-sm md:items-center md:rounded-[12px] md:border md:px-2 md:py-2">
-        <Link href="/" aria-label="Theru home" className="grid shrink-0 place-items-center px-1.5 transition hover:-translate-y-0.5 md:px-1">
-          <StreetSign size="sm" />
+        <Link href="/" aria-label="Theru home" className="grid shrink-0 place-items-center px-2.5 text-[17px] font-semibold tracking-[-0.04em] text-fg transition hover:opacity-75 md:px-3">
+          Theru
         </Link>
         <Lane />
         {NAV.map((n) => (

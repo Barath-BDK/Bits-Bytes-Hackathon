@@ -5,7 +5,6 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { CAPTIONS, HeroBackdrop, useThemeId } from "@/components/backdrops/hero-backdrop";
 import { BlurFade, WordReveal } from "@/components/motion-bits";
 import { StreetPicker } from "@/components/street-picker";
-import { StreetSign } from "@/components/street-sign";
 
 const EXAMPLES = [
   { name: "Velachery Main Road", area: "Velachery, Chennai", lat: 12.9793, lng: 80.2189 },
@@ -21,7 +20,6 @@ export function Hero({ ticker }: { ticker: string[] }) {
   const artScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const artOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0.25]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
-  const signY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
     <section ref={ref} className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-bg">
@@ -30,15 +28,6 @@ export function Hero({ ticker }: { ticker: string[] }) {
       </motion.div>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,var(--bg)_0%,color-mix(in_oklab,var(--bg)_72%,transparent)_42%,transparent_72%)]" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-bg to-transparent" />
-
-      {/* the brand, installed like a street sign on its pole */}
-      <motion.div style={{ y: signY }} className="pointer-events-none absolute bottom-0 right-[7%] hidden flex-col items-center lg:flex" aria-hidden>
-        <motion.div initial={{ rotate: -8, y: -30, opacity: 0 }} animate={{ rotate: 0, y: 0, opacity: 1 }} transition={{ delay: 0.9, type: "spring", stiffness: 120, damping: 11 }}
-          style={{ originY: 0 }}>
-          <StreetSign size="lg" />
-        </motion.div>
-        <span className="h-[46vh] w-[6px] rounded-t-sm bg-gradient-to-b from-fg-3 to-fg-3/20" />
-      </motion.div>
 
       <motion.div style={{ y: textY }} className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-4 py-20 sm:px-6">
         <h1 className="display max-w-[16ch] text-[clamp(2.9rem,7.4vw,6.8rem)] [text-wrap:balance]">

@@ -186,7 +186,7 @@ A 2 to 5 minute walkthrough will be added at `demo/theru-demo.mp4`.
 | [Zod](https://zod.dev) | Input validation | MIT |
 | [sharp](https://sharp.pixelplumbing.com) | Photo re-encoding | Apache-2.0 |
 | [Vercel Blob](https://vercel.com/storage/blob) | Photo storage | Hosted service |
-| Instrument Sans, Instrument Serif, Fragment Mono, Anek Tamil ([Google Fonts](https://fonts.google.com)) | Typography | SIL OFL 1.1 |
+| Instrument Sans, Instrument Serif, Fragment Mono ([Google Fonts](https://fonts.google.com)) | Typography | SIL OFL 1.1 |
 | [Wikimedia Commons](https://commons.wikimedia.org) | Demo photos (credits on the Method page and in `public/seed/credits.json`) | CC licences as listed |
 | [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | News sources for real notices, linked on every record | Linked, not copied |
 

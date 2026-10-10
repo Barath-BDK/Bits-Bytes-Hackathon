@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ViewTransition } from "react";
-import { Instrument_Sans, Instrument_Serif, Fragment_Mono, Anek_Tamil } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Dock } from "@/components/dock";
 import { Chainage, Ground } from "@/components/ground";
@@ -11,7 +11,6 @@ import "./globals.css";
 const instrument = Instrument_Sans({ variable: "--font-instrument", subsets: ["latin"] });
 const serif = Instrument_Serif({ variable: "--font-instrument-serif", weight: "400", style: ["normal", "italic"], subsets: ["latin"] });
 const fragment = Fragment_Mono({ variable: "--font-fragment", weight: "400", subsets: ["latin"] });
-const tamil = Anek_Tamil({ variable: "--font-anek-tamil", subsets: ["tamil"], weight: ["500", "600", "700"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -23,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-theme={DEFAULTS.theme} data-mode={DEFAULTS.mode} data-backdrop={DEFAULTS.backdrop} data-headline={DEFAULTS.headline}
       data-transition={DEFAULTS.transition} suppressHydrationWarning
-      className={`${instrument.variable} ${serif.variable} ${fragment.variable} ${tamil.variable} h-full antialiased`}>
+      className={`${instrument.variable} ${serif.variable} ${fragment.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>

@@ -19,7 +19,7 @@ const STACK = [
   ["Zod", "MIT", "https://zod.dev"],
   ["sharp", "Apache-2.0", "https://sharp.pixelplumbing.com"],
   ["Vercel Blob", "hosted service", "https://vercel.com/storage/blob"],
-  ["Instrument Sans, Instrument Serif, Fragment Mono, Anek Tamil", "SIL OFL 1.1", "https://fonts.google.com"],
+  ["Instrument Sans, Instrument Serif, Fragment Mono", "SIL OFL 1.1", "https://fonts.google.com"],
 ];
 
 const RULES = [
