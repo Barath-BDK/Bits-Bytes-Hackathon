@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getClusters, getFindings, getNotices } from "@/lib/data";
-import { KINDS, NOTICE_KINDS, PROVENANCE, REQUEST_CATEGORIES, clusterTitle, isLiveOutage, photoSrc, timeAgo, type Notice, type Provenance } from "@/lib/issues";
-import { inForceOrSoon, span } from "@/lib/time";
+import { KINDS, REQUEST_CATEGORIES, clusterTitle, isLiveOutage, photoSrc, timeAgo, type Notice, type Provenance } from "@/lib/issues";
 import { streetHref } from "@/lib/links";
 import { KindBadge } from "@/components/kind-icon";
 import { MapPreview } from "@/components/map-preview";
@@ -33,22 +32,9 @@ const SOURCES: [Provenance, string, string][] = [
 
 const place = (n: Notice) => n.area_text?.split(/[.(,]/)[0].trim() || n.title;
 
-// Notices issued together (one suspension that covers many localities) are listed once, with the places named.
-function grouped(notices: Notice[]) {
-  const groups = new Map<string, Notice[]>();
-  for (const n of notices) {
-    const key = [n.kind, n.agency, n.starts_at, n.ends_at].join("|");
-    groups.set(key, [...(groups.get(key) ?? []), n]);
-  }
-  return [...groups.values()];
-}
-
 export default async function Home() {
   const [clusters, findings, notices] = await Promise.all([getClusters(), getFindings(), getNotices()]);
-  const upcoming = inForceOrSoon(notices);
-  const groups = grouped(upcoming);
   const open = clusters.filter((c) => c.status === "open" && (c.kind !== "outage" || isLiveOutage(c)));
-  const live = open.filter(isLiveOutage);
   const asks = open.filter((c) => c.kind === "request").sort((a, b) => b.reporter_count - a.reporter_count);
   const incidents = notices.filter((n) => n.kind === "incident").sort((a, b) => b.starts_at.localeCompare(a.starts_at));
   const demoOpen = open.filter((c) => c.demo).length;
@@ -56,7 +42,6 @@ export default async function Home() {
   const withPhoto = open.filter((c) => c.cover_photo).sort((a, b) => b.priority - a.priority);
   const firstOfKind = withPhoto.filter((c, i) => withPhoto.findIndex((d) => d.kind === c.kind) === i);
   const photos = [...firstOfKind, ...withPhoto.filter((c) => !firstOfKind.includes(c))].slice(0, 3);
-  const shown = live.length ? 2 : 3;
   const pins = open.map((c) => ({ lat: c.lat, lng: c.lng, kind: c.kind, n: Math.min(c.reporter_count, 8) }));
   const works = notices.filter((n) => n.kind === "works").map((n) => ({ lat: n.lat, lng: n.lng, r: n.radius_m }));
 
@@ -81,49 +66,6 @@ export default async function Home() {
                 </div>
               ))}
             </dl>
-          </div>
-
-          {/* notice board, laid over the foot of the street plan */}
-          <div className="relative flex items-end pb-10 lg:justify-end lg:pb-14 lg:pl-10">
-            <div className="w-full rounded-[6px] border border-line bg-[color-mix(in_oklab,var(--bg)_94%,transparent)] p-5 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.7)] lg:max-w-[27rem]">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="display-face text-[1.0625rem] font-bold [font-stretch:108%]">In force, next 48 hours</h2>
-                <Link href="/records" className="link shrink-0 text-sm text-fg-2">All records</Link>
-              </div>
-              <ul className="mt-3">
-                {live.length > 0 && (
-                  <li className="border-t border-line">
-                    <Link href="/map" className="group flex items-start gap-3 py-3">
-                      <KindBadge kind="outage" size={24} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold group-hover:underline">Power reported off in {live.length} {live.length === 1 ? "area" : "areas"}</span>
-                        <span className="block text-sm text-fg-2">By {live.reduce((n, c) => n + c.reporter_count, 0)} residents in the last 6 hours</span>
-                      </span>
-                      <span className={`tag ${live.every((c) => c.demo) ? "tag-demo" : "tag-community"}`}>{live.every((c) => c.demo) ? "Demo data" : "Resident reports"}</span>
-                    </Link>
-                  </li>
-                )}
-                {groups.slice(0, shown).map(([n, ...more]) => (
-                  <li key={n.id} className="grid grid-cols-[auto_1fr] gap-x-3 border-t border-line py-3">
-                    <span className="mt-[0.45rem] h-2.5 w-2.5 rounded-[2px]" style={{ background: NOTICE_KINDS[n.kind].color }} aria-hidden />
-                    <span className="min-w-0">
-                      {more.length === 0
-                        ? <Link href={streetHref({ lat: n.lat, lng: n.lng, name: place(n) })} className="block font-semibold hover:underline">{NOTICE_KINDS[n.kind].label}, {place(n)}</Link>
-                        : <Link href="/records" className="block font-semibold hover:underline">{NOTICE_KINDS[n.kind].label} in {more.length + 1} localities</Link>}
-                      {more.length > 0 && <span className="block text-sm text-fg-2">{[n, ...more].slice(0, 3).map(place).join(", ")}{more.length > 2 && ` and ${more.length - 2} more`}</span>}
-                      <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-2">
-                        <span className="tabular-nums">{span(new Date(n.starts_at), n.ends_at ? new Date(n.ends_at) : null)}</span>
-                        {n.source_url
-                          ? <a href={n.source_url} target="_blank" rel="noreferrer" className="link">{PROVENANCE[n.provenance]}: {n.source_name.split(" (")[0]}</a>
-                          : <span>{PROVENANCE[n.provenance]}</span>}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-                {live.length === 0 && upcoming.length === 0 && <li className="border-t border-line py-4 text-fg-2">No shutdowns or suspensions on record for the next 48 hours.</li>}
-              </ul>
-              {groups.length > shown && <p className="border-t border-line pt-3 text-sm text-fg-2">{upcoming.length} notices in force or starting soon.</p>}
-            </div>
           </div>
         </div>
         <div className="lane relative z-[4]" aria-hidden />

@@ -123,6 +123,38 @@ function Flood() {
   );
 }
 
+// A fenced works zone with its permit on record, and a pothole residents keep reporting.
+function Works({ id }: { id: string }) {
+  return (
+    <g>
+      <defs>
+        <pattern id={id} width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+          <rect width="3" height="10" fill="var(--works)" opacity="0.35" />
+        </pattern>
+      </defs>
+      <g transform="rotate(-8 1330 690)">
+        <rect x="1250" y="650" width="160" height="80" fill={`url(#${id})`} />
+        <rect x="1250" y="650" width="160" height="80" fill="none" stroke="var(--works)" strokeWidth="1.8" strokeDasharray="8 6" className="march" />
+      </g>
+      <Label x={1330} y={618} o={1} size={12} fill="var(--works)" anchor="middle">METRO WORKS</Label>
+      <Label x={1330} y={636} o={0.8} size={11} anchor="middle">PERMIT ON RECORD</Label>
+    </g>
+  );
+}
+
+function Pothole() {
+  return (
+    <g>
+      {[0, 1.1].map((d) => <circle key={d} cx="1040" cy="660" r="12" fill="none" stroke="var(--pothole)" strokeWidth="1.5" className="ripple" style={delay(d)} />)}
+      <rect x="1030" y="650" width="20" height="20" rx="4" fill="var(--pothole)" />
+      <circle cx="1052" cy="648" r="9" fill="var(--fg)" />
+      <text x="1052" y="652" textAnchor="middle" fontFamily="var(--font-fragment)" fontSize="11" fill="var(--bg)">6</text>
+      <Label x={1040} y={704} o={1} size={12} fill="var(--pothole)" anchor="middle">POTHOLE</Label>
+      <Label x={1040} y={722} o={0.8} size={11} anchor="middle">6 REPORTS</Label>
+    </g>
+  );
+}
+
 // Static art and moving parts live in separate stacked SVGs, so an animation only repaints its own layer.
 // Wide screens show the plan beside the headline; phones get a closer crop so the labels stay readable.
 const VIEW = { wide: "760 70 840 760", phone: "930 80 560 420" };
@@ -156,6 +188,8 @@ function Plan({ view }: { view: keyof typeof VIEW }) {
         <PowerOff />
         <Flood />
         <RoadCuts />
+        <Works id={`hs-works-${view}`} />
+        <Pothole />
         {[[1310, 150, "var(--pothole)"], [960, 185, "var(--pothole)"]].map(([x, y, c]) => (
           <rect key={String(x)} className="art-blip" x={Number(x) - 7} y={Number(y) - 7} width="14" height="14" rx="3" fill={String(c)} />
         ))}
@@ -171,7 +205,7 @@ export function HeroStreet() {
       aria-label="Illustration: a street plan where roads are dug up and restored, one road is closed with a diversion, a block loses power and a junction floods.">
       <div className="absolute inset-0 hidden lg:block"><Plan view="wide" /></div>
       <div className="hs-phone absolute inset-0 lg:hidden"><Plan view="phone" /></div>
-      <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--bg)_0%,transparent_16%),linear-gradient(0deg,var(--bg)_0%,transparent_30%)] max-lg:bg-[linear-gradient(0deg,var(--bg)_0%,transparent_16%)]" aria-hidden />
+      <span className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--bg)_0%,transparent_16%),linear-gradient(0deg,var(--bg)_0%,transparent_14%)] max-lg:bg-[linear-gradient(0deg,var(--bg)_0%,transparent_16%)]" aria-hidden />
     </div>
   );
 }
