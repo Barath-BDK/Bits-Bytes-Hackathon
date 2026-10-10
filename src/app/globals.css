@@ -245,7 +245,7 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible, summary:focus
   --bg: #0f1112; --surface: #181b1c; --surface-2: #24282a; --line: rgb(255 255 255 / 0.16);
   --fg: #ffffff; --fg-2: #d2d6d7; --fg-3: #a3a9aa;
   --accent: #ffffff; --accent-fg: #000000;
-  --pothole: #f0a074; --water: #86c8de; --works: #e6c96a; --ok: #8fd3a8; --alert: #f59a8c;
+  --pothole: #f0a074; --water: #86c8de; --works: #ffd60a; --ok: #8fd3a8; --alert: #f59a8c; --outage: #a78bfa;
   --display-fg: #ffffff;
 }
 .asphalt { color: var(--fg); background-color: var(--bg); color-scheme: dark; }
@@ -270,3 +270,43 @@ a:focus-visible, button:focus-visible, [role="tab"]:focus-visible, summary:focus
 .hero-slide[data-on="true"] img { animation: hero-push 9s ease-out both; }
 @keyframes hero-push { from { transform: scale(1.06); } to { transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .hero-slide { transition: none; } .hero-slide[data-on="true"] img { animation: none; } }
+
+/* hero street plan: the city etches in, then roads are cut and restored, one is closed, a block goes dark, a junction floods */
+.etch path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: etch 2.2s cubic-bezier(0.6, 0, 0.3, 1) var(--d, 0s) forwards; }
+@keyframes etch { to { stroke-dashoffset: 0; } }
+.cut-seg { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: cut-seg 15s cubic-bezier(0.6, 0, 0.3, 1) infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-seg {
+  0% { stroke-dashoffset: 1; stroke: var(--works); opacity: 0; } 4% { opacity: 1; } 12% { stroke-dashoffset: 0; }
+  46% { stroke: var(--works); } 56% { stroke: var(--fg); opacity: 0.9; } 80% { stroke-dashoffset: 0; opacity: 0.5; } 90%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.cut-box { opacity: 0; animation: cut-box 15s ease infinite; animation-delay: var(--d, 0s); transform-box: fill-box; transform-origin: center; }
+@keyframes cut-box { 0%, 8% { opacity: 0; scale: 1.5; } 13% { opacity: 1; scale: 1; } 46% { opacity: 1; } 54%, 100% { opacity: 0; } }
+.cut-note { opacity: 0; animation: cut-note 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-note { 0%, 13% { opacity: 0; translate: 0 6px; } 19%, 48% { opacity: 1; translate: 0 0; } 53%, 100% { opacity: 0; } }
+.cut-done { opacity: 0; animation: cut-done 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-done { 0%, 53% { opacity: 0; translate: 0 6px; } 59%, 80% { opacity: 1; translate: 0 0; } 88%, 100% { opacity: 0; } }
+.cut-lead { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: cut-lead 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-lead { 0%, 11% { stroke-dashoffset: 1; opacity: 1; } 17% { stroke-dashoffset: 0; } 80% { stroke-dashoffset: 0; opacity: 0.8; } 88%, 100% { opacity: 0; } }
+.march { animation: march 1.2s linear infinite; }
+@keyframes march { to { stroke-dashoffset: -26; } }
+.blink { animation: blink 1.2s steps(1) infinite; animation-delay: var(--d, 0s); }
+@keyframes blink { 50% { opacity: 0.15; } }
+.lamp { animation: lamp 15s ease infinite; animation-delay: calc(var(--d, 0s) + 2s); }
+@keyframes lamp { 0%, 20% { opacity: 1; } 21% { opacity: 0.2; } 22% { opacity: 0.9; } 24%, 82% { opacity: 0.08; } 90%, 100% { opacity: 1; } }
+.dark-zone { opacity: 0; animation: dark-zone 15s ease infinite 2s; }
+@keyframes dark-zone { 0%, 40% { opacity: 0; } 48%, 80% { opacity: 0.2; } 90%, 100% { opacity: 0; } }
+.dark-zone-edge, .dark-note { opacity: 0; animation: dark-edge 15s ease infinite 2s; }
+@keyframes dark-edge { 0%, 42% { opacity: 0; } 50%, 80% { opacity: 1; } 88%, 100% { opacity: 0; } }
+.ripple { transform-box: fill-box; transform-origin: center; animation: ripple 3.6s ease-out infinite; animation-delay: var(--d, 0s); opacity: 0; }
+@keyframes ripple { 0% { scale: 0.4; opacity: 0.9; } 100% { scale: 2.4; opacity: 0; } }
+.art-blip { transform-box: fill-box; transform-origin: center; animation: blip 2.4s ease-in-out 3s infinite; }
+@keyframes blip { 50% { scale: 1.6; opacity: 0.6; } }
+.hs-scan { animation: hs-scan 18s linear infinite; }
+.hs-phone text { font-size: 16px; letter-spacing: 1.5px; }
+@keyframes hs-scan { from { transform: translateX(700px); } to { transform: translateX(1660px); } }
+@media (prefers-reduced-motion: reduce) {
+  .etch path, .cut-seg, .cut-lead { stroke-dashoffset: 0; }
+  .cut-seg { stroke: var(--works); }
+  .cut-seg, .cut-box, .cut-note, .cut-lead, .dark-zone-edge, .dark-note { opacity: 1; }
+  .dark-zone { opacity: 0.2; } .lamp { opacity: 0.08; } .hs-scan { display: none; }
+}

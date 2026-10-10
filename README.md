@@ -184,11 +184,11 @@ Every external service the site or its scripts call, and what for. None needs a 
 | [Open-Meteo](https://open-meteo.com) | Server (street pages) | Hourly rain forecast for the 48-hour outlook | CC BY 4.0 |
 | [Vercel Blob](https://vercel.com/storage/blob) | `/api/photos` | Storing residents' photos | Free tier |
 | [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | Read by hand into `scripts/real-records.json` | Published shutdown, suspension and incident notices | Linked on every record, not copied |
-| [Wikimedia Commons](https://commons.wikimedia.org) | Downloaded once into `public/seed` | Photos for the hero and the sample reports (credits below) | Licences as listed |
+| [Wikimedia Commons](https://commons.wikimedia.org) | Downloaded once into `public/seed` | Photos for the sample reports (credits below) | Licences as listed |
 
 ## Photo credits
 
-All photos are from Wikimedia Commons and are credited on the site (hero caption, Method page) and here.
+All photos are from Wikimedia Commons and are credited on the site (Method page) and here.
 
 | File | Title | Author | Licence |
 | --- | --- | --- | --- |
@@ -239,7 +239,7 @@ No paid APIs and no AI APIs are used. The project runs entirely on free tiers.
 
 ```
 src/app/            pages (/, /street, /map, /records, /c/[id], /about) and /api routes
-src/components/     UI: header, hero photos, street picker, outlook grid, map view, report sheet
+src/components/     UI: header, hero street plan, street picker, outlook grid, map view, report sheet
 src/lib/            data access, rules and labels, jurisdiction and escalation, forecast, outlook
 supabase/migrations database schema, RLS, functions and rules engine
 supabase/*.sql      seeds: illustrative reports, demo notices, real notices

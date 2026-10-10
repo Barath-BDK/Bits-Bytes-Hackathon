@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import credits from "../../public/seed/credits.json";
 import { getClusters, getFindings, getNotices } from "@/lib/data";
 import { KINDS, NOTICE_KINDS, PROVENANCE, REQUEST_CATEGORIES, clusterTitle, isLiveOutage, photoSrc, timeAgo, type Notice, type Provenance } from "@/lib/issues";
 import { inForceOrSoon, span } from "@/lib/time";
@@ -9,7 +8,7 @@ import { KindBadge } from "@/components/kind-icon";
 import { MapPreview } from "@/components/map-preview";
 import { StreetPicker } from "@/components/street-picker";
 import { VouchButton } from "@/components/vouch-button";
-import { HeroPhotos, type HeroPhoto } from "@/components/hero-photos";
+import { HeroStreet } from "@/components/hero-street";
 
 // Pre-rendered and served from the edge; regenerated on writes (revalidateTag) or every minute.
 export const revalidate = 60;
@@ -30,12 +29,6 @@ const SOURCES: [Provenance, string, string][] = [
   ["osm", "OpenStreetMap", "Mapped by volunteers. Shows that works exist, not their dates."],
   ["community", "Resident reports", "Submitted here by residents. Not checked by any agency."],
   ["demo", "Demo data", "Sample records that show how the site works. Not real."],
-];
-
-// Every photo the site uses, the monsoon street first; each is credited as its licence asks (public/seed/credits.json).
-const HERO_PHOTOS: HeroPhoto[] = [
-  ...credits.filter((c) => c.file === "waterlogging-5.webp"),
-  ...credits.filter((c) => c.file !== "waterlogging-5.webp"),
 ];
 
 const place = (n: Notice) => n.area_text?.split(/[.(,]/)[0].trim() || n.title;
@@ -69,9 +62,9 @@ export default async function Home() {
 
   return (
     <main>
-      {/* The street: look one up. Beside it, photographs of streets like it, and what is in force right now. */}
+      {/* The street: look one up. Beside it, a street plan where works keep happening, and what is in force right now. */}
       <section className="asphalt relative isolate overflow-hidden">
-        <HeroPhotos photos={HERO_PHOTOS} />
+        <HeroStreet />
 
         <div className="relative z-[4] mx-auto grid max-w-6xl grid-cols-1 px-4 sm:px-6 lg:min-h-[39rem] lg:grid-cols-[53%_47%]">
           <div className="pb-12 pt-6 lg:py-20 lg:pr-12">
@@ -90,7 +83,7 @@ export default async function Home() {
             </dl>
           </div>
 
-          {/* notice board, laid over the foot of the photograph */}
+          {/* notice board, laid over the foot of the street plan */}
           <div className="relative flex items-end pb-10 lg:justify-end lg:pb-14 lg:pl-10">
             <div className="w-full rounded-[6px] border border-line bg-[color-mix(in_oklab,var(--bg)_94%,transparent)] p-5 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.7)] lg:max-w-[27rem]">
               <div className="flex items-baseline justify-between gap-4">
