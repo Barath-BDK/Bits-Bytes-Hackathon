@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { KINDS, timeAgo, type Cluster, type Kind } from "@/lib/issues";
+import { KINDS, clusterTitle, timeAgo, type Cluster, type Kind } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { NumberTicker, listContainer, listItem } from "@/components/motion-bits";
 
@@ -33,6 +33,29 @@ function Pills<T extends string>({ id, value, options, onPick }: { id: string; v
   );
 }
 
+const CHIPS: [KindFilter, string][] = [
+  ["all", "All"], ["pothole", "Potholes"], ["waterlogging", "Water"], ["request", "Requests"], ["parking", "Parking"], ["worksite", "Works"], ["outage", "Power"],
+];
+
+// Kind filter: a scrollable row of chips, each marked with its kind's colour.
+function KindChips({ value, onPick, count }: { value: KindFilter; onPick: (k: KindFilter) => void; count: (k: KindFilter) => number }) {
+  return (
+    <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by kind">
+      {CHIPS.map(([k, label]) => {
+        const on = value === k;
+        return (
+          <button key={k} onClick={() => onPick(k)} aria-pressed={on}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium transition ${on ? "border-fg/40 bg-fg text-bg" : "border-line text-fg-2 hover:border-fg-3 hover:text-fg"}`}>
+            {k !== "all" && <span className="h-2 w-2 rounded-[3px]" style={{ background: KINDS[k].color }} />}
+            {label}
+            <span className={`tabular-nums ${on ? "opacity-70" : "text-fg-3"}`}>{count(k)}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 type Props = {
   all: Cluster[]; visible: Cluster[]; selected: string | null; onSelect: (id: string) => void;
   kind: KindFilter; setKind: (k: KindFilter) => void; sort: SortBy; setSort: (s: SortBy) => void;
@@ -50,9 +73,7 @@ export function IssuePanel({ all, visible, selected, onSelect, kind, setKind, so
           <Stat n={open.reduce((n, c) => n + c.reporter_count, 0)} label="Reporters" />
           <Stat n={open.filter((c) => c.near_worksite).length} label="Near works" accent />
         </div>
-        <Pills id={`${idPrefix}-kind`} value={kind} onPick={setKind} options={[
-          ["all", `All ${count("all")}`], ["pothole", `Potholes ${count("pothole")}`], ["waterlogging", `Water ${count("waterlogging")}`], ["worksite", `Works ${count("worksite")}`], ["outage", `Power ${count("outage")}`],
-        ]} />
+        <KindChips value={kind} onPick={setKind} count={count} />
         <div className="grid grid-cols-[1.4fr_1fr] gap-2">
           <Pills id={`${idPrefix}-sort`} value={sort} onPick={setSort} options={[["priority", "Priority"], ["recent", "Recent"], ["reports", "Most"]]} />
           <Pills id={`${idPrefix}-status`} value={status} onPick={setStatus} options={[["open", "Open"], ["resolved", "Fixed"], ["all", "All"]]} />
@@ -66,13 +87,15 @@ export function IssuePanel({ all, visible, selected, onSelect, kind, setKind, so
               <KindBadge kind={c.kind} size={34} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-[15px] font-medium tracking-[-0.01em]">{KINDS[c.kind].severity[c.severity_max - 1]} {KINDS[c.kind].label.toLowerCase()}</span>
+                  <span className="truncate text-[15px] font-medium tracking-[-0.01em]">{clusterTitle(c)}</span>
                   <span className={`label shrink-0 ${c.status === "resolved" ? "text-ok" : "text-fg-3"}`}>
                     {c.status === "resolved" ? "Fixed" : sort === "priority" ? `#${i + 1}` : `P${c.priority}`}
                   </span>
                 </span>
                 <span className="mt-0.5 block truncate text-[13px] text-fg-3">
-                  {c.kind === "worksite" ? c.department : `${c.reporter_count} ${c.reporter_count === 1 ? "report" : "reports"}, ${timeAgo(c.last_reported_at)}`}
+                  {c.kind === "worksite" ? c.department
+                    : c.kind === "request" ? `${c.reporter_count} ${c.reporter_count === 1 ? "person" : "people"} asking${c.vouches ? `, ${c.vouches} vouched` : ""}, ${timeAgo(c.last_reported_at)}`
+                    : `${c.reporter_count} ${c.reporter_count === 1 ? "report" : "reports"}, ${timeAgo(c.last_reported_at)}`}
                 </span>
                 {c.near_worksite && c.status === "open" && (
                   <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-[3px] bg-works/15 px-1.5 py-0.5 text-[11px] font-medium text-works">

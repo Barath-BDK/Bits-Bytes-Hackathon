@@ -4,7 +4,7 @@ import { getStreet } from "@/lib/data";
 import { rainForecast } from "@/lib/forecast";
 import { buildOutlook } from "@/lib/outlook";
 import { departments, locate } from "@/lib/jurisdiction";
-import { KINDS, NOTICE_KINDS, PROVENANCE, isLiveOutage, timeAgo, type Kind } from "@/lib/issues";
+import { KINDS, NOTICE_KINDS, PROVENANCE, clusterTitle, isLiveOutage, timeAgo, type Kind } from "@/lib/issues";
 import { SITE } from "@/lib/site";
 import { dayMonth, hhmm } from "@/lib/time";
 import { KindBadge } from "@/components/kind-icon";
@@ -68,7 +68,8 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
   const live = street.clusters.filter(isLiveOutage);
   const open = street.clusters.filter((c) => c.status === "open" && (c.kind !== "outage" || isLiveOutage(c)));
   const kinds = [...new Set(open.map((c) => c.kind))] as Kind[];
-  const contacts = (kinds.length ? kinds : (["notice"] as const)).flatMap((k) => departments(k));
+  const contacts = (kinds.length ? kinds : (["notice"] as const)).flatMap((k) => departments(k))
+    .filter((x, i, all) => all.findIndex((y) => y.name === x.name) === i);
   const pageUrl = `${SITE.url}/street?lat=${lat.toFixed(5)}&lng=${lng.toFixed(5)}&name=${encodeURIComponent(name)}`;
   const message = [
     `Street record for ${name}${area ? `, ${area}` : ""}:`,
@@ -155,7 +156,7 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
                     <span className="absolute -left-[26px] top-1 h-3 w-3 rounded-[3px] border-2 border-bg" style={{ background: KINDS[t.c.kind].color }} />
                     <p className="font-mono text-[11px] text-fg-3">{dayMonth(new Date(t.c.first_reported_at))}</p>
                     <Link href={`/c/${t.c.id}`} className="font-medium underline decoration-line underline-offset-4 hover:decoration-fg">
-                      {KINDS[t.c.kind].severity[t.c.severity_max - 1]} {KINDS[t.c.kind].label.toLowerCase()}, {t.c.reporter_count} {t.c.reporter_count === 1 ? "report" : "reports"}
+                      {clusterTitle(t.c)}, {t.c.reporter_count} {t.c.reporter_count === 1 ? "report" : "reports"}
                     </Link>
                     <p className="mt-1 flex flex-wrap gap-1.5">
                       <span className={`tag ${t.c.demo ? "tag-demo" : "tag-community"}`}>{t.c.demo ? "Demo data" : "Resident reports"}</span>
@@ -178,7 +179,7 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
                     <Link href={`/c/${c.id}`} className="flex items-center gap-3 rounded-[6px] p-2.5 transition hover:bg-surface-2">
                       <KindBadge kind={c.kind} size={32} />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-medium">{KINDS[c.kind].severity[c.severity_max - 1]} {KINDS[c.kind].label.toLowerCase()}</span>
+                        <span className="block truncate font-medium">{clusterTitle(c)}</span>
                         <span className="block truncate text-sm text-fg-3">{c.kind === "worksite" ? c.department : `${c.reporter_count} reports, ${timeAgo(c.last_reported_at)}`}</span>
                       </span>
                       {c.demo && <span className="tag tag-demo">Demo</span>}

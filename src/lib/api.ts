@@ -30,6 +30,7 @@ export function dbError(e: { code?: string; message: string }) {
   switch (e.code) {
     case "22023": return err("location must be inside India", 400);
     case "P0429": return err("too many reports, try again later", 429);
+    case "P0422": return err("choose what the request is for", 400);
     case "P0002": return err("not found", 404);
     default:
       console.error("db error", e.code, e.message);

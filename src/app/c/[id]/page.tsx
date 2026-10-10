@@ -4,7 +4,8 @@ import Image from "next/image";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { getCluster, getFindings } from "@/lib/data";
-import { KINDS, complaintDraft, formatDate, isOverdue, photoSrc, priorityParts, shortId, timeAgo } from "@/lib/issues";
+import { KINDS, clusterTitle, complaintDraft, formatDate, isOverdue, photoSrc, priorityParts, shortId, timeAgo } from "@/lib/issues";
+import { VouchButton } from "@/components/vouch-button";
 import { KindBadge } from "@/components/kind-icon";
 import { BlurFade } from "@/components/motion-bits";
 import { BackLink } from "@/components/back-link";
@@ -64,7 +65,9 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
           <h1 className="display mt-6 max-w-3xl text-[clamp(2.2rem,5.5vw,4.4rem)]">
             {c.kind === "worksite"
               ? `${c.department ?? "Unnamed agency"} is digging here.`
-              : `${c.reporter_count} ${c.reporter_count === 1 ? "person has" : "people have"} reported this ${k.label.toLowerCase()}.`}
+              : c.kind === "request"
+                ? `${clusterTitle(c)}: ${c.reporter_count} ${c.reporter_count === 1 ? "person is" : "people are"} asking.`
+                : `${c.reporter_count} ${c.reporter_count === 1 ? "person has" : "people have"} reported this ${k.label.toLowerCase()}.`}
           </h1>
           <p className="mt-5 text-lg text-fg-2">
             {k.severity[c.severity_max - 1]}. First reported {formatDate(c.first_reported_at)}, last report {timeAgo(c.last_reported_at)}.
@@ -141,13 +144,29 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
         </section>
 
         <aside className="space-y-8">
+          {c.kind !== "worksite" && c.status === "open" && (
+            <BlurFade inView>
+              <Sheet label={c.kind === "request" ? "Support this request" : "Seen it too?"} bodyClassName="p-6">
+                {c.kind === "request" && <RequestTrack raised={c.reporter_count - (d.confirmations.vouch ?? 0)} vouches={d.confirmations.vouch ?? 0} resolved={false} />}
+                <p className="mb-4 mt-1 text-sm text-fg-2">
+                  {c.kind === "request"
+                    ? "Each vouch counts as one more resident asking, and raises its priority. One per person; nothing about you is stored."
+                    : "Add your weight without filing a new report. One per person; nothing about you is stored."}
+                </p>
+                <VouchButton id={c.id} initial={d.confirmations.vouch ?? 0} label={c.kind === "request" ? "I need this too" : "I see this too"} />
+              </Sheet>
+            </BlurFade>
+          )}
           {c.kind !== "worksite" && (
             <BlurFade inView>
               <Sheet label="Neighbour check" bodyClassName="p-6">
-                <h2 className="text-xl font-semibold tracking-[-0.03em]">{c.kind === "outage" ? "Is the power back?" : "Is it fixed?"}</h2>
+                {c.kind === "request" && c.status === "resolved" && <RequestTrack raised={c.reporter_count - (d.confirmations.vouch ?? 0)} vouches={d.confirmations.vouch ?? 0} resolved />}
+                <h2 className="text-xl font-semibold tracking-[-0.03em]">
+                  {c.kind === "outage" ? "Is the power back?" : c.kind === "request" ? "Has it been done?" : c.kind === "parking" ? "Is the spot clear now?" : "Is it fixed?"}
+                </h2>
                 <p className="mt-1 text-sm text-fg-2">It closes only when two neighbours confirm, and they outnumber those who say otherwise.</p>
                 <ConfirmButtons id={c.id} initial={d.confirmations} status={c.status}
-                  labels={c.kind === "outage" ? ["Power is back", "Still off"] : ["Fixed", "Still there"]} />
+                  labels={c.kind === "outage" ? ["Power is back", "Still off"] : c.kind === "request" ? ["Done", "Still waiting"] : c.kind === "parking" ? ["Cleared", "Still blocked"] : ["Fixed", "Still there"]} />
               </Sheet>
             </BlurFade>
           )}
@@ -160,7 +179,7 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
           )}
           <BlurFade inView delay={0.08}>
             <Sheet label="Who answers for this" bodyClassName="p-5">
-              <WhoAnswers j={j} contacts={departments(c.kind)} message={draft} subject={`${k.label} reported by ${c.reporter_count} residents, ref. TH-${shortId(c.id)}`}
+              <WhoAnswers j={j} contacts={departments(c.kind, c.category)} message={draft} subject={`${clusterTitle(c)}, ${c.reporter_count} residents, ref. TH-${shortId(c.id)}`}
                 ladder={c.status === "open" ? ladder(c.kind, j) : undefined} daysOpen={daysOpen} />
             </Sheet>
           </BlurFade>
@@ -171,5 +190,25 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
         </aside>
       </div>
     </main>
+  );
+}
+
+// Where a request stands: raised, supported, resolved. Resolution is confirmed by residents, not claimed for an agency.
+function RequestTrack({ raised, vouches, resolved }: { raised: number; vouches: number; resolved: boolean }) {
+  const steps = [
+    { label: "Raised", detail: `${raised} ${raised === 1 ? "resident" : "residents"}`, on: true },
+    { label: "Supported", detail: `${vouches} ${vouches === 1 ? "vouch" : "vouches"}`, on: vouches > 0 },
+    { label: "Resolved", detail: resolved ? "confirmed by neighbours" : "waiting", on: resolved },
+  ];
+  return (
+    <ol className="mb-5 grid grid-cols-3 gap-2">
+      {steps.map((s, i) => (
+        <li key={s.label} className="relative">
+          <span className={`block h-1.5 rounded-full ${s.on ? "bg-request" : "bg-surface-2"}`} style={{ opacity: s.on ? 1 - i * 0.12 : 1 }} />
+          <span className={`mt-2 block text-sm font-medium ${s.on ? "text-fg" : "text-fg-3"}`}>{s.label}</span>
+          <span className="block text-xs text-fg-3">{s.detail}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

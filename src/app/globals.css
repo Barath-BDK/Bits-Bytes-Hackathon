@@ -97,12 +97,14 @@
   --pothole: #d9481c; --water: #0a6fd6; --works: #b98d00; --ok: #11914a; --alert: #c4262c;
 }
 
-/* Power-cut colour, shared by every theme */
-:root { --outage: #a78bfa; }
-:root[data-mode="light"] { --outage: #6d4fd8; }
+/* Colours shared by every theme: power cuts, parking, requests */
+:root { --outage: #a78bfa; --parking: #f0739f; --request: #4fd1b5; }
+:root[data-mode="light"] { --outage: #6d4fd8; --parking: #c23b6c; --request: #0e8a73; }
 
 @theme inline {
   --color-outage: var(--outage);
+  --color-parking: var(--parking);
+  --color-request: var(--request);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
@@ -441,3 +443,39 @@ html[data-mode="light"] .ground svg { opacity: 0.2; }
 .survey-scan { animation: survey-scan 24s linear infinite; }
 @keyframes survey-scan { from { transform: translateX(-160px); } to { transform: translateX(1760px); } }
 @media (prefers-reduced-motion: reduce) { .cut-seg, .cut-box, .cut-note, .cut-done, .cut-lead, .survey-scan { animation: none; } }
+
+/* ---------- Life: tinted sheets, lift, shine, live rings ---------- */
+.sheet-tone { isolation: isolate; transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.sheet-tone::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(110% 75% at 100% 0%, color-mix(in oklab, var(--tone) 15%, transparent), transparent 60%);
+  opacity: 0.75; transition: opacity 0.4s ease;
+}
+.sheet-tone:hover { border-color: color-mix(in oklab, var(--tone) 45%, var(--line)); box-shadow: 0 22px 60px -30px color-mix(in oklab, var(--tone) 60%, transparent); transform: translateY(-3px); }
+.sheet-tone:hover::after { opacity: 1; }
+
+.lift { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease; }
+.lift:hover { transform: translateY(-3px); box-shadow: 0 18px 44px -26px rgb(0 0 0 / 0.65); border-color: color-mix(in oklab, var(--fg) 25%, var(--line)); }
+
+/* a band of light that sweeps across primary buttons (after Magic UI's shimmer button) */
+.shine { background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.4) 50%, transparent 70%); background-size: 250% 100%; animation: shine 3.6s ease-in-out infinite; mix-blend-mode: soft-light; }
+@keyframes shine { 0% { background-position: 160% 0; } 55%, 100% { background-position: -60% 0; } }
+
+/* something is happening right now */
+.live-ring { position: relative; }
+.live-ring::before { content: ""; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid currentColor; opacity: 0; animation: live-ring 2s ease-out infinite; }
+@keyframes live-ring { 0% { transform: scale(0.85); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
+
+/* finding rows and kind tiles */
+.row-hover { position: relative; }
+.row-hover::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: var(--tone, var(--accent)); transform: scaleY(0); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.row-hover:hover::before { transform: scaleY(1); }
+.kind-tile { --k: var(--accent); }
+.kind-tile:hover .kind-glyph { transform: translateY(-3px) rotate(-6deg) scale(1.08); }
+.kind-glyph { transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@media (prefers-reduced-motion: reduce) { .shine, .live-ring::before { animation: none; } .sheet-tone:hover, .lift:hover { transform: none; } }
+
+/* feed items arrive one after another (after Magic UI's animated list) */
+.feed-in { animation: feed-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes feed-in { from { opacity: 0; transform: translateY(14px) scale(0.98); filter: blur(4px); } }
+@media (prefers-reduced-motion: reduce) { .feed-in { animation: none; } }

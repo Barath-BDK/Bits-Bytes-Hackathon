@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { KINDS, NOTICE_KINDS, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
+import { KINDS, NOTICE_KINDS, clusterTitle, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
 import { addOverlays, setNight } from "@/lib/map-layers";
 import { KindBadge, kindIconSvg } from "@/components/kind-icon";
 import { IssuePanel, applyFilters, type KindFilter, type SortBy, type StatusFilter } from "@/components/issue-list";
@@ -33,7 +33,10 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   const liveOutages = clusters.filter(isLiveOutage).length;
   const router = useRouter();
   const params = useSearchParams();
-  const startReporting = params.get("report") === "1";
+  // ?report=1 opens the form; ?report=<kind> also picks the kind (e.g. ?report=request from the requests board)
+  const reportParamRaw = params.get("report");
+  const startReporting = !!reportParamRaw && reportParamRaw !== "0";
+  const startKind = reportParamRaw && reportParamRaw in KINDS ? (reportParamRaw as Kind) : undefined;
   const focusId = params.get("c");
   const mapEl = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -324,7 +327,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
                 {sel.kind === "worksite" ? sel.department : `${sel.reporter_count} ${sel.reporter_count === 1 ? "person has" : "people have"} reported this`}
               </p>
               <p className="mt-1 text-sm text-fg-3">
-                {KINDS[sel.kind].severity[sel.severity_max - 1]}, first seen {timeAgo(sel.first_reported_at)}{sel.status === "resolved" ? ", confirmed fixed" : ""}
+                {sel.kind === "request" ? KINDS.request.severity[sel.severity_max - 1] : clusterTitle(sel)}, first seen {timeAgo(sel.first_reported_at)}{sel.status === "resolved" ? ", confirmed fixed" : ""}
               </p>
               <Link href={`/c/${sel.id}`} className="mt-4 flex items-center justify-between rounded-xl bg-surface-2 px-3.5 py-2.5 text-sm font-medium transition hover:bg-fg hover:text-bg">
                 Open the full record
@@ -337,7 +340,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
 
       <AnimatePresence>
         {reporting && (
-          <ReportSheet key="sheet" point={draft} onPoint={setDraft} onCancel={() => { setReporting(false); setDraft(null); }} onSubmitted={onSubmitted} />
+          <ReportSheet key="sheet" initialKind={startKind} point={draft} onPoint={setDraft} onCancel={() => { setReporting(false); setDraft(null); }} onSubmitted={onSubmitted} />
         )}
       </AnimatePresence>
     </div>

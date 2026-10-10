@@ -5,7 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { dbError, err, guardWrite, reporterHash, rpcToken } from "@/lib/api";
 
 const Report = z.object({
-  kind: z.enum(["pothole", "waterlogging", "worksite", "outage"]),
+  kind: z.enum(["pothole", "waterlogging", "worksite", "outage", "parking", "request"]),
+  category: z.enum(["streetlight", "garbage", "drain", "tree", "animals", "water", "other"]).optional(),
   lat: z.number().min(6).max(37.5),
   lng: z.number().min(68).max(97.5),
   // pothole: small/medium/large; waterlogging: ankle/knee/waist; worksite: footpath/lane/road blocked
@@ -24,6 +25,7 @@ export async function POST(req: Request) {
   const parsed = Report.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return err("invalid report", 400);
   const r = parsed.data;
+  if (r.kind === "request" && !r.category) return err("choose what the request is for", 400);
 
   const { data, error } = await supabase().rpc("submit_report", {
     p_token: rpcToken(),
@@ -36,6 +38,7 @@ export async function POST(req: Request) {
     p_promised_end: r.kind === "worksite" ? (r.promisedEnd ?? null) : null,
     p_photo_path: r.photo ?? null,
     p_reporter_hash: reporterHash(req),
+    p_category: r.kind === "request" ? r.category : null,
   });
   if (error) return dbError(error);
   revalidateTag(CLUSTERS_TAG, { expire: 0 }); // reporter must see their pin immediately

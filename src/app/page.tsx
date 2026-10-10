@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getClusters, getFindings, getNotices } from "@/lib/data";
-import { KINDS, NOTICE_KINDS, PROVENANCE, isLiveOutage, photoSrc, timeAgo } from "@/lib/issues";
+import { KINDS, NOTICE_KINDS, clusterTitle, isLiveOutage, photoSrc, timeAgo } from "@/lib/issues";
 import { dayWord, hhmm, inForceOrSoon } from "@/lib/time";
 import { streetHref } from "@/lib/links";
 import { SITE } from "@/lib/site";
 import { KindBadge } from "@/components/kind-icon";
-import { BlurFade, NumberTicker } from "@/components/motion-bits";
+import { BlurFade } from "@/components/motion-bits";
 import { Hero } from "@/components/hero";
+import { KindStrip, RequestFeed, TodayPanel } from "@/components/home-sections";
 import { Sheet } from "@/components/sheet";
 import { GapVignette, LadderVignette, MergeBeams, OutlookVignette, PriorityLedger, StrikeVignette } from "@/components/vignettes";
 import { HeroBackdrop } from "@/components/backdrops/hero-backdrop";
@@ -35,7 +36,9 @@ export default async function Home() {
     ...[...open].sort((x, y) => y.last_reported_at.localeCompare(x.last_reported_at)).slice(0, 6).map((c) =>
       c.kind === "worksite"
         ? `${c.department ?? "A work site"} logged, ${timeAgo(c.last_reported_at)}`
-        : `${c.reporter_count} ${c.reporter_count === 1 ? "resident reports" : "residents report"} ${KINDS[c.kind].severity[c.severity_max - 1].toLowerCase()} ${KINDS[c.kind].label.toLowerCase()}, ${timeAgo(c.last_reported_at)}`),
+        : c.kind === "request"
+          ? `${c.reporter_count} ${c.reporter_count === 1 ? "resident asks" : "residents ask"}: ${clusterTitle(c).toLowerCase()}, ${timeAgo(c.last_reported_at)}`
+          : `${c.reporter_count} ${c.reporter_count === 1 ? "resident reports" : "residents report"} ${clusterTitle(c).toLowerCase()}, ${timeAgo(c.last_reported_at)}`),
   ];
 
   return (
@@ -43,55 +46,45 @@ export default async function Home() {
       <Hero ticker={ticker} />
 
       {/* Today */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 pt-16 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6">
         <BlurFade inView y={30}>
-          <div className="sheet">
-            <div className="grid overflow-hidden md:grid-cols-[1.4fr_1fr]">
-              <div className="border-b border-line md:border-b-0 md:border-r">
-                <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                  <span className="label text-fg-3">{findings.length ? "The records today" : "In force and coming up"}</span>
-                  <Link href="/records" className="label text-fg-3 hover:text-fg">{findings.length ? "All findings" : "All records"}</Link>
-                </div>
-                {findings.length === 0 && (
-                  <ol>
-                    {upcoming.slice(0, 4).map((n) => (
-                      <li key={n.id} className="border-b border-line last:border-0">
-                        <Link href={streetHref({ lat: n.lat, lng: n.lng, name: n.area_text?.split(/[.(,]/)[0] ?? n.title })} className="group flex items-start gap-4 px-5 py-3.5 transition hover:bg-surface-2/60">
-                          <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-[2px]" style={{ background: NOTICE_KINDS[n.kind].color }} />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate font-medium tracking-[-0.01em]">{n.title}</span>
-                            <span className="line-clamp-1 text-sm text-fg-3">{dayWord(new Date(n.starts_at))} {hhmm(new Date(n.starts_at))}, {n.area_text}</span>
-                          </span>
-                          <span className={`tag tag-${n.provenance} shrink-0`}>{PROVENANCE[n.provenance]}</span>
-                        </Link>
-                      </li>
-                    ))}
-                    {upcoming.length === 0 && <li className="px-5 py-6 text-fg-3">Nothing flagged and no notices in force today.</li>}
-                  </ol>
-                )}
-                <ol>
-                  {findings.slice(0, 4).map((f) => (
-                    <li key={f.id} className="border-b border-line last:border-0">
-                      <Link href={streetHref({ lat: f.lat, lng: f.lng, name: f.title })} className="group flex items-start gap-4 px-5 py-3.5 transition hover:bg-surface-2/60">
-                        <span className="tag tag-gap mt-0.5 shrink-0">{f.label}</span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-medium tracking-[-0.01em]">{f.title}</span>
-                          <span className="line-clamp-1 text-sm text-fg-3">{f.explanation}</span>
-                        </span>
-                        {f.demo && <span className="tag tag-demo shrink-0">Demo</span>}
-                      </Link>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              <div className="grid grid-cols-3 md:grid-cols-1">
-                <Figure n={open.filter((c) => c.kind !== "outage").length} label="Open issues" />
-                <Figure n={live.length} label="Live power cuts" tone="var(--outage)" />
-                <Figure n={findings.length} label="Records to check" tone="var(--works)" />
-              </div>
+          <TodayPanel findings={findings} upcoming={upcoming} clusters={clusters} />
+        </BlurFade>
+      </section>
+
+      {/* Report anything */}
+      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <BlurFade inView>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="label text-accent">Report anything on the street</p>
+              <h2 className="display mt-4 max-w-2xl text-[clamp(2rem,4.5vw,3.5rem)]">Six things, one <span className="accent-word">record.</span></h2>
             </div>
+            <p className="max-w-sm text-fg-2">Pick one and the form opens on the map, ready for a pin. No account, no phone number.</p>
           </div>
         </BlurFade>
+        <BlurFade inView delay={0.08} className="mt-10"><KindStrip /></BlurFade>
+      </section>
+
+      {/* Requests */}
+      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+          <BlurFade inView>
+            <p className="label text-request">Community requests</p>
+            <h2 className="display mt-4 text-[clamp(2rem,4.5vw,3.5rem)]">What Chennai is <span className="accent-word">asking for.</span></h2>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-fg-2">
+              Streetlights, garbage, drains, fallen trees. Ask once in public; neighbours vouch instead of filing the same complaint again,
+              and it closes only when two of them confirm it was done.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/requests" className="group inline-flex items-center gap-2 rounded-[10px] bg-request px-5 py-3 font-medium text-[#06201b] transition hover:brightness-110">
+                See every request <Arrow />
+              </Link>
+              <Link href="/map?report=request" className="inline-flex items-center rounded-[10px] border border-line px-5 py-3 font-medium transition hover:border-fg-3">Raise one</Link>
+            </div>
+          </BlurFade>
+          <BlurFade inView delay={0.1}><RequestFeed requests={clusters.filter((c) => c.kind === "request")} /></BlurFade>
+        </div>
       </section>
 
       {/* What only Theru does */}
@@ -102,7 +95,7 @@ export default async function Home() {
         </BlurFade>
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           <BlurFade inView delay={0.05}>
-            <Sheet label="Dig strike" no="01" bodyClassName="p-5">
+            <Sheet label="Dig strike" no="01" tone="var(--outage)" bodyClassName="p-5">
               <StrikeVignette />
               <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Power cuts traced to the trench beside them</h3>
               <p className="mt-2 leading-relaxed text-fg-2">
@@ -113,7 +106,7 @@ export default async function Home() {
             </Sheet>
           </BlurFade>
           <BlurFade inView delay={0.1}>
-            <Sheet label="Outlook" no="02" bodyClassName="p-5">
+            <Sheet label="Outlook" no="02" tone="var(--water)" bodyClassName="p-5">
               <OutlookVignette />
               <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">The next 48 hours on your street</h3>
               <p className="mt-2 leading-relaxed text-fg-2">
@@ -123,7 +116,7 @@ export default async function Home() {
             </Sheet>
           </BlurFade>
           <BlurFade inView delay={0.15}>
-            <Sheet label="Who answers" no="03" bodyClassName="p-5">
+            <Sheet label="Who answers" no="03" tone="var(--request)" bodyClassName="p-5">
               <LadderVignette />
               <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">The right office for that spot, and what to do next</h3>
               <p className="mt-2 leading-relaxed text-fg-2">
@@ -133,7 +126,7 @@ export default async function Home() {
             </Sheet>
           </BlurFade>
           <BlurFade inView delay={0.2}>
-            <Sheet label="Evidence gaps" no="04" bodyClassName="p-5">
+            <Sheet label="Evidence gaps" no="04" tone="var(--works)" bodyClassName="p-5">
               <GapVignette />
               <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">What the records leave out, said carefully</h3>
               <p className="mt-2 leading-relaxed text-fg-2">
@@ -169,14 +162,14 @@ export default async function Home() {
         </BlurFade>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <BlurFade inView delay={0.05}>
-            <Sheet label="Merge" no="05" bodyClassName="p-5">
+            <Sheet label="Merge" no="05" tone="var(--pothole)" bodyClassName="p-5">
               <MergeBeams />
               <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">Duplicates merge into one record</h3>
               <p className="mt-2 leading-relaxed text-fg-2">A report within 25 m of an open pothole, 75 m of a flooded stretch or 300 m of a power cut joins that record.</p>
             </Sheet>
           </BlurFade>
           <BlurFade inView delay={0.1}>
-            <Sheet label="Priority" no="06" bodyClassName="p-5">
+            <Sheet label="Priority" no="06" tone="var(--accent)" bodyClassName="p-5">
               <PriorityLedger total={136} parts={[
                 { label: "Severity 3 of 3", points: 60 }, { label: "5 distinct reporters", points: 40 },
                 { label: "Open 9 days", points: 21 }, { label: "Beside an active dig", points: 15 },
@@ -219,15 +212,5 @@ export default async function Home() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function Figure({ n, label, tone }: { n: number; label: string; tone?: string }) {
-  return (
-    <div className="relative flex flex-col justify-center border-line px-5 py-6 [&:not(:last-child)]:border-r md:[&:not(:last-child)]:border-b md:[&:not(:last-child)]:border-r-0">
-      {tone && <span className="absolute inset-x-0 top-0 h-1" style={{ background: tone }} />}
-      <NumberTicker value={n} className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl" />
-      <span className="label mt-1.5 text-fg-3">{label}</span>
-    </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { KINDS, type Kind } from "@/lib/issues";
+import { KINDS, REQUEST_CATEGORIES, type Kind, type RequestCategory } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 
 export type Submitted = { cluster_id: string; joined_existing: boolean; report_count: number; reporter_count: number };
@@ -29,8 +29,9 @@ async function downscale(file: File): Promise<Blob> {
 
 const field = "mt-1.5 w-full rounded-xl border border-line bg-surface-2/70 px-3 py-2.5 text-sm outline-none transition focus:border-accent";
 
-export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
-  const [kind, setKind] = useState<Kind>("pothole");
+export function ReportSheet({ point, onPoint, onCancel, onSubmitted, initialKind }: Props & { initialKind?: Kind }) {
+  const [kind, setKind] = useState<Kind>(initialKind ?? "pothole");
+  const [category, setCategory] = useState<RequestCategory | null>(null);
   const [severity, setSeverity] = useState(2);
   const [note, setNote] = useState("");
   const [department, setDepartment] = useState("");
@@ -70,6 +71,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!point) return setError("Place the pin first: use your location, search, or tap the map.");
+    if (kind === "request" && !category) return setError("Choose what the request is for.");
     setBusy(true);
     setError(null);
     try {
@@ -91,6 +93,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
           department: kind === "worksite" && department ? department : undefined,
           promisedEnd: kind === "worksite" && promisedEnd ? promisedEnd : undefined,
           photo: photoUrl,
+          category: kind === "request" ? category : undefined,
         }),
       });
       const body = await res.json();
@@ -148,12 +151,13 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
 
             <fieldset className="mt-3">
               <legend className="text-2xl font-semibold tracking-[-0.04em]">What did you see?</legend>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {(Object.keys(KINDS) as Kind[]).map((k) => (
-                  <label key={k} className={`relative cursor-pointer rounded-xl border px-1.5 py-3 text-center text-[13px] transition ${kind === k ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
-                    <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {(["pothole", "waterlogging", "request", "parking", "worksite", "outage"] as Kind[]).map((k) => (
+                  <label key={k} style={{ "--k": KINDS[k].color } as React.CSSProperties}
+                    className={`relative min-w-0 cursor-pointer rounded-xl border px-1 py-3 text-center text-[12px] leading-tight transition ${kind === k ? "border-[color:var(--k)] bg-[color-mix(in_oklab,var(--k)_14%,transparent)]" : "border-line hover:border-fg-3"}`}>
+                    <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => { setKind(k); setSeverity(2); }} className="sr-only" />
                     <span className="mx-auto mb-2 block w-fit"><KindBadge kind={k} size={34} /></span>
-                    {KINDS[k].label}
+                    <span className="block break-words [hyphens:auto]">{KINDS[k].label}</span>
                   </label>
                 ))}
               </div>
@@ -193,6 +197,26 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
             </fieldset>
 
             <AnimatePresence>
+              {kind === "request" && (
+                <motion.fieldset initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                  <legend className="label mt-5 text-fg-2">What is needed</legend>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {(Object.keys(REQUEST_CATEGORIES) as RequestCategory[]).map((cat) => (
+                      <label key={cat} className={`cursor-pointer rounded-full border px-3 py-1.5 text-[13px] transition ${category === cat ? "border-request bg-request/15 text-fg" : "border-line text-fg-2 hover:border-fg-3"}`}>
+                        <input type="radio" name="category" value={cat} checked={category === cat} onChange={() => setCategory(cat)} className="sr-only" />
+                        {REQUEST_CATEGORIES[cat].label}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-fg-3">Requests are public: neighbours can vouch for yours, and it closes when two of them confirm it was done.</p>
+                </motion.fieldset>
+              )}
+              {kind === "parking" && (
+                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 overflow-hidden rounded-lg border border-parking/40 bg-parking/10 px-3 py-2 text-xs text-fg-2">
+                  This marks a spot that keeps getting blocked, not a person. Keep number plates and faces out of photos. To report a specific vehicle, use the traffic police&apos;s GCTP Citizen Services app.
+                </motion.p>
+              )}
               {kind === "worksite" && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                   <label className="mt-5 block text-sm">

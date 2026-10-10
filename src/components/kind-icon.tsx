@@ -1,6 +1,6 @@
 import type { Kind } from "@/lib/issues";
 
-// Hand-drawn 24px glyphs: a cracked crater, a flooded street, a traffic cone, a broken bolt.
+// Hand-drawn 24px glyphs: a cracked crater, a flooded street, a traffic cone, a broken bolt, a struck-out P, a raised hand.
 const PATHS: Record<Kind, string> = {
   pothole:
     '<path d="M4 15.5c0-2.3 3.6-4.2 8-4.2s8 1.9 8 4.2-3.6 4.2-8 4.2-8-1.9-8-4.2z"/><path d="M7.5 15.5c.8 1 2.5 1.6 4.5 1.6"/><path d="M12 11.3 10.6 8l2-2.2L11.4 3"/><path d="m17.4 12.3 2.1-2.6"/><path d="M6.4 12.2 4 9.8"/>',
@@ -10,10 +10,15 @@ const PATHS: Record<Kind, string> = {
     '<path d="M10 3.5h4l4.2 14.5H5.8z"/><path d="M8.4 9h7.2"/><path d="M7 13.6h10"/><path d="M3.5 18h17v2.5h-17z"/>',
   // a bolt with a break through it: the power is off
   outage: '<path d="M13.5 2.5 5 13.2h6l-1 8.3 8.6-11h-6.1z"/><path d="M3 3.5l18 17"/>',
+  // a parking sign struck through
+  parking: '<rect x="4" y="3" width="16" height="18" rx="3.5"/><path d="M10 17V7.5h3.2a2.8 2.8 0 0 1 0 5.6H10"/><path d="M5 20 19 4"/>',
+  // a raised hand: someone asking for something
+  request: '<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M11 10V4a1.5 1.5 0 0 1 3 0v6"/><path d="M14 10V5.5a1.5 1.5 0 0 1 3 0V13"/><path d="M8 11.5a1.5 1.5 0 0 0-3 0V14a7 7 0 0 0 7 7h.5a6.5 6.5 0 0 0 4.5-6.5V12"/>',
 };
 
 const BADGE: Record<Kind, [string, string]> = {
   pothole: ["var(--pothole)", "#fff"], waterlogging: ["var(--water)", "#fff"], worksite: ["var(--works)", "#18160f"], outage: ["var(--outage)", "#fff"],
+  parking: ["var(--parking)", "#fff"], request: ["var(--request)", "#0b1d1a"],
 };
 
 export function kindIconSvg(kind: Kind, size = 16) {

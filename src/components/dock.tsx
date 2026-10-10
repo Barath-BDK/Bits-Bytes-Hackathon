@@ -10,6 +10,7 @@ import { ThemeControls } from "@/components/theme-controls";
 const NAV = [
   { href: "/street", label: "Your street", short: "Street", icon: "M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6" },
   { href: "/map", label: "Map", short: "Map", icon: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" },
+  { href: "/requests", label: "Requests", short: "Requests", icon: "M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4a1.5 1.5 0 0 1 3 0v6M14 10V5.5a1.5 1.5 0 0 1 3 0V13M8 11.5a1.5 1.5 0 0 0-3 0V14a7 7 0 0 0 7 7h.5a6.5 6.5 0 0 0 4.5-6.5V12" },
   { href: "/records", label: "Records", short: "Records", icon: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7" },
   { href: "/about", label: "Method", short: "Method", icon: "M12 3v18M3 12h18M5.6 5.6l12.8 12.8", desktopOnly: true },
 ];
@@ -37,7 +38,8 @@ export function Dock() {
         ))}
         <Lane />
         <ThemeControls up />
-        <Link href="/map?report=1" className="ml-1 hidden items-center rounded-[8px] bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-85 md:flex">
+        <Link href="/map?report=1" className="relative ml-1 hidden items-center overflow-hidden rounded-[8px] bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 md:flex">
+          <span aria-hidden className="shine pointer-events-none absolute inset-0" />
           Report
         </Link>
         <Link href="/map?report=1" aria-label="Report" className="grid shrink-0 place-items-center px-1 md:hidden">

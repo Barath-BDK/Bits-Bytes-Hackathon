@@ -1,7 +1,7 @@
 // Who answers for a spot in Chennai, and how to escalate.
 // Zone lookup is approximate: nearest Greater Chennai Corporation zone office, not the official ward boundary.
 // Every contact says where it came from; directory entries are marked for verification before use.
-import type { Kind } from "@/lib/issues";
+import type { Kind, RequestCategory } from "@/lib/issues";
 
 export type Verified = "official" | "directory";
 export type Contact = { name: string; role: string; phone?: string; email?: string; web?: string; verified: Verified; note?: string };
@@ -76,12 +76,22 @@ const UTILITY = {
   cmwssb: { name: "Chennai Metrowater (CMWSSB)", role: "Water supply, sewers and their trenches", phone: "1916", web: "https://cmwssb.tn.gov.in", verified: "official" },
   tnpdcl: { name: "TNPDCL complaints", role: "Power cuts and damaged cables; ask for a complaint number", phone: "1912", web: "https://www.tnpdcl.org", verified: "directory", note: "1912 is widely published; Minnagam (94987 94987) also takes complaints" },
   cmrl: { name: "Chennai Metro Rail (CMRL)", role: "Metro construction sites and their diversions", web: "https://chennaimetrorail.org", verified: "official" },
+  traffic: { name: "Greater Chennai Traffic Police", role: "Report a specific vehicle in the GCTP Citizen Services app (photo taken in the app); call 100 if a vehicle blocks an emergency route", phone: "100", verified: "official", note: "No dedicated parking helpline could be verified" },
   cpgrams: { name: "CPGRAMS", role: "Central grievance portal, for escalation when local channels fail", web: "https://pgportal.gov.in", verified: "official" },
 } satisfies Record<string, Contact>;
 
 // Which department owns what, per kind of issue.
-export function departments(kind: Kind | "notice"): Contact[] {
+export function departments(kind: Kind | "notice", category?: RequestCategory | null): Contact[] {
+  if (kind === "request") {
+    switch (category) {
+      case "streetlight": return [UTILITY.gcc1913, UTILITY.gccElectrical];
+      case "drain": return [UTILITY.gcc1913, UTILITY.cmwssb];
+      case "water": return [UTILITY.cmwssb, UTILITY.gcc1913];
+      default: return [UTILITY.gcc1913];
+    }
+  }
   switch (kind) {
+    case "parking": return [UTILITY.traffic, UTILITY.gcc1913];
     case "pothole": return [UTILITY.gcc1913, UTILITY.gccRoads];
     case "waterlogging": return [UTILITY.gcc1913, UTILITY.cmwssb];
     case "worksite": return [UTILITY.gcc1913, UTILITY.gccRoads, UTILITY.cmwssb, UTILITY.cmrl];
@@ -95,6 +105,13 @@ export type Step = { day: number; who: string; action: string };
 // An escalation ladder, counted from the first report. Times are this project's suggestion, not statutory deadlines.
 export function ladder(kind: Kind, j: Jurisdiction): Step[] {
   const zone = j.zone ? `Zone ${j.zone.no} (${j.zone.name})` : "the local body";
+  if (kind === "parking") {
+    return [
+      { day: 0, who: "Greater Chennai Traffic Police", action: "Report the spot; for a specific vehicle use the GCTP Citizen Services app" },
+      { day: 7, who: "Inspector of Police (Traffic) for the area", action: "If the spot is blocked again and again, ask for regular enforcement, with this record's link" },
+      { day: 15, who: "CPGRAMS", action: "Escalate with the history of reports if nothing changes" },
+    ];
+  }
   if (kind === "outage") {
     return [
       { day: 0, who: "TNPDCL 1912", action: "Register the outage and note the complaint number" },

@@ -1,6 +1,18 @@
 // Shared, client-safe types and wording for issues.
 
-export type Kind = "pothole" | "waterlogging" | "worksite" | "outage";
+export type Kind = "pothole" | "waterlogging" | "worksite" | "outage" | "parking" | "request";
+
+// Community service requests: what residents are asking the corporation and utilities for.
+export type RequestCategory = "streetlight" | "garbage" | "drain" | "tree" | "animals" | "water" | "other";
+export const REQUEST_CATEGORIES: Record<RequestCategory, { label: string; short: string }> = {
+  streetlight: { label: "Streetlight not working", short: "Streetlight" },
+  garbage: { label: "Garbage not cleared", short: "Garbage" },
+  drain: { label: "Blocked or overflowing drain", short: "Drain" },
+  tree: { label: "Fallen or dangerous tree", short: "Tree" },
+  animals: { label: "Stray animal concern", short: "Animals" },
+  water: { label: "No piped water", short: "Water" },
+  other: { label: "Other request", short: "Other" },
+};
 
 export type Cluster = {
   id: string;
@@ -19,6 +31,8 @@ export type Cluster = {
   priority: number;
   cover_photo: string | null;
   demo: boolean;
+  category: RequestCategory | null;
+  vouches: number;
 };
 
 export type NoticeKind = "road_permit" | "completion" | "resurfacing" | "power_shutdown" | "water_suspension" | "incident" | "works";
@@ -52,7 +66,7 @@ export const PROVENANCE: Record<Provenance, string> = {
 export type ClusterDetail = {
   cluster: Cluster;
   reports: { id: string; severity: number; note: string | null; department: string | null; promised_end: string | null; photo: string | null; created_at: string }[];
-  confirmations: { fixed: number; still_there: number };
+  confirmations: { fixed: number; still_there: number; vouch?: number };
   nearby_works: { id: string; department: string | null; promised_end: string | null; distance_m: number }[];
 };
 
@@ -77,7 +91,24 @@ export const KINDS: Record<Kind, { label: string; plural: string; color: string;
     severity: ["Flickering", "Whole street", "Whole area"],
     authority: "The Assistant Engineer (O&M), TNPDCL section office",
   },
+  parking: {
+    label: "Illegal parking", plural: "Parking", color: "var(--parking)",
+    severity: ["Footpath blocked", "Lane blocked", "Junction or gate blocked"],
+    authority: "The Inspector of Police (Traffic), Greater Chennai Traffic Police",
+  },
+  request: {
+    label: "Request", plural: "Requests", color: "var(--request)",
+    severity: ["Can wait", "Needed soon", "Urgent"],
+    authority: "The Assistant Engineer, Greater Chennai Corporation zone office",
+  },
 };
+
+// One line that names an issue: a request by what is asked for, anything else by how bad it is.
+export function clusterTitle(c: Pick<Cluster, "kind" | "severity_max" | "category">) {
+  if (c.kind === "request") return REQUEST_CATEGORIES[c.category ?? "other"].label;
+  if (c.kind === "parking") return `Illegal parking, ${KINDS.parking.severity[c.severity_max - 1].toLowerCase()}`;
+  return `${KINDS[c.kind].severity[c.severity_max - 1]} ${KINDS[c.kind].label.toLowerCase()}`;
+}
 
 // A reported power cut counts as live for six hours after the latest report.
 export function isLiveOutage(c: Cluster) {
@@ -131,11 +162,11 @@ export function complaintDraft(d: ClusterDetail, pageUrl: string) {
     k.authority,
     ...(works.length ? [`Copy to: ${[...new Set(works.map((w) => w.department))].join("; ")}`] : []),
     ``,
-    `Subject: ${k.label} (${sev}) reported by ${c.reporter_count} residents, ref. TH-${shortId(c.id)}`,
+    `Subject: ${clusterTitle(c)} reported by ${c.reporter_count} residents, ref. TH-${shortId(c.id)}`,
     ``,
     `Sir/Madam,`,
     ``,
-    `${c.reporter_count} residents have independently reported a ${k.label.toLowerCase()} (${sev}) at ` +
+    `${c.reporter_count} residents have independently reported: ${clusterTitle(c).toLowerCase()} (${sev}), at ` +
       `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)} (https://www.openstreetmap.org/?mlat=${c.lat.toFixed(5)}&mlon=${c.lng.toFixed(5)}#map=19/${c.lat.toFixed(5)}/${c.lng.toFixed(5)}). ` +
       `It was first reported on ${formatDate(c.first_reported_at)} and remains unresolved.`,
     ...works.map((w) =>
