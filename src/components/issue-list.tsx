@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { KINDS, clusterTitle, timeAgo, type Cluster, type Kind } from "@/lib/issues";
+import { clusterTitle, timeAgo, type Cluster, type Kind } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { NumberTicker, listContainer, listItem } from "@/components/motion-bits";
 
@@ -37,21 +37,17 @@ const CHIPS: [KindFilter, string][] = [
   ["all", "All"], ["pothole", "Potholes"], ["waterlogging", "Water"], ["request", "Requests"], ["parking", "Parking"], ["worksite", "Works"], ["outage", "Power"],
 ];
 
-// Kind filter: a scrollable row of chips, each marked with its kind's colour.
+// Kind filter: the same segmented pills as sort and status, scrolling sideways now that there are seven kinds.
 function KindChips({ value, onPick, count }: { value: KindFilter; onPick: (k: KindFilter) => void; count: (k: KindFilter) => number }) {
   return (
-    <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by kind">
-      {CHIPS.map(([k, label]) => {
-        const on = value === k;
-        return (
-          <button key={k} onClick={() => onPick(k)} aria-pressed={on}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium transition ${on ? "border-fg/40 bg-fg text-bg" : "border-line text-fg-2 hover:border-fg-3 hover:text-fg"}`}>
-            {k !== "all" && <span className="h-2 w-2 rounded-[3px]" style={{ background: KINDS[k].color }} />}
-            {label}
-            <span className={`tabular-nums ${on ? "opacity-70" : "text-fg-3"}`}>{count(k)}</span>
-          </button>
-        );
-      })}
+    <div className="flex gap-1 overflow-x-auto rounded-lg bg-surface-2 p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by kind">
+      {CHIPS.map(([k, label]) => (
+        <button key={k} onClick={() => onPick(k)} aria-pressed={value === k}
+          className={`relative z-10 shrink-0 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[11px] font-medium transition ${value === k ? "text-fg" : "text-fg-3 hover:text-fg-2"}`}>
+          {value === k && <motion.span layoutId="pill-kind" className="absolute inset-0 -z-10 rounded-md bg-bg shadow" transition={{ type: "spring", stiffness: 480, damping: 36 }} />}
+          {label} {count(k)}
+        </button>
+      ))}
     </div>
   );
 }

@@ -153,8 +153,8 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted, initialKind
               <legend className="text-2xl font-semibold tracking-[-0.04em]">What did you see?</legend>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {(["pothole", "waterlogging", "request", "parking", "worksite", "outage"] as Kind[]).map((k) => (
-                  <label key={k} style={{ "--k": KINDS[k].color } as React.CSSProperties}
-                    className={`relative min-w-0 cursor-pointer rounded-xl border px-1 py-3 text-center text-[12px] leading-tight transition ${kind === k ? "border-[color:var(--k)] bg-[color-mix(in_oklab,var(--k)_14%,transparent)]" : "border-line hover:border-fg-3"}`}>
+                  <label key={k}
+                    className={`relative min-w-0 cursor-pointer rounded-xl border px-1 py-3 text-center text-[12px] leading-tight transition ${kind === k ? "border-accent bg-surface-2" : "border-line hover:border-fg-3"}`}>
                     <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => { setKind(k); setSeverity(2); }} className="sr-only" />
                     <span className="mx-auto mb-2 block w-fit"><KindBadge kind={k} size={34} /></span>
                     <span className="block break-words [hyphens:auto]">{KINDS[k].label}</span>

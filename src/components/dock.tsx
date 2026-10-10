@@ -15,21 +15,22 @@ const NAV = [
   { href: "/about", label: "Method", short: "Method", icon: "M12 3v18M3 12h18M5.6 5.6l12.8 12.8", desktopOnly: true },
 ];
 
-const Lane = () => <span aria-hidden className="lane-mark mx-1 hidden h-6 w-[2px] md:block" />;
+const Lane = () => <span aria-hidden className="lane-mark mx-1 hidden h-6 w-[2px] shrink-0 self-center md:block" />;
 
 export function Dock() {
   const path = usePathname();
   const active = NAV.find((n) => path.startsWith(n.href))?.href;
   return (
-    <nav aria-label="Main" className="dock fixed inset-x-0 bottom-0 z-50 md:inset-x-auto md:bottom-5 md:left-1/2 md:-translate-x-1/2">
-      <div className="flex items-stretch gap-0.5 border-t border-line bg-surface/95 px-1.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-2xl backdrop-blur-sm md:items-center md:rounded-[12px] md:border md:px-2 md:py-2">
-        <Link href="/" aria-label="Theru home" className="grid shrink-0 place-items-center px-2.5 text-[17px] font-semibold tracking-[-0.04em] text-fg transition hover:opacity-75 md:px-3">
+    <nav aria-label="Main" className="dock fixed inset-x-0 bottom-0 z-50 md:inset-x-auto md:bottom-5 md:left-1/2 md:max-w-[calc(100vw-2rem)] md:-translate-x-1/2">
+      {/* every item sits on the same 36 px line; labels never wrap, and the Report button never shrinks */}
+      <div className="flex items-stretch gap-0.5 border-t border-line bg-surface/95 px-1.5 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-2xl backdrop-blur-sm md:items-center md:gap-1 md:rounded-[12px] md:border md:px-2 md:py-2">
+        <Link href="/" aria-label="Theru home" className="grid h-auto shrink-0 place-items-center px-2.5 text-[17px] font-semibold leading-none tracking-[-0.04em] text-fg transition hover:opacity-75 md:h-9 md:px-3">
           Theru
         </Link>
         <Lane />
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} aria-current={active === n.href ? "page" : undefined}
-            className={`relative flex-1 flex-col items-center gap-1 rounded-md px-1.5 py-1.5 text-[11px] transition md:flex-none md:flex-row md:gap-2 md:px-3 md:py-2 md:text-sm ${"desktopOnly" in n ? "hidden md:flex" : "flex"} ${active === n.href ? "text-fg" : "text-fg-3 hover:text-fg"}`}>
+            className={`relative min-w-0 flex-1 flex-col items-center justify-center gap-1 whitespace-nowrap rounded-md px-1 py-1.5 text-[11px] leading-none transition md:h-9 md:flex-none md:flex-row md:gap-2 md:px-2.5 md:py-0 md:text-sm lg:px-3 ${"desktopOnly" in n ? "hidden lg:flex" : "flex"} ${active === n.href ? "text-fg" : "text-fg-3 hover:text-fg"}`}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="md:hidden"><path d={n.icon} /></svg>
             <span className="md:hidden">{n.short}</span>
             <span className="hidden md:inline">{n.label}</span>
@@ -38,8 +39,7 @@ export function Dock() {
         ))}
         <Lane />
         <ThemeControls up />
-        <Link href="/map?report=1" className="relative ml-1 hidden items-center overflow-hidden rounded-[8px] bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 md:flex">
-          <span aria-hidden className="shine pointer-events-none absolute inset-0" />
+        <Link href="/map?report=1" className="ml-1 hidden h-9 shrink-0 items-center whitespace-nowrap rounded-[8px] bg-accent px-4 text-sm font-medium leading-none text-accent-fg transition hover:opacity-85 md:flex">
           Report
         </Link>
         <Link href="/map?report=1" aria-label="Report" className="grid shrink-0 place-items-center px-1 md:hidden">

@@ -35,13 +35,12 @@ export function VouchButton({ id, initial, label = "I need this too", compact = 
   return (
     <div>
       <motion.button whileTap={{ scale: 0.95 }} onClick={vouch} disabled={busy || done} aria-pressed={done}
-        className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-[10px] border font-medium transition disabled:cursor-default ${compact ? "px-3 py-1.5 text-sm" : "w-full justify-center px-4 py-3"} ${done ? "border-request/60 bg-request/15 text-request" : "border-request/50 bg-request text-[#06201b] hover:brightness-110"}`}>
-        {!done && <span aria-hidden className="shine pointer-events-none absolute inset-0" />}
+        className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border font-medium transition disabled:cursor-default ${compact ? "px-3 py-1.5 text-sm" : "w-full justify-center py-2.5"} ${done ? "border-ok/60 bg-ok/10 text-ok" : "border-line hover:bg-fg hover:text-bg"}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           {done ? <path d="M5 12.5l4.5 4.5L19 7.5" /> : <><path d="M7 11v8H4v-8z" /><path d="M7 11l4-7a2 2 0 0 1 3 2l-1 4h5.5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17.3 20H7" /></>}
         </svg>
         {done ? "You vouched" : label}
-        <span className={`rounded-full px-1.5 text-xs tabular-nums ${done ? "bg-request/20" : "bg-black/15"}`}>
+        <span className="tabular-nums">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span key={count} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} className="inline-block">{count}</motion.span>
           </AnimatePresence>
