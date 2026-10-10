@@ -168,7 +168,9 @@ Known, accepted: Supabase's advisor warns that the read functions are callable a
 
 ## Demo video
 
-[Watch the demo (4 min 55 s)](demo/theru-demo.mp4): searching a street, reporting a problem, vouching for a request, where each record comes from, and how residents are kept private. The file is in the repository at `demo/theru-demo.mp4`.
+**[Watch the demo (4 min 55 s)](https://theru.vercel.app/demo/theru-demo.mp4)**: plays in any browser, no login needed. It covers searching a street, reporting a problem, vouching for a request, where each record comes from, and how residents are kept private.
+
+The video file is in this repository at [`public/demo/theru-demo.mp4`](https://raw.githubusercontent.com/Barath-BDK/Bits-Bytes-Hackathon/main/public/demo/theru-demo.mp4) (direct download).
 
 ## Data sources and APIs
 
