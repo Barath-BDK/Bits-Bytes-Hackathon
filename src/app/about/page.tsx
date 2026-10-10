@@ -5,24 +5,6 @@ import { Sheet } from "@/components/sheet";
 
 export const metadata: Metadata = { title: "Method and sources" };
 
-const STACK = [
-  ["Next.js", "MIT", "https://nextjs.org"],
-  ["Supabase (Postgres + PostGIS)", "Apache-2.0 / GPL-2.0", "https://supabase.com"],
-  ["MapLibre GL JS", "BSD-3-Clause", "https://maplibre.org"],
-  ["OpenFreeMap tiles, and OpenStreetMap data for the map and mapped construction", "ODbL", "https://www.openstreetmap.org/copyright"],
-  ["Photon and Nominatim geocoders (OpenStreetMap data)", "ODbL", "https://nominatim.org"],
-  ["Open-Meteo weather forecast", "CC BY 4.0", "https://open-meteo.com"],
-  ["Lenis (smooth scroll)", "MIT", "https://lenis.dev"],
-  ["Magic UI AnimatedBeam", "MIT", "https://magicui.design"],
-  ["Motion", "MIT", "https://motion.dev"],
-  ["Tailwind CSS", "MIT", "https://tailwindcss.com"],
-  ["Zod", "MIT", "https://zod.dev"],
-  ["sharp", "Apache-2.0", "https://sharp.pixelplumbing.com"],
-  ["Vercel Blob", "hosted service", "https://vercel.com/storage/blob"],
-  ["Archivo, Instrument Sans, Instrument Serif, Fragment Mono", "SIL OFL 1.1", "https://fonts.google.com"],
-  ["Overpass API (OpenStreetMap), for mapped construction", "ODbL", "https://overpass-api.de"],
-];
-
 const RULES = [
   ["Possible cable strike", "Requires verification", "A power cut reported in the last 6 hours lies within 150 m of an active excavation (a resident-reported work site, or a road-cutting permission in force) that began before the outage. Correlation only: the cause has to be confirmed by TNPDCL."],
   ["Completion record not found", "Information incomplete", "A road-cutting permission's validity period has ended and no completion record matches it with a score of 70 or more. This describes the record, not the road."],
@@ -93,19 +75,8 @@ export default function About() {
           which strips location metadata. All writes go through validated, rate-limited server routes, and the database refuses anything without the server&apos;s key.
         </Sheet>
 
-        <Sheet label="Open-source libraries and services" no="07" bodyClassName="p-6">
-          <ul className="divide-y divide-line">
-            {STACK.map(([name, license, url]) => (
-              <li key={name} className="flex justify-between gap-4 py-2.5">
-                <a href={url} className="underline decoration-line underline-offset-4 hover:decoration-fg">{name}</a>
-                <span className="label text-fg-3">{license}</span>
-              </li>
-            ))}
-          </ul>
-        </Sheet>
-
-        <Sheet label="Photo credits" no="08" bodyClassName="p-6">
-          <p className="text-fg-2">Photos in the sample reports are from Wikimedia Commons under the licenses below.</p>
+        <Sheet label="Photo credits" no="07" bodyClassName="p-6">
+          <p className="text-fg-2">Every photo on this site was downloaded from Wikimedia Commons and is used under the licence shown.</p>
           <ul className="mt-4 divide-y divide-line text-sm">
             {credits.map((c) => (
               <li key={c.file} className="grid grid-cols-1 gap-1 py-2.5 sm:grid-cols-[1fr_auto]">

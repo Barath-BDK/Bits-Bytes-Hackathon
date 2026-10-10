@@ -1,8 +1,8 @@
 // Palettes, each paired with a backdrop drawn from the city's own infrastructure. Keep ids in sync with globals.css.
 export const THEMES = [
+  { id: "ink", name: "Ink", note: "Pure black, signal yellow", swatch: ["#000000", "#ffffff", "#ffd60a"] },
   { id: "bw", name: "Black & White", note: "Ink and paper, nothing else", swatch: ["#ffffff", "#000000", "#575757"] },
   { id: "paper", name: "Paper", note: "Black, white, a line of cobalt", swatch: ["#ffffff", "#0a0a0a", "#0047ab"] },
-  { id: "ink", name: "Ink", note: "Pure black, signal yellow", swatch: ["#000000", "#ffffff", "#ffd60a"] },
   { id: "graphite", name: "Graphite", note: "Charcoal and orange", swatch: ["#141414", "#f5f5f5", "#ff8a3d"] },
   { id: "midnight", name: "Midnight", note: "Navy and sky blue", swatch: ["#0b1020", "#f4f6ff", "#38bdf8"] },
   { id: "mono", name: "Mono", note: "Etched street plan", swatch: ["#031211", "#e8e4d3", "#75736a"] },
@@ -17,7 +17,7 @@ export const THEMES = [
 export type ThemeId = (typeof THEMES)[number]["id"];
 export type Mode = "dark" | "light";
 
-// Trial settings while we decide on the final look. Each maps to a data-* attribute on <html>.
+// Display settings. Each maps to a data-* attribute on <html>.
 export const SETTINGS = {
   backdrop: { label: "Background", options: [["art", "Theme art"], ["grid", "Grid"], ["off", "Plain"]] },
   headline: { label: "Headline", options: [["plain", "Plain"], ["serif", "Serif accent"], ["gradient", "Gradient"], ["tinted", "Tinted"]] },
@@ -31,7 +31,7 @@ export const SWITCH_FOR: Record<ThemeId, string> = {
   bw: "sweep", paper: "sweep", ink: "lanes", graphite: "etch", midnight: "ripple", mono: "etch", utilities: "lanes", blueprint: "sweep", drainage: "ripple", transit: "lanes", lumora: "ripple", field: "horizon",
 };
 
-export const DEFAULTS = { theme: "bw", mode: "light", backdrop: "art", headline: "plain", transition: "blur", switch: "auto" } as const;
+export const DEFAULTS = { theme: "ink", mode: "dark", backdrop: "art", headline: "plain", transition: "blur", switch: "ripple" } as const;
 export const DEFAULT_THEME: ThemeId = DEFAULTS.theme;
 export const DEFAULT_MODE: Mode = DEFAULTS.mode;
 
@@ -42,4 +42,4 @@ const allowed: Record<string, readonly string[]> = {
 };
 
 // Runs before first paint (inlined in <head>) so there is no flash of the wrong look.
-export const themeBootScript = `try{var A=${JSON.stringify(allowed)},D=${JSON.stringify(DEFAULTS)},d=document.documentElement;for(var k in D){var v=localStorage.getItem("gw-"+k);d.setAttribute("data-"+k,A[k].indexOf(v)>=0?v:D[k])}}catch(e){}`;
+export const themeBootScript = `try{var A=${JSON.stringify(allowed)},D=${JSON.stringify(DEFAULTS)},d=document.documentElement;for(var k in D){var v=localStorage.getItem("th-"+k);d.setAttribute("data-"+k,A[k].indexOf(v)>=0?v:D[k])}}catch(e){}`;

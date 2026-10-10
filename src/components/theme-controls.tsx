@@ -19,7 +19,7 @@ function useSetting(key: Key) {
 // Theme and mode changes ripple out from the pointer using the View Transitions API.
 function setSetting(key: Key, value: string, origin?: { x: number; y: number }) {
   const root = document.documentElement;
-  try { localStorage.setItem(`gw-${key}`, value); } catch { /* private mode: setting just won't persist */ }
+  try { localStorage.setItem(`th-${key}`, value); } catch { /* private mode: setting just won't persist */ }
   const apply = () => root.setAttribute(`data-${key}`, value);
   const visual = key === "theme" || key === "mode";
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
