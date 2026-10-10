@@ -170,6 +170,47 @@ Known, accepted: Supabase's advisor warns that the read functions are callable a
 
 A 2 to 5 minute walkthrough will be added at `demo/theru-demo.mp4`.
 
+## Data sources and APIs
+
+Every external service the site or its scripts call, and what for. None needs a key or costs anything.
+
+| Service | Called from | Used for | Terms |
+| --- | --- | --- | --- |
+| [Supabase](https://supabase.com) (PostgreSQL, PostGIS) | Server routes | The database: reports, notices, findings, vouches | Free tier |
+| [OpenFreeMap](https://openfreemap.org) | Browser (map) | Map tiles and styles | Free, attribution to OpenStreetMap |
+| [Photon](https://photon.komoot.io) (komoot) | `/api/geocode` | Place search as you type | OSM data, ODbL, fair use |
+| [Nominatim](https://nominatim.openstreetmap.org) (OpenStreetMap) | `/api/geocode`, `scripts/build-real-seed.py` | Place search; placing notices on the map | ODbL, 1 request per second |
+| [Overpass API](https://overpass-api.de) (OpenStreetMap) | `scripts/build-osm-works.py` | Roads and rail lines mapped as under construction | ODbL |
+| [Open-Meteo](https://open-meteo.com) | Server (street pages) | Hourly rain forecast for the 48-hour outlook | CC BY 4.0 |
+| [Vercel Blob](https://vercel.com/storage/blob) | `/api/photos` | Storing residents' photos | Free tier |
+| [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | Read by hand into `scripts/real-records.json` | Published shutdown, suspension and incident notices | Linked on every record, not copied |
+| [Wikimedia Commons](https://commons.wikimedia.org) | Downloaded once into `public/seed` | Photos for the hero and the sample reports (credits below) | Licences as listed |
+
+## Photo credits
+
+All photos are from Wikimedia Commons and are credited on the site (hero caption, Method page) and here.
+
+| File | Title | Author | Licence |
+| --- | --- | --- | --- |
+| `pothole-1.webp` | [Broken Roads in India's Capital New Delhi](https://commons.wikimedia.org/wiki/File:Broken_Roads_in_India%27s_Capital_New_Delhi.webp) | Rrthakur22 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `pothole-2.webp` | [Driving through potholes](https://commons.wikimedia.org/wiki/File:Driving_through_potholes.webp) | KEmel49 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `pothole-4.webp` | [Potholes on road](https://commons.wikimedia.org/wiki/File:Potholes_on_road.webp) | KEmel49 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `pothole-5.webp` | [Roads deformed T munnekollala Bengaluru](https://commons.wikimedia.org/wiki/File:Roads_deformed_T_munnekollala_Bengaluru.webp) | Gangaasoonu | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `pothole-6.webp` | [Roads deformed T munnekollala Bengaluru 2](https://commons.wikimedia.org/wiki/File:Roads_deformed_T_munnekollala_Bengaluru_2.webp) | Gangaasoonu | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `waterlogging-1.webp` | [Chennai flood water logging near ofice nandanam4](https://commons.wikimedia.org/wiki/File:Chennai_flood_water_logging_near_ofice_nandanam4.webp) | Vijayingarsal | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `waterlogging-2.webp` | [Chennai flood water logging near ofice nandanam5](https://commons.wikimedia.org/wiki/File:Chennai_flood_water_logging_near_ofice_nandanam5.webp) | Vijayingarsal | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `waterlogging-3.webp` | [Chennai flood water logging near ofice nandanam6](https://commons.wikimedia.org/wiki/File:Chennai_flood_water_logging_near_ofice_nandanam6.webp) | Vijayingarsal | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `waterlogging-4.webp` | [India - Chennai - Monsoon - 02 (3059047958)](https://commons.wikimedia.org/wiki/File:India_-_Chennai_-_Monsoon_-_02_(3059047958).webp) | McKay Savage from London, UK | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `waterlogging-5.webp` | [India - Chennai - Monsoon - 03 (3058213357)](https://commons.wikimedia.org/wiki/File:India_-_Chennai_-_Monsoon_-_03_(3058213357).webp) | McKay Savage from London, UK | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `waterlogging-6.webp` | [India - Chennai - Monsoon - 04 (3058215637)](https://commons.wikimedia.org/wiki/File:India_-_Chennai_-_Monsoon_-_04_(3058215637).webp) | McKay Savage from London, UK | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `waterlogging-7.webp` | [India - Chennai - Monsoon - 05 (3058218683)](https://commons.wikimedia.org/wiki/File:India_-_Chennai_-_Monsoon_-_05_(3058218683).webp) | McKay Savage from London, UK | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `waterlogging-8.webp` | [Inundation of Chennai in 2017-1](https://commons.wikimedia.org/wiki/File:Inundation_of_Chennai_in_2017-1.webp) | Kaitha Poo Manam | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `waterlogging-10.webp` | [Inundation of Chennai in 2017-5](https://commons.wikimedia.org/wiki/File:Inundation_of_Chennai_in_2017-5.webp) | Kaitha Poo Manam | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0) |
+| `worksite-1.webp` | [Road construction India](https://commons.wikimedia.org/wiki/File:Road_construction_India.webp) | Shyamal | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `worksite-3.webp` | [Road construction work](https://commons.wikimedia.org/wiki/File:Road_construction_work.webp) | Siyaulhaque | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `worksite-4.webp` | [Road construction work 2](https://commons.wikimedia.org/wiki/File:Road_construction_work_2.webp) | Siyaulhaque | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `worksite-6.webp` | [Road Repairs Pump](https://commons.wikimedia.org/wiki/File:Road_Repairs_Pump.JPG) | Drmarathe | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+
 ## Open-source libraries, APIs and data
 
 | Name | Use | Licence or terms |
@@ -188,7 +229,7 @@ A 2 to 5 minute walkthrough will be added at `demo/theru-demo.mp4`.
 | [Zod](https://zod.dev) | Input validation | MIT |
 | [sharp](https://sharp.pixelplumbing.com) | Photo re-encoding | Apache-2.0 |
 | [Vercel Blob](https://vercel.com/storage/blob) | Photo storage | Hosted service |
-| Instrument Sans, Instrument Serif, Fragment Mono ([Google Fonts](https://fonts.google.com)) | Typography | SIL OFL 1.1 |
+| Archivo, Instrument Sans, Instrument Serif, Fragment Mono ([Google Fonts](https://fonts.google.com)) | Typography | SIL OFL 1.1 |
 | [Wikimedia Commons](https://commons.wikimedia.org) | Demo photos (credits on the Method page and in `public/seed/credits.json`) | CC licences as listed |
 | [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | News sources for real notices, linked on every record | Linked, not copied |
 

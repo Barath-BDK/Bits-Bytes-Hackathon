@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { ViewTransition } from "react";
-import { Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/font/google";
+import { Archivo, Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SiteHeader } from "@/components/site-header";
-import { Chainage, Ground } from "@/components/ground";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { DEFAULTS, themeBootScript } from "@/lib/themes";
 import { SITE } from "@/lib/site";
@@ -11,6 +10,8 @@ import "./globals.css";
 
 const instrument = Instrument_Sans({ variable: "--font-instrument", subsets: ["latin"] });
 const serif = Instrument_Serif({ variable: "--font-instrument-serif", weight: "400", style: ["normal", "italic"], subsets: ["latin"] });
+// Archivo (variable width) for headings and figures: set wide and heavy, like lettering on a road sign
+const archivo = Archivo({ variable: "--font-display", subsets: ["latin"], axes: ["wdth"] });
 const fragment = Fragment_Mono({ variable: "--font-fragment", weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-theme={DEFAULTS.theme} data-mode={DEFAULTS.mode} data-backdrop={DEFAULTS.backdrop} data-headline={DEFAULTS.headline}
       data-transition={DEFAULTS.transition} suppressHydrationWarning
-      className={`${instrument.variable} ${serif.variable} ${fragment.variable} h-full antialiased`}>
+      className={`${instrument.variable} ${serif.variable} ${fragment.variable} ${archivo.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
@@ -31,10 +32,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll />
         <ScrollProgress />
         <SiteHeader />
-        <Ground />
         <ViewTransition default="page">
           <div className="relative flex flex-1 flex-col">
-            <Chainage />
             {children}
           </div>
         </ViewTransition>

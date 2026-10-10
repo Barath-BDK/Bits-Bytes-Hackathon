@@ -19,7 +19,8 @@ const STACK = [
   ["Zod", "MIT", "https://zod.dev"],
   ["sharp", "Apache-2.0", "https://sharp.pixelplumbing.com"],
   ["Vercel Blob", "hosted service", "https://vercel.com/storage/blob"],
-  ["Instrument Sans, Instrument Serif, Fragment Mono", "SIL OFL 1.1", "https://fonts.google.com"],
+  ["Archivo, Instrument Sans, Instrument Serif, Fragment Mono", "SIL OFL 1.1", "https://fonts.google.com"],
+  ["Overpass API (OpenStreetMap), for mapped construction", "ODbL", "https://overpass-api.de"],
 ];
 
 const RULES = [

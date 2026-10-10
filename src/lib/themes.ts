@@ -1,5 +1,6 @@
 // Palettes, each paired with a backdrop drawn from the city's own infrastructure. Keep ids in sync with globals.css.
 export const THEMES = [
+  { id: "bw", name: "Black & White", note: "Ink and paper, nothing else", swatch: ["#ffffff", "#000000", "#575757"] },
   { id: "paper", name: "Paper", note: "Black, white, a line of cobalt", swatch: ["#ffffff", "#0a0a0a", "#0047ab"] },
   { id: "ink", name: "Ink", note: "Pure black, signal yellow", swatch: ["#000000", "#ffffff", "#ffd60a"] },
   { id: "graphite", name: "Graphite", note: "Charcoal and orange", swatch: ["#141414", "#f5f5f5", "#ff8a3d"] },
@@ -19,7 +20,7 @@ export type Mode = "dark" | "light";
 // Trial settings while we decide on the final look. Each maps to a data-* attribute on <html>.
 export const SETTINGS = {
   backdrop: { label: "Background", options: [["art", "Theme art"], ["grid", "Grid"], ["off", "Plain"]] },
-  headline: { label: "Headline", options: [["serif", "Serif accent"], ["gradient", "Gradient"], ["tinted", "Tinted"]] },
+  headline: { label: "Headline", options: [["plain", "Plain"], ["serif", "Serif accent"], ["gradient", "Gradient"], ["tinted", "Tinted"]] },
   transition: { label: "Page transition", options: [["blur", "Blur"], ["slide", "Slide"], ["wipe", "Wipe"], ["circle", "Circle"], ["zoom", "Zoom"], ["none", "None"]] },
   switch: { label: "Theme switch", options: [["auto", "Match theme"], ["etch", "Street grid"], ["lanes", "Lanes"], ["sweep", "Sweep"], ["ripple", "Ripple"], ["horizon", "Horizon"], ["blocks", "Blocks"], ["circle", "Circle"], ["fade", "Fade"]] },
 } as const;
@@ -27,10 +28,10 @@ export type SettingKey = keyof typeof SETTINGS;
 
 // Theme switch style used by "Match theme".
 export const SWITCH_FOR: Record<ThemeId, string> = {
-  paper: "sweep", ink: "lanes", graphite: "etch", midnight: "ripple", mono: "etch", utilities: "lanes", blueprint: "sweep", drainage: "ripple", transit: "lanes", lumora: "ripple", field: "horizon",
+  bw: "sweep", paper: "sweep", ink: "lanes", graphite: "etch", midnight: "ripple", mono: "etch", utilities: "lanes", blueprint: "sweep", drainage: "ripple", transit: "lanes", lumora: "ripple", field: "horizon",
 };
 
-export const DEFAULTS = { theme: "paper", mode: "light", backdrop: "art", headline: "serif", transition: "blur", switch: "auto" } as const;
+export const DEFAULTS = { theme: "bw", mode: "light", backdrop: "art", headline: "plain", transition: "blur", switch: "auto" } as const;
 export const DEFAULT_THEME: ThemeId = DEFAULTS.theme;
 export const DEFAULT_MODE: Mode = DEFAULTS.mode;
 
