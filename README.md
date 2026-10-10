@@ -170,9 +170,25 @@ Known, accepted: Supabase's advisor warns that the read functions are callable a
 
 A 2 to 5 minute walkthrough will be added at `demo/theru-demo.mp4`.
 
+## Data sources and APIs
+
+Every external service the site or its scripts call, and what for. None needs a key or costs anything.
+
+| Service | Called from | Used for | Terms |
+| --- | --- | --- | --- |
+| [Supabase](https://supabase.com) (PostgreSQL, PostGIS) | Server routes | The database: reports, notices, findings, vouches | Free tier |
+| [OpenFreeMap](https://openfreemap.org) | Browser (map) | Map tiles and styles | Free, attribution to OpenStreetMap |
+| [Photon](https://photon.komoot.io) (komoot) | `/api/geocode` | Place search as you type | OSM data, ODbL, fair use |
+| [Nominatim](https://nominatim.openstreetmap.org) (OpenStreetMap) | `/api/geocode`, `scripts/build-real-seed.py` | Place search; placing notices on the map | ODbL, 1 request per second |
+| [Overpass API](https://overpass-api.de) (OpenStreetMap) | `scripts/build-osm-works.py` | Roads and rail lines mapped as under construction | ODbL |
+| [Open-Meteo](https://open-meteo.com) | Server (street pages) | Hourly rain forecast for the 48-hour outlook | CC BY 4.0 |
+| [Vercel Blob](https://vercel.com/storage/blob) | `/api/photos` | Storing residents' photos | Free tier |
+| [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | Read by hand into `scripts/real-records.json` | Published shutdown, suspension and incident notices | Linked on every record, not copied |
+| [Wikimedia Commons](https://commons.wikimedia.org) | Downloaded once into `public/seed` | Photos for the hero and the sample reports (credits below) | Licences as listed |
+
 ## Photo credits
 
-Every photo on the site was downloaded from [Wikimedia Commons](https://commons.wikimedia.org) into `public/seed` and is used under the licence listed. Each one is credited on the site (the hero caption and the Method page) and here; the same list is in `public/seed/credits.json`.
+All photos are from Wikimedia Commons and are credited on the site (hero caption, Method page) and here.
 
 | File | Title | Author | Licence |
 | --- | --- | --- | --- |
@@ -194,6 +210,30 @@ Every photo on the site was downloaded from [Wikimedia Commons](https://commons.
 | `worksite-3.webp` | [Road construction work](https://commons.wikimedia.org/wiki/File:Road_construction_work.webp) | Siyaulhaque | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 | `worksite-4.webp` | [Road construction work 2](https://commons.wikimedia.org/wiki/File:Road_construction_work_2.webp) | Siyaulhaque | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 | `worksite-6.webp` | [Road Repairs Pump](https://commons.wikimedia.org/wiki/File:Road_Repairs_Pump.JPG) | Drmarathe | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) |
+
+## Open-source libraries, APIs and data
+
+| Name | Use | Licence or terms |
+| --- | --- | --- |
+| [Next.js](https://nextjs.org) | Framework, pages and API routes | MIT |
+| [React](https://react.dev) | UI | MIT |
+| [Supabase](https://supabase.com) (Postgres, [PostGIS](https://postgis.net)) | Database, geospatial queries | Apache-2.0, GPL-2.0 |
+| [MapLibre GL JS](https://maplibre.org) | Map rendering | BSD-3-Clause |
+| [OpenFreeMap](https://openfreemap.org) and [OpenStreetMap](https://www.openstreetmap.org/copyright) | Map tiles and map data | ODbL |
+| [Photon](https://photon.komoot.io) and [Nominatim](https://nominatim.org) | Place search and geocoding of notices | ODbL data, fair-use policies |
+| [Open-Meteo](https://open-meteo.com) | Hourly rain forecast | CC BY 4.0 |
+| [Lenis](https://lenis.dev) | Smooth scrolling | MIT |
+| [Motion](https://motion.dev) | Animation | MIT |
+| [Magic UI](https://magicui.design) AnimatedBeam | Coordination diagram (vendored) | MIT |
+| [Tailwind CSS](https://tailwindcss.com) | Styling | MIT |
+| [Zod](https://zod.dev) | Input validation | MIT |
+| [sharp](https://sharp.pixelplumbing.com) | Photo re-encoding | Apache-2.0 |
+| [Vercel Blob](https://vercel.com/storage/blob) | Photo storage | Hosted service |
+| Archivo, Instrument Sans, Instrument Serif, Fragment Mono ([Google Fonts](https://fonts.google.com)) | Typography | SIL OFL 1.1 |
+| [Wikimedia Commons](https://commons.wikimedia.org) | Demo photos (credits on the Method page and in `public/seed/credits.json`) | CC licences as listed |
+| [DT Next](https://www.dtnext.in), [Urban Acres](https://urbanacres.in) | News sources for real notices, linked on every record | Linked, not copied |
+
+No paid APIs and no AI APIs are used. The project runs entirely on free tiers.
 
 ## Project layout
 
