@@ -1,0 +1,126 @@
+{
+  "_about": "Real, sourced Chennai records for Theru. Each entry cites its source. 'geo' lists place names tried in order to place the record; the first match inside the Chennai area wins. Areas are approximate (centre of the named locality plus a radius).",
+  "shutdowns": [
+    {
+      "date": "2026-10-03", "from": "09:00", "to": "14:00", "timeStated": true,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/power-shutdown-on-october-3-in-chennais-avadi-besant-nagar-pallavaram",
+      "areas": [
+        { "name": "Chembarampakkam", "geo": ["Chembarambakkam"], "list": "Panimalar Medical College, Varadharajapuram, Yamuna Nagar, Kolapancherry, Chokkanallur, Pidarethangal" },
+        { "name": "Sembakkam", "geo": ["Sembakkam"], "list": "Manavala Nagar, Jayendra Nagar, Iyyapa Nagar, Prasanth Colony, Senthil Avenue, Bagyam Nagar, Navaneetham Nagar, VGP Pon Nagar" },
+        { "name": "Mudichur", "geo": ["Mudichur"], "list": "VM Garden, GMR Toll booth, Sundar Nagar, Selva Nagar, Rayappa Nagar" },
+        { "name": "Pallavaram", "geo": ["Pallavaram"], "list": "Radha Nagar Main Road, Ramasamy Street, Hanuman Koil Street, Bharathipuram, Subash Nagar, Venkateswara Nagar, MGR Nagar, Shanti Nagar and nearby streets" },
+        { "name": "IT Corridor", "geo": ["Karapakkam", "Thoraipakkam"], "list": "Mettukuppam, PTC Quarters, Okkiyam Pettai, Nehru Nagar, Rajiv Gandhi Salai, Kannagi Nagar, Thoraipakkam, Karapakkam, River View Colony" },
+        { "name": "Besant Nagar", "geo": ["Besant Nagar"], "list": "TMM Street, Mahalakshmi Avenue, Anna Colony, Sasthiri Nagar, Gangai Amman Koil Street, MG Road, Kamarajar Salai" },
+        { "name": "Kundrathur", "geo": ["Kundrathur"], "list": "Moondramkattalai, Balaji Nagar, Poosanikulam, Bazaar Road, Saravana Nagar, Thirupathy Nagar, Andamkuppam Main Road, Manacherry" },
+        { "name": "Velachery", "geo": ["Tansi Nagar, Velachery", "Velachery"], "list": "Velachery Main Road, LIC Colony, Tansi Nagar 1st to 7th Streets, Taramani Link Road, Dhandeeswaram 11th and 12th Streets" },
+        { "name": "Avadi", "geo": ["Thirumullaivoyal", "Avadi"], "list": "Kovilpathagai, Poompozhil Nagar, Kalaignar Nagar, Annanur, Cholambedu, CTH Road, Thirumullaivoyal, JB Nagar" },
+        { "name": "Chintadripet", "geo": ["Chintadripet"], "list": "Venkatesa Gramani Street, Sowrimuthu Street, Koyathope, Harris Road, Padavettuamman Street, Ulagappa Street and nearby streets" }
+      ]
+    },
+    {
+      "date": "2026-10-05", "from": "09:00", "to": "14:00", "timeStated": true,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/power-shutdown-on-october-5-in-chennais-nehru-nagar-velachery-chetpet",
+      "areas": [
+        { "name": "Thillaiganga Nagar", "geo": ["Thillai Ganga Nagar", "Nanganallur"], "list": "Thillaiganga Nagar, Nanganallur, Pazhavanthangal, Jeevan Nagar, Velachery, Adambakkam, Andal Nagar, Puzhuthivakkam, Ullagaram, AGS Colony" },
+        { "name": "Chetpet", "geo": ["Chetpet, Chennai"], "list": "McNichols Road, Nauroji Road, Gurusamy Road, Harrington area streets, Taylors Road, Hales Road, New Avadi Road, RBI Quarters" },
+        { "name": "Chitlapakkam", "geo": ["Chitlapakkam"], "list": "Chitlapakkam, Sarvamangala Nagar, Thiru-Vi-Ka Nagar, Haridaspuram Main Road, Sudha Avenue, Sharma Nagar, Thirumalai Nagar, Velachery Main Road" }
+      ]
+    },
+    {
+      "date": "2026-10-08", "from": "09:00", "to": "14:00", "timeStated": true,
+      "source": "DT Next (live shutdown updates)", "url": "https://www.dtnext.in/news/chennai/live-power-shutdown-chennai-electricity-updates-check-your-area-timings-details",
+      "areas": [
+        { "name": "Tambaram", "geo": ["Madambakkam"], "list": "Madambakkam, Vengaivasal, Mappedu, Agaramthen, Padhuvanchery, Kaspapuram" },
+        { "name": "Ramapuram", "geo": ["Manapakkam", "Ramapuram, Chennai"], "list": "IPS Colony, Manapakkam, Mugalivakkam, Kolapakkam, Ramachandra Nagar, Gerugambakkam" },
+        { "name": "Rajakilpakkam", "geo": ["Rajakilpakkam"], "list": "Velachery Main Road, Mehta Nagar Main Road, Mahalakshmi Nagar Main Road, Maruthi Nagar, Gomathy Nagar, Iyyappa Nagar" },
+        { "name": "Tiruverkadu", "geo": ["Thiruverkadu"], "list": "Sundarachozhapuram, Ram Nagar, Sundharavinayaga Nagar, Chelliamman Nagar, Green Park, Sakkareswari Nagar" },
+        { "name": "Tiruvanmiyur", "geo": ["Kamaraj Nagar, Thiruvanmiyur", "Thiruvanmiyur"], "list": "Kamaraj Nagar 3rd and 4th Main Roads, PTC Depot, Thiruvalluvar Salai, South Avenue, Mangaleri" },
+        { "name": "Besant Nagar", "geo": ["Besant Nagar"], "list": "SBI Colony, Ellai Amman Kovil Street, Jayaram Avenue, Shastri Nagar cross streets" },
+        { "name": "Mudichur", "geo": ["Mudichur"], "list": "Ranga Nagar, Annai Indra Nagar, Saranga Avenue, Captain Sasikumar Nagar, Thiruvalluvar Nagar, Kamarajar Nedunchalai" },
+        { "name": "Chromepet", "geo": ["Chromepet"], "list": "Radha Nagar, Lakshmi Nagar, Kannan Nagar, Station Border Road, Padmavathi Nagar, East Puthuvai Nagar" },
+        { "name": "Medavakkam", "geo": ["Medavakkam"], "list": "Valli Nagar, Punithavathi Colony, Thiruvalluvar Street, Vembuliamman Koil Street and nearby streets" },
+        { "name": "Kundrathur", "geo": ["Kundrathur"], "list": "Murugan Kovil area, Temple Town, Melandai Street, Pallavarayan Kulakkarai Street, Rajarajeshwari Nagar, Ranganathan Nagar" }
+      ]
+    },
+    {
+      "date": "2026-10-09", "from": "09:00", "to": "14:00", "timeStated": false,
+      "source": "DT Next (live shutdown updates)", "url": "https://www.dtnext.in/news/chennai/live-power-shutdown-chennai-electricity-updates-check-your-area-timings-details",
+      "areas": [
+        { "name": "Ambattur", "geo": ["Ambattur"], "list": "Ponniamman Nagar, Agraharam, Anna Salai, JJ Street" },
+        { "name": "Pallavaram", "geo": ["Pammal"], "list": "Pammal, Venkateswara Nagar, Moovar Nagar, Agatheeswarar Koil Street, Andal Nagar, Cowl Bazaar" },
+        { "name": "Perungalathur", "geo": ["Perungalathur"], "list": "Kurinji Nagar, Ragavendra Nagar, Kakapunjandhar Nagar" },
+        { "name": "Iyyappanthangal", "geo": ["Iyyappanthangal"], "list": "Vasanthapuram, Iyyappa Nagar, Maruti Enclave, Sangamitra Avenue and nearby streets" },
+        { "name": "Korattur", "geo": ["Korattur"], "list": "TNHB East, Central and North Avenue, Thillai Nagar extension, Kasthuri Nagar, Sivasakthi Nagar, Kannagi Street" },
+        { "name": "Tiruverkadu", "geo": ["Velappanchavadi"], "list": "Velappanchavadi, Madharvedu, Perumal Koil Street, Padmavathy Nagar, PH Road, Co-operative Nagar" },
+        { "name": "Tirumudivakkam", "geo": ["Thirumudivakkam"], "list": "MKB Nagar, Women's Industrial Park, Tiruneermalai Main Road, Perumal Nagar, Sri Krishna Nagar, Vazhuthalampedu" },
+        { "name": "Royapettah", "geo": ["Royapettah"], "list": "Peters Road, WK Road, Gowdiya Mutt Road, Royapettah High Road, Bazaar Road" },
+        { "name": "Nerkundram", "geo": ["Nerkundram"], "list": "Reddy Street, Dayasadhan Road, Erikkarai Street, Pallavan Nagar, Mandaveli Street, Sivanthi Avenue" }
+      ]
+    },
+    {
+      "date": "2026-10-10", "from": "09:00", "to": "14:00", "timeStated": false,
+      "source": "DT Next (live shutdown updates)", "url": "https://www.dtnext.in/news/chennai/live-power-shutdown-chennai-electricity-updates-check-your-area-timings-details",
+      "areas": [
+        { "name": "Kundrathur", "geo": ["Vazhuthalambedu", "Kundrathur"], "list": "Vazhuthalambedu, Astalakshimi Nagar, VLC Kakkanji Street, Thiru Ooragaperumal Nagar, Vijayaraja Nagar, Annai Velankanni Nagar" }
+      ]
+    },
+    {
+      "date": "2026-10-11", "from": "09:00", "to": "14:00", "timeStated": false,
+      "source": "DT Next (live shutdown updates)", "url": "https://www.dtnext.in/news/chennai/live-power-shutdown-chennai-electricity-updates-check-your-area-timings-details",
+      "areas": [
+        { "name": "Ambattur Industrial Estate", "geo": ["Ambattur Industrial Estate"], "list": "Aavin Main Road, 8th Street, Ponniamman Nagar, Tass Estate, SIDCO 7th Street, Coromandel Town" }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "starts": "2026-10-10T09:00:00+05:30", "ends": "2026-10-11T09:00:00+05:30",
+      "agency": "Chennai Metrowater (CMWSSB)",
+      "title": "Piped water supply suspended for 24 hours: maintenance at the 110 MLD Nemmeli desalination plant",
+      "source": "DT Next", "url": "https://www.dtnext.in/amp/story/news/chennai/drinking-water-to-be-suspended-in-south-chennai-for-24-hours-from-october-10-onwards",
+      "note": "Street tanks and tankers continue to supply unconnected and low-pressure areas.",
+      "zones": {
+        "Adyar zone": [["Tiruvanmiyur", "Thiruvanmiyur"], ["Pallipattu", "Pallipattu, Thiruvanmiyur", "Kalakshetra Colony"], "Kotturpuram", "Indira Nagar, Adyar"],
+        "Perungudi zone": ["Kottivakkam", "Palavakkam", "Perungudi", "Pallikaranai", "Madipakkam", "Puzhuthivakkam"],
+        "Sholinganallur zone": ["Neelankarai", ["Akkarai", "Akkarai, Sholinganallur"], "Kannagi Nagar", "Karapakkam", "Perumbakkam", ["Vettuvankeni", "Vettuvankani", "Injambakkam"], "Sholinganallur", "Semmancheri", "Okkiyam Thoraipakkam"]
+      }
+    }
+  ],
+  "incidents": [
+    {
+      "kind": "incident", "at": "2026-09-29T12:00:00+05:30", "agency": "Greater Chennai Corporation (works); TNPDCL (cables)",
+      "title": "Power cables left exposed on the footpath after stormwater drain works",
+      "area": "Paper Mills Road, Perambur, near Our Lady of Lourdes Shrine",
+      "geo": ["Our Lady of Lourdes Shrine, Perambur", "Paper Mills Road, Perambur"], "radius": 250,
+      "source": "Urban Acres", "url": "https://urbanacres.in/exposed-power-cables-put-chennais-paper-mills-road-pedestrians-at-risk/"
+    },
+    {
+      "kind": "incident", "at": "2026-08-28T12:00:00+05:30", "agency": "Chennai Metrowater (CMWSSB); Greater Chennai Corporation",
+      "title": "Road restoration uncertain on about 28 streets after Metro Water works; road-cut charges unpaid",
+      "area": "Sundharapuram and Shivarajapuram, Pulianthope (Ward 78), 14 streets each",
+      "geo": ["Pulianthope"], "radius": 600,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/cmda-cash-crunch-leaves-rs-80-cr-road-cut-charges-unpaid-to-metro-water"
+    },
+    {
+      "kind": "incident", "at": "2026-09-06T12:00:00+05:30", "agency": "TNPDCL (CEDC West Chennai)",
+      "title": "33 kV underground feeder damaged by gas pipeline works; police case registered",
+      "area": "Paruthipattu, Avadi (approximate location)",
+      "lat": 13.1105, "lng": 80.0915, "radius": 300,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/avadi-police-book-torrent-gas-agent-contractor-and-driver-over-power-cable-damage"
+    },
+    {
+      "kind": "resurfacing", "at": "2025-11-02T12:00:00+05:30", "agency": "Greater Chennai Corporation",
+      "title": "1.9 km stretch near Tidel Park repaired",
+      "area": "Taramani, near Tidel Park",
+      "geo": ["Tidel Park, Taramani"], "radius": 900,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/large-scale-road-restoration-works-begin-across-city-851726"
+    },
+    {
+      "kind": "resurfacing", "at": "2025-11-02T12:00:00+05:30", "agency": "Greater Chennai Corporation",
+      "title": "Service road restored after Metro Rail works",
+      "area": "Vadapalani 100 Feet Road to Arumbakkam",
+      "geo": ["Arumbakkam"], "radius": 1200,
+      "source": "DT Next", "url": "https://www.dtnext.in/news/chennai/large-scale-road-restoration-works-begin-across-city-851726"
+    }
+  ]
+}

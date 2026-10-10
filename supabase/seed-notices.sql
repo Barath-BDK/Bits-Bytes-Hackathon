@@ -1,6 +1,6 @@
 -- Theru demo layer: notices, outages and demo labels. Re-runnable; leaves real (non-demo) reports alone.
 -- Dates are relative to now(), so re-run before a demo to keep "tomorrow" in the future.
--- Everything here is provenance 'demo' except one sourced news incident.
+-- Everything here is provenance 'demo'. Real, sourced records live in seed-real.sql; this file leaves them alone.
 
 -- 1. Label the original seeded reports as demo, matched by their seed fingerprints.
 with seedlats(lat) as (values
@@ -11,7 +11,7 @@ hashes as (select encode(extensions.digest('seed-' || lat || '-' || i, 'sha256')
 update public.reports set demo = true where reporter_hash in (select h from hashes);
 
 -- 2. Reset previous demo notices, news items and demo outages.
-delete from public.notices where provenance in ('demo', 'news');
+delete from public.notices where provenance = 'demo';
 delete from public.clusters where kind = 'outage' and demo;
 
 -- 3. Notices. IST helper: tomorrow 09:00 IST etc.
@@ -44,11 +44,7 @@ begin
   ('power_shutdown', 'TNPDCL (Chennai South)', 'Planned maintenance shutdown', 'Adyar, Thiruvanmiyur, Kottur Gardens',
      st_setsrid(st_makepoint(80.25800, 13.00100), 4326)::geography, 1500, d0 + interval '2 days 9 hours', d0 + interval '2 days 14 hours', null, demo_src, null, 'demo'),
   ('water_suspension', 'Chennai Metrowater (CMWSSB)', 'Piped supply suspended for plant maintenance', 'Perungudi and Sholinganallur zones, parts of Velachery',
-     st_setsrid(st_makepoint(80.24000, 12.96500), 4326)::geography, 3500, d0 + interval '1 day 9 hours', d0 + interval '2 days 9 hours', null, demo_src, null, 'demo'),
-  -- A real, sourced incident: the pattern the dig-strike rule looks for.
-  ('incident', 'TNPDCL (CEDC West Chennai)', '33 kV underground feeder damaged by gas pipeline works; police case registered', 'Paruthipattu, Avadi (approximate location)',
-     st_setsrid(st_makepoint(80.0915, 13.1105), 4326)::geography, 300, timestamptz '2026-09-06 12:00+05:30', null, null, 'DT Next',
-     'https://www.dtnext.in/news/chennai/avadi-police-book-torrent-gas-agent-contractor-and-driver-over-power-cable-damage', 'news');
+     st_setsrid(st_makepoint(80.24000, 12.96500), 4326)::geography, 3500, d0 + interval '1 day 9 hours', d0 + interval '2 days 9 hours', null, demo_src, null, 'demo');
 end $$;
 
 -- 4. Demo power cuts: one beside the Velachery trench (should raise a dig-strike finding), one elsewhere.
