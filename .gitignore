@@ -33,3 +33,7 @@ graphify-out/
 
 # copied from node_modules at build time
 public/maplibre-gl-worker.mjs
+
+# demo video: only the final, compressed file is committed; raw recordings stay local
+demo/*
+!demo/theru-demo.mp4
