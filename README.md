@@ -168,7 +168,7 @@ Known, accepted: Supabase's advisor warns that the read functions are callable a
 
 ## Demo video
 
-A 2 to 5 minute walkthrough will be added at `demo/theru-demo.mp4`.
+[Watch the demo (4 min 55 s)](demo/theru-demo.mp4): searching a street, reporting a problem, vouching for a request, where each record comes from, and how residents are kept private. The file is in the repository at `demo/theru-demo.mp4`.
 
 ## Data sources and APIs
 
