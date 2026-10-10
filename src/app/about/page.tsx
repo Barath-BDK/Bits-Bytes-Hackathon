@@ -9,7 +9,7 @@ const STACK = [
   ["Next.js", "MIT", "https://nextjs.org"],
   ["Supabase (Postgres + PostGIS)", "Apache-2.0 / GPL-2.0", "https://supabase.com"],
   ["MapLibre GL JS", "BSD-3-Clause", "https://maplibre.org"],
-  ["OpenFreeMap tiles and OpenStreetMap data", "ODbL", "https://openfreemap.org"],
+  ["OpenFreeMap tiles, and OpenStreetMap data for the map and mapped construction", "ODbL", "https://www.openstreetmap.org/copyright"],
   ["Photon and Nominatim geocoders (OpenStreetMap data)", "ODbL", "https://nominatim.org"],
   ["Open-Meteo weather forecast", "CC BY 4.0", "https://open-meteo.com"],
   ["Lenis (smooth scroll)", "MIT", "https://lenis.dev"],
@@ -52,7 +52,8 @@ export default function About() {
           <p><span className="tag tag-community mr-2">Resident reports</span>Potholes, waterlogging, work sites and power cuts reported here. Reports of the same thing merge: 25 m for potholes, 75 m for waterlogging, 50 m for work sites, 300 m for power cuts (a power cut only merges with reports from the last 6 hours).</p>
           <p><span className="tag tag-news mr-2">News report</span>Incidents published by news outlets, with a link to the article.</p>
           <p><span className="tag tag-official mr-2">Official record</span>Published permissions, completions and shutdown schedules, each with its source link and import date. Live government feeds are not integrated: TNPDCL publishes planned shutdowns behind a captcha, so they are entered from published lists.</p>
-          <p><span className="tag tag-demo mr-2">Demo data</span>For this demonstration, permissions, completions, schedules and some reports are synthetic, so the matching and rules can be shown working. They are labelled wherever they appear and never presented as real.</p>
+          <p><span className="tag tag-osm mr-2">OpenStreetMap</span>Roads, flyovers and metro lines mapped as under construction (Chennai Metro Phase 2, the Port to Maduravoyal expressway and others), cut into stretches of about 800 m, each linked to the map way it came from. OpenStreetMap records that works exist, not when they began or end, so these show as ongoing.</p>
+          <p><span className="tag tag-demo mr-2">Demo data</span>None at present. Road-cutting permissions and completion records are not published as open data, so the permission-matching rules wait for real records. If synthetic records are ever loaded to show the rules working, they carry this label wherever they appear.</p>
           <p>Rain comes from the Open-Meteo forecast. Place search uses Photon and Nominatim, both built on OpenStreetMap.</p>
         </Sheet>
 
@@ -103,7 +104,7 @@ export default function About() {
         </Sheet>
 
         <Sheet label="Photo credits" no="08" bodyClassName="p-6">
-          <p className="text-fg-2">Demo photos are from Wikimedia Commons under the licenses below. Locations and report text in the demo data are illustrative.</p>
+          <p className="text-fg-2">Photos in the sample reports used for local development (supabase/seed.sql) are from Wikimedia Commons under the licenses below.</p>
           <ul className="mt-4 divide-y divide-line text-sm">
             {credits.map((c) => (
               <li key={c.file} className="grid gap-1 py-2.5 sm:grid-cols-[1fr_auto]">

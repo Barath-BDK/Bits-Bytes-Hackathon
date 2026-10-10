@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getClusters, getFindings } from "@/lib/data";
-import { KINDS, isLiveOutage, photoSrc, timeAgo } from "@/lib/issues";
+import { getClusters, getFindings, getNotices } from "@/lib/data";
+import { KINDS, NOTICE_KINDS, PROVENANCE, isLiveOutage, photoSrc, timeAgo } from "@/lib/issues";
+import { dayWord, hhmm, inForceOrSoon } from "@/lib/time";
 import { streetHref } from "@/lib/links";
 import { SITE } from "@/lib/site";
 import { KindBadge } from "@/components/kind-icon";
@@ -19,13 +20,16 @@ const Arrow = () => (
 export const revalidate = 60;
 
 export default async function Home() {
-  const [clusters, findings] = await Promise.all([getClusters(), getFindings()]);
+  const [clusters, findings, notices] = await Promise.all([getClusters(), getFindings(), getNotices()]);
+  const upcoming = inForceOrSoon(notices);
   const open = clusters.filter((c) => c.status === "open" && (c.kind !== "outage" || isLiveOutage(c)));
   const live = open.filter(isLiveOutage);
   const withPhotos = open.filter((c) => c.cover_photo);
   const strike = findings.find((f) => f.type === "possible_cable_strike");
   const ticker = [
+    ...(live.length ? [`Power reported off in ${live.length} ${live.length === 1 ? "area" : "areas"} right now`] : []),
     ...findings.slice(0, 4).map((f) => `${f.label}: ${f.title.toLowerCase()}`),
+    ...upcoming.slice(0, 6).map((n) => `${NOTICE_KINDS[n.kind].label}, ${n.area_text?.split(/[.(]/)[0] ?? n.title}: ${dayWord(new Date(n.starts_at))} ${hhmm(new Date(n.starts_at))}`),
     ...[...open].sort((x, y) => y.last_reported_at.localeCompare(x.last_reported_at)).slice(0, 6).map((c) =>
       c.kind === "worksite"
         ? `${c.department ?? "A work site"} logged, ${timeAgo(c.last_reported_at)}`
@@ -34,7 +38,7 @@ export default async function Home() {
 
   return (
     <main className="overflow-x-clip">
-      <Hero openCount={open.length} liveOutages={live.length} findingsCount={findings.length} ticker={ticker} />
+      <Hero ticker={ticker} />
 
       {/* Today */}
       <section className="mx-auto max-w-6xl px-4 pb-24 pt-16 sm:px-6">
@@ -43,9 +47,26 @@ export default async function Home() {
             <div className="grid overflow-hidden md:grid-cols-[1.4fr_1fr]">
               <div className="border-b border-line md:border-b-0 md:border-r">
                 <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                  <span className="label text-fg-3">The records today</span>
-                  <Link href="/records" className="label text-fg-3 hover:text-fg">All findings</Link>
+                  <span className="label text-fg-3">{findings.length ? "The records today" : "In force and coming up"}</span>
+                  <Link href="/records" className="label text-fg-3 hover:text-fg">{findings.length ? "All findings" : "All records"}</Link>
                 </div>
+                {findings.length === 0 && (
+                  <ol>
+                    {upcoming.slice(0, 4).map((n) => (
+                      <li key={n.id} className="border-b border-line last:border-0">
+                        <Link href={streetHref({ lat: n.lat, lng: n.lng, name: n.area_text?.split(/[.(,]/)[0] ?? n.title })} className="group flex items-start gap-4 px-5 py-3.5 transition hover:bg-surface-2/60">
+                          <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-[2px]" style={{ background: NOTICE_KINDS[n.kind].color }} />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-medium tracking-[-0.01em]">{n.title}</span>
+                            <span className="line-clamp-1 text-sm text-fg-3">{dayWord(new Date(n.starts_at))} {hhmm(new Date(n.starts_at))}, {n.area_text}</span>
+                          </span>
+                          <span className={`tag tag-${n.provenance} shrink-0`}>{PROVENANCE[n.provenance]}</span>
+                        </Link>
+                      </li>
+                    ))}
+                    {upcoming.length === 0 && <li className="px-5 py-6 text-fg-3">Nothing flagged and no notices in force today.</li>}
+                  </ol>
+                )}
                 <ol>
                   {findings.slice(0, 4).map((f) => (
                     <li key={f.id} className="border-b border-line last:border-0">

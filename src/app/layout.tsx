@@ -3,6 +3,7 @@ import { ViewTransition } from "react";
 import { Instrument_Sans, Instrument_Serif, Fragment_Mono, Anek_Tamil } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Dock } from "@/components/dock";
+import { Chainage, Ground } from "@/components/ground";
 import { DEFAULTS, themeBootScript } from "@/lib/themes";
 import { SITE } from "@/lib/site";
 import "./globals.css";
@@ -28,8 +29,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col">
         <SmoothScroll />
+        <Ground />
         <ViewTransition default="page">
-          <div className="flex flex-1 flex-col pb-20 md:pb-24">{children}</div>
+          <div className="relative flex flex-1 flex-col pb-20 md:pb-24">
+            <Chainage />
+            {children}
+          </div>
         </ViewTransition>
         <Dock />
       </body>

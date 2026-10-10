@@ -21,8 +21,8 @@ export type Cluster = {
   demo: boolean;
 };
 
-export type NoticeKind = "road_permit" | "completion" | "resurfacing" | "power_shutdown" | "water_suspension" | "incident";
-export type Provenance = "official" | "news" | "community" | "demo";
+export type NoticeKind = "road_permit" | "completion" | "resurfacing" | "power_shutdown" | "water_suspension" | "incident" | "works";
+export type Provenance = "official" | "news" | "community" | "osm" | "demo";
 
 export type Notice = {
   id: string; kind: NoticeKind; agency: string; title: string; area_text: string | null; lat: number; lng: number; radius_m: number;
@@ -42,10 +42,11 @@ export const NOTICE_KINDS: Record<NoticeKind, { label: string; color: string }> 
   power_shutdown: { label: "Planned power shutdown", color: "var(--outage)" },
   water_suspension: { label: "Water supply suspension", color: "var(--water)" },
   incident: { label: "Reported incident", color: "var(--alert)" },
+  works: { label: "Construction in progress", color: "var(--works)" },
 };
 
 export const PROVENANCE: Record<Provenance, string> = {
-  official: "Official record", news: "News report", community: "Resident reports", demo: "Demo data",
+  official: "Official record", news: "News report", community: "Resident reports", osm: "OpenStreetMap", demo: "Demo data",
 };
 
 export type ClusterDetail = {

@@ -21,12 +21,13 @@ function cssVar(name: string) {
 }
 
 const NOTICE_VAR: Record<string, string> = {
-  road_permit: "--works", power_shutdown: "--outage", water_suspension: "--water", resurfacing: "--fg-2", completion: "--ok", incident: "--alert",
+  road_permit: "--works", power_shutdown: "--outage", water_suspension: "--water", resurfacing: "--fg-2", completion: "--ok", incident: "--alert", works: "--works",
 };
 
 export function noticeFeatures(notices: Notice[], now = Date.now()) {
   const features: Feature[] = notices
-    .filter((n) => !n.ends_at || new Date(n.ends_at).getTime() > now - 30 * 86_400_000)
+    // what matters today: notices in force, upcoming or ended in the last day; undated incidents from the last 60 days
+    .filter((n) => n.kind === "works" || (n.ends_at ? new Date(n.ends_at).getTime() > now - 86_400_000 : new Date(n.starts_at).getTime() > now - 60 * 86_400_000))
     .map((n) => ({
       type: "Feature",
       properties: { kind: n.kind, color: cssVar(NOTICE_VAR[n.kind] ?? "--fg-3"), title: n.title },

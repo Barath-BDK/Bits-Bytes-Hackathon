@@ -6,10 +6,10 @@
 */
 :root,
 [data-theme="mono"][data-mode="dark"] {
-  --bg: #031211; --surface: #0a1918; --surface-2: #122221; --line: rgb(232 228 211 / 0.1);
-  --fg: #e8e4d3; --fg-2: #aeab9d; --fg-3: #75736a;
-  --accent: #e8e4d3; --accent-fg: #031211; --glow: rgb(232 228 211 / 0.1);
-  --pothole: #dc8d62; --water: #82b6b6; --works: #d9c27a; --ok: #9cc29a; --alert: #e6826f;
+  --bg: #04181a; --surface: #0c2021; --surface-2: #152c2c; --line: rgb(236 232 216 / 0.13);
+  --fg: #f0ecdc; --fg-2: #c3c0b1; --fg-3: #8d8b80;
+  --accent: #f0ecdc; --accent-fg: #04181a; --glow: rgb(240 236 220 / 0.12);
+  --pothole: #e8996c; --water: #8fc4c3; --works: #e4cc84; --ok: #a8cfa5; --alert: #ef8f7b;
 }
 [data-theme="lumora"][data-mode="dark"] {
   --bg: #031211; --surface: #08191a; --surface-2: #0f2423; --line: rgb(232 228 211 / 0.11);
@@ -36,10 +36,10 @@
   --pothole: #b5532a; --water: #3d777d; --works: #a07a26; --ok: #52753f; --alert: #a8321f;
 }
 [data-theme="mono"][data-mode="dark"] {
-  --bg: #031211; --surface: #0a1918; --surface-2: #122221; --line: rgb(232 228 211 / 0.1);
-  --fg: #e8e4d3; --fg-2: #aeab9d; --fg-3: #75736a;
-  --accent: #e8e4d3; --accent-fg: #031211; --glow: rgb(232 228 211 / 0.1);
-  --pothole: #dc8d62; --water: #82b6b6; --works: #d9c27a; --ok: #9cc29a; --alert: #e6826f;
+  --bg: #04181a; --surface: #0c2021; --surface-2: #152c2c; --line: rgb(236 232 216 / 0.13);
+  --fg: #f0ecdc; --fg-2: #c3c0b1; --fg-3: #8d8b80;
+  --accent: #f0ecdc; --accent-fg: #04181a; --glow: rgb(240 236 220 / 0.12);
+  --pothole: #e8996c; --water: #8fc4c3; --works: #e4cc84; --ok: #a8cfa5; --alert: #ef8f7b;
 }
 [data-theme="mono"][data-mode="light"] {
   --bg: #e8e4d3; --surface: #f2efe4; --surface-2: #d9d4c0; --line: rgb(3 18 17 / 0.13);
@@ -127,12 +127,13 @@ html {
   background: var(--bg);
   color: var(--fg);
   color-scheme: dark;
+  transition: background-color 400ms ease;
 }
 html[data-mode="light"] {
   color-scheme: light;
 }
+/* body stays transparent: the page ground (z-index -1) sits between it and the html background. */
 body {
-  background: var(--bg);
   color: var(--fg);
   font-family: var(--font-instrument), system-ui, sans-serif;
   font-feature-settings: "ss01", "cv11";
@@ -143,12 +144,12 @@ body {
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
 /* Headline colours per theme: not just black or white. */
-:root, [data-theme="mono"][data-mode="dark"] { --display-fg: #ece8d8; --display-accent: #ece8d8; }
+:root, [data-theme="mono"][data-mode="dark"] { --display-fg: #f6f2e3; --display-accent: #f6f2e3; }
 [data-theme="lumora"][data-mode="dark"] { --display-fg: #f3efe0; --display-accent: #2fe0ea; }
 [data-theme="lumora"][data-mode="light"] { --display-fg: #031211; --display-accent: #00808a; }
 [data-theme="field"][data-mode="dark"] { --display-fg: #f0e3cb; --display-accent: #e0a65c; }
 [data-theme="field"][data-mode="light"] { --display-fg: #1e170d; --display-accent: #8f5a1f; }
-[data-theme="mono"][data-mode="dark"] { --display-fg: #ece8d8; --display-accent: #ece8d8; }
+[data-theme="mono"][data-mode="dark"] { --display-fg: #f6f2e3; --display-accent: #f6f2e3; }
 [data-theme="mono"][data-mode="light"] { --display-fg: #031211; --display-accent: #031211; }
 
 [data-theme="utilities"][data-mode="dark"] { --display-fg: #f1ede4; --display-accent: #ffd23f; }
@@ -171,6 +172,8 @@ html[data-headline="gradient"] .display:not(:has(span)) {
   background: linear-gradient(180deg, var(--display-fg) 30%, color-mix(in oklab, var(--display-fg) 58%, transparent));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
+/* the accent word sits inside a gradient-clipped wrapper and would inherit its transparent fill */
+html[data-headline="gradient"] .display .accent-word { -webkit-text-fill-color: var(--display-accent); background: none; }
 html[data-headline="tinted"] .display, html[data-headline="tinted"] .display span {
   background: linear-gradient(100deg, var(--display-fg) 15%, var(--display-accent) 85%);
   background-attachment: fixed; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
@@ -239,8 +242,14 @@ html[data-theme="blueprint"][data-mode="light"] .maplibregl-canvas { filter: sep
 .maplibregl-ctrl-group { background: var(--surface) !important; border: 1px solid var(--line); box-shadow: none !important; }
 .maplibregl-ctrl-group button + button { border-top-color: var(--line) !important; }
 html[data-mode="dark"] .maplibregl-ctrl-icon { filter: invert(1); }
-.maplibregl-ctrl-attrib { background: color-mix(in oklab, var(--surface) 80%, transparent) !important; color: var(--fg-3); }
-.maplibregl-ctrl-attrib a { color: var(--fg-2) !important; }
+/* attribution: a small "i" chip under the zoom buttons that opens into one readable line */
+.maplibregl-ctrl-attrib.maplibregl-compact { background: var(--surface) !important; border: 1px solid var(--line); min-height: 29px; border-radius: 8px !important; }
+.maplibregl-ctrl-attrib.maplibregl-compact-show { padding: 4px 32px 4px 10px !important; }
+.maplibregl-ctrl-attrib-inner, .maplibregl-ctrl-attrib-inner * { color: var(--fg-2) !important; font: 11px/20px var(--font-instrument), system-ui, sans-serif; }
+.maplibregl-ctrl-attrib-inner a { text-decoration: underline; text-decoration-color: var(--line); }
+.maplibregl-ctrl-attrib-button { background-color: transparent !important; top: 2px !important; right: 2px !important; }
+html[data-mode="dark"] .maplibregl-ctrl-attrib-button { filter: invert(1); }
+.maplibregl-ctrl-group { border-radius: 8px !important; overflow: hidden; }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
 .marquee { animation: marquee 70s linear infinite; will-change: transform; }
@@ -376,6 +385,7 @@ html.theme-vt[data-vt="fade"]::view-transition-new(root) { animation: 500ms ease
 .tag-official { color: var(--ok); border: 1px solid color-mix(in oklab, var(--ok) 50%, transparent); }
 .tag-news { color: var(--water); border: 1px solid color-mix(in oklab, var(--water) 50%, transparent); }
 .tag-community { color: var(--fg-2); border: 1px solid var(--line); }
+.tag-osm { color: var(--fg-2); border: 1px solid color-mix(in oklab, var(--works) 45%, transparent); }
 .tag-verify { color: var(--works); border: 1px solid color-mix(in oklab, var(--works) 55%, transparent); }
 .tag-gap { color: var(--fg-2); border: 1px solid var(--line); background: var(--surface-2); }
 
@@ -383,7 +393,65 @@ html.theme-vt[data-vt="fade"]::view-transition-new(root) { animation: 500ms ease
 @keyframes flicker { 0%, 100% { opacity: 1; } 8% { opacity: 0.2; } 10% { opacity: 0.9; } 14% { opacity: 0.1; } 60% { opacity: 0.05; } }
 .lights-out { animation: flicker 3.2s ease-in-out forwards; }
 
-/* the dock covers the bottom of the map: lift MapLibre's own controls above it */
-.maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left { bottom: 78px !important; }
-@media (min-width: 768px) { .maplibregl-ctrl-bottom-right, .maplibregl-ctrl-bottom-left { bottom: 84px !important; } }
+/* map controls: top right, under the search bar */
+.maplibregl-ctrl-top-right { top: 58px !important; display: flex; flex-direction: column; align-items: flex-end; }
+.maplibregl-ctrl-top-right .maplibregl-ctrl { margin: 6px 12px 0 0 !important; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 50%; flex: none; }
 .gw-pin[data-kind="outage"].gw-pulse::after { border-color: var(--outage); }
+
+/* Scrollbars: a strip of road, with a dashed lane marking down the thumb */
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in oklab, var(--fg) 30%, transparent) transparent; }
+}
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-button { display: none; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+html::-webkit-scrollbar-track { background: var(--bg); box-shadow: inset 1px 0 0 var(--line); }
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent; background-clip: padding-box; border-radius: 4px;
+  background-color: color-mix(in oklab, var(--fg) 16%, transparent);
+  background-image: repeating-linear-gradient(to bottom, color-mix(in oklab, var(--fg) 55%, transparent) 0 5px, transparent 5px 11px);
+  background-size: 1.5px 100%; background-position: center; background-repeat: no-repeat;
+}
+::-webkit-scrollbar-thumb:horizontal {
+  background-image: repeating-linear-gradient(to right, color-mix(in oklab, var(--fg) 55%, transparent) 0 5px, transparent 5px 11px);
+  background-size: 100% 1.5px;
+}
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in oklab, var(--fg) 28%, transparent); }
+::-webkit-scrollbar-thumb:active { background-color: color-mix(in oklab, var(--accent) 60%, transparent); }
+
+/* Page ground: a faint survey sheet behind every page, and a chainage ruler down the margin that scrolls past */
+.ground { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.ground svg { opacity: 0.16; }
+html[data-mode="light"] .ground svg { opacity: 0.2; }
+.ground::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 45%, var(--bg) 110%); }
+.chainage {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 44px; pointer-events: none; overflow: hidden;
+  border-right: 1px solid var(--line);
+  background:
+    repeating-linear-gradient(to bottom, color-mix(in oklab, var(--fg) 30%, transparent) 0 1px, transparent 1px 200px) right top / 16px 100% no-repeat,
+    repeating-linear-gradient(to bottom, color-mix(in oklab, var(--fg) 15%, transparent) 0 1px, transparent 1px 20px) right top / 6px 100% no-repeat;
+}
+.chainage span {
+  position: absolute; right: 20px; translate: 0 -50%; rotate: 180deg; writing-mode: vertical-rl;
+  font: 10px/1 var(--font-fragment), monospace; letter-spacing: 0.08em; color: var(--fg-3);
+}
+
+/* Mono hero: road cuts open, get logged, are restored, and the next one opens */
+.cut-seg { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: cut-seg 15s cubic-bezier(0.6, 0, 0.3, 1) infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-seg {
+  0% { stroke-dashoffset: 1; stroke: var(--works); opacity: 0; } 4% { opacity: 1; } 12% { stroke-dashoffset: 0; }
+  46% { stroke: var(--works); } 56% { stroke: var(--fg); opacity: 0.9; } 80% { stroke-dashoffset: 0; opacity: 0.5; } 90%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.cut-box { opacity: 0; animation: cut-box 15s ease infinite; animation-delay: var(--d, 0s); transform-box: fill-box; transform-origin: center; }
+@keyframes cut-box { 0%, 8% { opacity: 0; transform: scale(1.5); } 13% { opacity: 1; transform: scale(1); } 46% { opacity: 1; } 54%, 100% { opacity: 0; } }
+.cut-note { opacity: 0; animation: cut-note 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-note { 0%, 13% { opacity: 0; transform: translateY(6px); } 19%, 48% { opacity: 1; transform: none; } 53%, 100% { opacity: 0; } }
+.cut-done { opacity: 0; animation: cut-done 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-done { 0%, 53% { opacity: 0; transform: translateY(6px); } 59%, 80% { opacity: 1; transform: none; } 88%, 100% { opacity: 0; } }
+.cut-lead { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; animation: cut-lead 15s ease infinite; animation-delay: var(--d, 0s); }
+@keyframes cut-lead { 0%, 11% { stroke-dashoffset: 1; opacity: 1; } 17% { stroke-dashoffset: 0; } 80% { stroke-dashoffset: 0; opacity: 0.8; } 88%, 100% { opacity: 0; } }
+.survey-scan { animation: survey-scan 24s linear infinite; }
+@keyframes survey-scan { from { transform: translateX(-160px); } to { transform: translateX(1760px); } }
+@media (prefers-reduced-motion: reduce) { .cut-seg, .cut-box, .cut-note, .cut-done, .cut-lead, .survey-scan { animation: none; } }

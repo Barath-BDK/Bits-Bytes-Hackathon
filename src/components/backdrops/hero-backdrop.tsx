@@ -15,19 +15,19 @@ const readTheme = attr("data-theme", DEFAULTS.theme);
 const readMode = attr("data-mode", DEFAULTS.mode);
 const readBackdrop = attr("data-backdrop", DEFAULTS.backdrop);
 
-const CANVAS: Partial<Record<ThemeId, CanvasKind>> = { lumora: "water", field: "terrain" };
+const CANVAS: Partial<Record<ThemeId, CanvasKind>> = { lumora: "water" };
 const SVG: Partial<Record<ThemeId, () => React.JSX.Element>> = {
-  mono: StreetPlan, utilities: UtilityPlan, blueprint: BlueprintPlan, drainage: DrainagePlan, transit: TransitPlan,
+  mono: () => <StreetPlan live />, field: () => <StreetPlan />, utilities: UtilityPlan, blueprint: BlueprintPlan, drainage: DrainagePlan, transit: TransitPlan,
 };
 
 export const CAPTIONS: Record<ThemeId, string> = {
-  mono: "Fig. 1  Street plan, etched. Adyar and its lanes.",
+  mono: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
   utilities: "Fig. 1  Under the road. Five departments, one carriageway.",
   blueprint: "Fig. 1  DWG 14. Junction resurfacing, Zone 13.",
   drainage: "Fig. 1  Storm water network. Where it silts, streets flood.",
   transit: "Fig. 1  Metro works. Phase 2 lines under construction.",
   lumora: "Fig. 1  Monsoon surface. Rain on standing water, Velachery.",
-  field: "Fig. 1  Earthworks. A road that keeps getting dug up, at dusk.",
+  field: "Fig. 1  Street plan at dusk. Adyar and its lanes.",
 };
 
 export function useThemeId() {

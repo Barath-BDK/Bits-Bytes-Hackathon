@@ -53,7 +53,15 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
     );
   }
 
-  function choosePhoto(f: File | null) {
+  async function choosePhoto(f: File | null) {
+    // Gallery picks can be anything: check the browser can decode it now, not at submit time.
+    if (f) {
+      if (!f.type.startsWith("image/") || f.size > 30_000_000) return setError("Choose an image under 30 MB.");
+      const bmp = await createImageBitmap(f).catch(() => null);
+      if (!bmp) return setError("This photo's format can't be read in this browser. Try a JPEG or PNG.");
+      bmp.close();
+      setError(null);
+    }
     setPhoto(f);
     if (preview) URL.revokeObjectURL(preview);
     setPreview(f ? URL.createObjectURL(f) : null);
@@ -201,19 +209,28 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted }: Props) {
 
             <div className="mt-5">
               <span className="label text-fg-2">Photo, optional</span>
-              <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-line p-3 transition hover:border-fg-3">
+              <div className="mt-2 flex items-center gap-3 rounded-xl border border-dashed border-line p-3">
                 {preview
                   // eslint-disable-next-line @next/next/no-img-element -- local object URL preview
-                  ? <img src={preview} alt="Selected photo" className="h-14 w-14 rounded-lg object-cover" />
-                  : <span className="grid h-14 w-14 place-items-center rounded-lg bg-surface-2 text-fg-3">
+                  ? <img src={preview} alt="Selected photo" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+                  : <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-surface-2 text-fg-3">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>
                     </span>}
-                <span className="text-sm">
-                  <span className="font-medium">{photo ? "Change photo" : "Add a photo"}</span>
-                  <span className="block text-xs text-fg-3">Location data is stripped before storage.</span>
-                </span>
-                <input type="file" accept="image/*" capture="environment" onChange={(e) => choosePhoto(e.target.files?.[0] ?? null)} className="sr-only" />
-              </label>
+                <div className="min-w-0 flex-1">
+                  {/* capture opens the camera on phones; the second input opens the gallery or file picker */}
+                  <div className="flex flex-wrap gap-2">
+                    <label className="cursor-pointer rounded-[8px] border border-line bg-surface-2 px-3 py-1.5 text-sm font-medium transition hover:border-fg-3">
+                      {photo ? "Retake" : "Take photo"}
+                      <input type="file" accept="image/*" capture="environment" onChange={(e) => choosePhoto(e.target.files?.[0] ?? null)} className="sr-only" />
+                    </label>
+                    <label className="cursor-pointer rounded-[8px] border border-line px-3 py-1.5 text-sm font-medium transition hover:border-fg-3">
+                      {photo ? "Choose another" : "From gallery"}
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" onChange={(e) => choosePhoto(e.target.files?.[0] ?? null)} className="sr-only" />
+                    </label>
+                  </div>
+                  <span className="mt-1.5 block text-xs text-fg-3">Location data is stripped before storage.</span>
+                </div>
+              </div>
             </div>
 
             <label className="mt-5 block text-sm">

@@ -41,3 +41,11 @@ export function span(start: Date, end: Date | null, now = new Date()) {
 export function daysSince(iso: string) {
   return Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 }
+
+// Dated notices in force now or starting within the next `hours`, soonest first.
+export function inForceOrSoon<T extends { starts_at: string; ends_at: string | null }>(notices: T[], hours = 48): T[] {
+  const now = Date.now(), horizon = now + hours * 3_600_000;
+  return notices
+    .filter((n) => n.ends_at && new Date(n.ends_at).getTime() > now && new Date(n.starts_at).getTime() < horizon)
+    .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+}

@@ -67,19 +67,71 @@ function Layer({ children, className = "" }: { children: React.ReactNode; classN
   );
 }
 
-/* ---------- Mono: an etched street plan ---------- */
-export function StreetPlan() {
+/* ---------- Mono (and Field): an etched street plan ---------- */
+// Road cuts picked from the generated city: local streets in the open right-hand part of the plan, spread apart.
+const CUTS = (() => {
+  const segs = city.locals.flat().map((d) => {
+    const [x1, y1, x2, y2] = d.slice(1).split("L").flatMap((pt) => pt.split(" ").map(Number));
+    return { d, x: (x1 + x2) / 2, y: (y1 + y2) / 2, a: (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI };
+  }).filter((g) => g.x > 860 && g.x < 1440 && g.y > 170 && g.y < 720);
+  const picked: typeof segs = [];
+  for (const g of segs) if (picked.every((q) => Math.hypot(q.x - g.x, q.y - g.y) > 300) && picked.length < 3) picked.push(g);
+  const notes: [string, string, string][] = [
+    ["ROAD CUT  METROWATER", "RESTORED  DAY 14", "var(--fg)"],
+    ["ROAD CUT  TNPDCL", "RESTORED  DAY 9", "var(--fg)"],
+    ["ROAD CUT  TELECOM", "COMPLETION NOT FOUND", "var(--alert)"],
+  ];
+  return picked.map((g, i) => ({ ...g, note: notes[i][0], done: notes[i][1], tone: notes[i][2], delay: i * 5 }));
+})();
+
+function RoadCuts() {
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="art-drift absolute inset-0 h-full w-full" aria-hidden>
-      <CityBase />
-      <path d={city.rail} fill="none" stroke="var(--fg)" strokeWidth="3" strokeDasharray="2 9" opacity="0.5" />
-      <Label x={560} y={672}>ADYAR RIVER</Label>
-      <Label x={1120} y={240}>T NAGAR</Label>
-      <Label x={240} y={812}>VELACHERY</Label>
-      {[[700, 455, "var(--pothole)"], [1010, 395, "var(--water)"], [372, 700, "var(--works)"]].map(([x, y, c]) => (
-        <rect key={String(x)} className="art-blip" x={Number(x) - 7} y={Number(y) - 7} width="14" height="14" rx="3" fill={String(c)} />
-      ))}
-    </svg>
+    <g>
+      {CUTS.map((c) => {
+        const lx = c.x + 70, ly = c.y - 64;
+        return (
+          <g key={c.d} style={delay(c.delay)}>
+            <path d={c.d} pathLength={1} className="cut-seg" fill="none" strokeWidth="6" strokeLinecap="round" />
+            <rect x={c.x - 30} y={c.y - 30} width="60" height="60" fill="none" stroke="var(--works)" strokeWidth="1.6" strokeDasharray="6 5"
+              transform={`rotate(${c.a.toFixed(0)} ${c.x.toFixed(0)} ${c.y.toFixed(0)})`} className="cut-box" style={delay(c.delay)} />
+            <path d={`M${f1(c.x + 22)} ${f1(c.y - 22)}L${f1(lx - 6)} ${f1(ly + 6)}H${f1(lx + 190)}`} pathLength={1} fill="none" stroke="var(--fg)" strokeWidth="1"
+              className="cut-lead" style={delay(c.delay)} />
+            <g className="cut-note" style={delay(c.delay)}>
+              <Label x={lx} y={ly} o={0.9} size={12}>{c.note}</Label>
+            </g>
+            <g className="cut-done" style={delay(c.delay)}>
+              <Label x={lx} y={ly} o={0.9} size={12} fill={c.tone}>{c.done}</Label>
+            </g>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+export function StreetPlan({ live = false }: { live?: boolean }) {
+  return (
+    <div className="art-drift absolute inset-0">
+      <Layer>
+        <CityBase opacity={live ? 0.34 : 0.28} />
+        <path d={city.rail} fill="none" stroke="var(--fg)" strokeWidth="3" strokeDasharray="2 9" opacity="0.5" />
+        <Label x={560} y={672}>ADYAR RIVER</Label>
+        <Label x={1120} y={240}>T NAGAR</Label>
+        <Label x={240} y={812}>VELACHERY</Label>
+      </Layer>
+      <Layer>
+        {[[700, 455, "var(--pothole)"], [1010, 395, "var(--water)"], [372, 700, "var(--works)"]].map(([x, y, c]) => (
+          <rect key={String(x)} className="art-blip" x={Number(x) - 7} y={Number(y) - 7} width="14" height="14" rx="3" fill={String(c)} />
+        ))}
+        {live && <>
+          <RoadCuts />
+          {/* a surveyor's line sweeping the sheet */}
+          <g className="survey-scan" opacity="0.5">
+            <line x1="0" y1="0" x2="0" y2={H} stroke="var(--fg)" strokeWidth="1" strokeDasharray="3 7" />
+          </g>
+        </>}
+      </Layer>
+    </div>
   );
 }
 

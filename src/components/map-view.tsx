@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { KINDS, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
+import { KINDS, NOTICE_KINDS, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
 import { addOverlays, setNight } from "@/lib/map-layers";
 import { KindBadge, kindIconSvg } from "@/components/kind-icon";
 import { IssuePanel, applyFilters, type KindFilter, type SortBy, type StatusFilter } from "@/components/issue-list";
@@ -59,6 +59,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   const reportingRef = useRef(reporting);
   useEffect(() => { reportingRef.current = reporting; }, [reporting]);
   const [night, setNightView] = useState(false);
+  const [legend, setLegend] = useState(false);
   const overlay = useRef({ notices, clusters, night });
   useEffect(() => {
     overlay.current = { notices, clusters, night };
@@ -73,13 +74,21 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   // Create the map once; follow the site's light/dark mode.
   useEffect(() => {
     if (!mapEl.current) return;
-    const m = new maplibregl.Map({ container: mapEl.current, style: STYLE[currentMode()], center: CHENNAI, zoom: 11, attributionControl: { compact: true } });
-    m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+    const m = new maplibregl.Map({ container: mapEl.current, style: STYLE[currentMode()], center: CHENNAI, zoom: 11, attributionControl: false });
+    // controls sit top right under the search bar, clear of the dock and the preview card at the bottom
+    m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    m.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
+    // compact attribution starts expanded; fold it to its "i" chip (credits stay one tap away)
+    m.once("load", () => {
+      const a = mapEl.current?.querySelector(".maplibregl-ctrl-attrib");
+      a?.classList.remove("maplibregl-compact-show");
+      a?.removeAttribute("open");
+    });
     m.on("click", (e) => { if (reportingRef.current) setDraft({ lat: e.lngLat.lat, lng: e.lngLat.lng }); });
     // overlays are wiped by every style change (light/dark), so re-add them each time a style loads
     m.on("style.load", () => { const o = overlay.current; addOverlays(m, o.notices, o.clusters, o.night); });
     const open = clusters.filter((c) => c.status === "open");
-    if (open.length > 1 && !focusId) {
+    if (open.length > 4 && !focusId) { // with only a few pins, stay on the city rather than zooming out to fit them
       const b = new maplibregl.LngLatBounds();
       open.forEach((c) => b.extend([c.lng, c.lat]));
       m.fitBounds(b, { padding: 70, maxZoom: 13, duration: 0 });
@@ -245,7 +254,35 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
           <span className="hidden sm:inline">Night view</span>
           {liveOutages > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-outage px-1 font-mono text-[11px] text-white">{liveOutages}</span>}
         </button>
+        <button onClick={() => setLegend((v) => !v)} aria-expanded={legend} aria-controls="map-legend" title="What the shapes on the map mean"
+          className={`panel flex h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium transition ${legend ? "!border-fg-3" : ""}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /></svg>
+          <span className="hidden sm:inline">Key</span>
+        </button>
       </motion.div>
+
+      <AnimatePresence>
+        {legend && (
+          <motion.div id="map-legend" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25, ease: EASE }}
+            className="panel absolute right-3 top-[62px] z-30 w-[min(320px,calc(100%-1.5rem))] sm:right-[58px] rounded-[8px] p-4 text-sm shadow-2xl">
+            <p className="label text-fg-3">Shaded circles: works and notices</p>
+            <p className="mt-1 text-xs text-fg-3">The approximate area each record covers: construction mapped on OpenStreetMap, and published notices centred on the locality they name (shown while in force, upcoming, or ended in the last day).</p>
+            <ul className="mt-3 space-y-1.5">
+              {(["works", "power_shutdown", "water_suspension", "road_permit", "incident", "resurfacing"] as const).map((k) => (
+                <li key={k} className="flex items-center gap-2.5">
+                  <span className="legend-swatch" style={{ background: `color-mix(in oklab, ${NOTICE_KINDS[k].color} 30%, transparent)`, border: `1.5px solid ${NOTICE_KINDS[k].color}` }} />
+                  {NOTICE_KINDS[k].label}
+                </li>
+              ))}
+            </ul>
+            <p className="label mt-4 text-fg-3">Rings and pins: resident reports</p>
+            <ul className="mt-2 space-y-1.5">
+              <li className="flex items-center gap-2.5"><span className="legend-swatch" style={{ border: "2.5px solid var(--outage)" }} />Power cut reported in the last 6 hours</li>
+              <li className="flex items-center gap-2.5"><span className="legend-swatch !rounded-[4px]" style={{ background: "var(--pothole)" }} />A report; the number counts residents</li>
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Searched place: offer to report there */}
       <AnimatePresence>

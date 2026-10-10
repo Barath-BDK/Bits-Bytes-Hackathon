@@ -6,7 +6,7 @@ export const THEMES = [
   { id: "drainage", name: "Drainage", note: "Storm water network", swatch: ["#07141b", "#3fb6ff", "#dfe9ee"] },
   { id: "transit", name: "Transit", note: "Metro works diagram", swatch: ["#0e0f11", "#3aa8ff", "#3ccf7a"] },
   { id: "lumora", name: "Lumora", note: "Monsoon surface", swatch: ["#031211", "#e8e4d3", "#00aebb"] },
-  { id: "field", name: "Field", note: "Earthworks at dusk", swatch: ["#090907", "#6c5636", "#b89d73"] },
+  { id: "field", name: "Field", note: "Street plan at dusk", swatch: ["#090907", "#6c5636", "#b89d73"] },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];

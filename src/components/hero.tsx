@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import { motion, useScroll, useTransform } from "motion/react";
 import { CAPTIONS, HeroBackdrop, useThemeId } from "@/components/backdrops/hero-backdrop";
 import { BlurFade, WordReveal } from "@/components/motion-bits";
@@ -14,7 +13,7 @@ const EXAMPLES = [
   { name: "2nd Avenue", area: "Anna Nagar, Chennai", lat: 13.0872, lng: 80.2103 },
 ];
 
-export function Hero({ openCount, liveOutages, findingsCount, ticker }: { openCount: number; liveOutages: number; findingsCount: number; ticker: string[] }) {
+export function Hero({ ticker }: { ticker: string[] }) {
   const ref = useRef<HTMLElement>(null);
   const theme = useThemeId();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -25,7 +24,7 @@ export function Hero({ openCount, liveOutages, findingsCount, ticker }: { openCo
   const signY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
   return (
-    <section ref={ref} className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
+    <section ref={ref} className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-bg">
       <motion.div style={{ y: artY, scale: artScale, opacity: artOpacity }} className="absolute inset-0 -z-10">
         <HeroBackdrop />
       </motion.div>
@@ -42,15 +41,7 @@ export function Hero({ openCount, liveOutages, findingsCount, ticker }: { openCo
       </motion.div>
 
       <motion.div style={{ y: textY }} className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-4 py-20 sm:px-6">
-        <BlurFade>
-          <Link href="/map" className="group inline-flex flex-wrap items-center gap-x-1.5 gap-y-1 rounded-[6px] border border-line bg-surface/60 py-1 pl-1 pr-3 text-[13px] text-fg-2 transition hover:border-fg-3">
-            <span className="rounded-[4px] bg-accent px-2 py-0.5 text-[11px] font-semibold text-accent-fg">Live</span>
-            <span>{openCount} open issues</span>
-            {liveOutages > 0 && <span className="text-outage">{liveOutages} power {liveOutages === 1 ? "cut" : "cuts"}</span>}
-            <span>{findingsCount} records to check</span>
-          </Link>
-        </BlurFade>
-        <h1 className="display mt-7 max-w-[16ch] text-[clamp(2.9rem,7.4vw,6.8rem)] [text-wrap:balance]">
+        <h1 className="display max-w-[16ch] text-[clamp(2.9rem,7.4vw,6.8rem)] [text-wrap:balance]">
           <WordReveal text="Every street in Chennai has a record." accent={["record."]} delay={0.15} />
         </h1>
         <BlurFade delay={0.6}>

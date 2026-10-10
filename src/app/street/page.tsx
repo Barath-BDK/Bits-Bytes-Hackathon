@@ -14,6 +14,7 @@ import { OutlookGrid } from "@/components/outlook-grid";
 import { FindingCard } from "@/components/finding-card";
 import { WhoAnswers } from "@/components/who-answers";
 import { StreetPicker } from "@/components/street-picker";
+import { BackLink } from "@/components/back-link";
 
 export const metadata: Metadata = { title: "Your street" };
 
@@ -82,8 +83,8 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
   ].sort((a, b) => b.at.localeCompare(a.at));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-12 sm:px-6">
-      <Link href="/street" className="label text-fg-3 transition hover:text-fg">Look up another street</Link>
+    <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6">
+      <BackLink href="/street">Look up another street</BackLink>
 
       <header className="mt-6 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <BlurFade>
@@ -139,7 +140,9 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
                 {timeline.map((t) => t.kind === "notice" ? (
                   <li key={`n${t.n.id}`} className="relative">
                     <span className="absolute -left-[26px] top-1 h-3 w-3 rounded-[3px] border-2 border-bg" style={{ background: NOTICE_KINDS[t.n.kind].color }} />
-                    <p className="font-mono text-[11px] text-fg-3">{dayMonth(new Date(t.n.starts_at))}{t.n.ends_at && ` to ${dayMonth(new Date(t.n.ends_at))}`}</p>
+                    <p className="font-mono text-[11px] text-fg-3">
+                      {t.n.kind === "works" ? `Mapped as ongoing, checked ${dayMonth(new Date(t.n.imported_at))}` : <>{dayMonth(new Date(t.n.starts_at))}{t.n.ends_at && ` to ${dayMonth(new Date(t.n.ends_at))}`}</>}
+                    </p>
                     <p className="font-medium">{NOTICE_KINDS[t.n.kind].label}: {t.n.title}</p>
                     <p className="text-sm text-fg-2">{t.n.agency}{t.n.reference && <span className="font-mono text-fg-3">, ref {t.n.reference}</span>}</p>
                     <p className="mt-1 flex flex-wrap gap-1.5">

@@ -7,6 +7,7 @@ import { getCluster, getFindings } from "@/lib/data";
 import { KINDS, complaintDraft, formatDate, isOverdue, photoSrc, priorityParts, shortId, timeAgo } from "@/lib/issues";
 import { KindBadge } from "@/components/kind-icon";
 import { BlurFade } from "@/components/motion-bits";
+import { BackLink } from "@/components/back-link";
 import { ConfirmButtons } from "@/components/confirm-buttons";
 import { Sheet } from "@/components/sheet";
 import { PriorityLedger } from "@/components/vignettes";
@@ -48,10 +49,7 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6">
-      <Link href={`/map?c=${c.id}`} className="group inline-flex items-center gap-1.5 text-sm text-fg-3 transition hover:text-fg">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="transition-transform group-hover:-translate-x-0.5"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-        Back to the map
-      </Link>
+      <BackLink href={`/map?c=${c.id}`}>Back to the map</BackLink>
 
       <header className="mt-8 grid gap-8 border-b border-line pb-10 lg:grid-cols-[1fr_auto]">
         <BlurFade>
