@@ -1,5 +1,5 @@
-// GeoJSON layers drawn under the pins: recorded notices as areas, live power cuts as dark patches,
-// and an optional night overlay. Colours are read from the theme's CSS variables at draw time.
+// GeoJSON layers drawn under the pins: recorded notices as areas, live power cuts as dark patches.
+// Colours are read from the theme's CSS variables at draw time.
 import type * as maplibregl from "maplibre-gl";
 import { isLiveOutage, type Cluster, type Notice } from "@/lib/issues";
 
@@ -44,10 +44,8 @@ export function outageFeatures(clusters: Cluster[]) {
   return { type: "FeatureCollection" as const, features };
 }
 
-const INDIA = { type: "FeatureCollection" as const, features: [{ type: "Feature" as const, properties: {}, geometry: { type: "Polygon" as const, coordinates: [[[68, 6], [97.5, 6], [97.5, 37.5], [68, 37.5], [68, 6]]] } }] };
-
 // Adds (or re-adds after a style change) every overlay. Safe to call repeatedly.
-export function addOverlays(m: maplibregl.Map, notices: Notice[], clusters: Cluster[], night: boolean) {
+export function addOverlays(m: maplibregl.Map, notices: Notice[], clusters: Cluster[]) {
   const outage = cssVar("--outage");
   const set = (id: string, data: unknown) => {
     const src = m.getSource(id) as maplibregl.GeoJSONSource | undefined;
@@ -56,9 +54,7 @@ export function addOverlays(m: maplibregl.Map, notices: Notice[], clusters: Clus
   };
   set("theru-notices", noticeFeatures(notices));
   set("theru-outages", outageFeatures(clusters));
-  set("theru-night", INDIA);
 
-  if (!m.getLayer("theru-night")) m.addLayer({ id: "theru-night", type: "fill", source: "theru-night", paint: { "fill-color": "#000000", "fill-opacity": 0, "fill-opacity-transition": { duration: 900 } } });
   if (!m.getLayer("theru-notices-fill")) {
     m.addLayer({ id: "theru-notices-fill", type: "fill", source: "theru-notices", paint: { "fill-color": ["get", "color"], "fill-opacity": 0.1 } });
     m.addLayer({ id: "theru-notices-line", type: "line", source: "theru-notices", paint: { "line-color": ["get", "color"], "line-width": 1.4, "line-dasharray": [3, 2], "line-opacity": 0.8 } });
@@ -67,11 +63,4 @@ export function addOverlays(m: maplibregl.Map, notices: Notice[], clusters: Clus
     m.addLayer({ id: "theru-outages", type: "fill", source: "theru-outages", paint: { "fill-color": "#000000", "fill-opacity": ["case", ["==", ["get", "ring"], 1], 0.42, 0.26] } });
     m.addLayer({ id: "theru-outages-edge", type: "line", source: "theru-outages", filter: ["==", ["get", "ring"], 0], paint: { "line-color": outage, "line-width": 1.6, "line-blur": 2, "line-opacity": 0.9 } });
   }
-  setNight(m, night);
-}
-
-export function setNight(m: maplibregl.Map, night: boolean) {
-  if (!m.getLayer("theru-night")) return;
-  m.setPaintProperty("theru-night", "fill-opacity", night ? 0.5 : 0);
-  m.setPaintProperty("theru-outages", "fill-opacity", night ? ["case", ["==", ["get", "ring"], 1], 0.85, 0.6] : ["case", ["==", ["get", "ring"], 1], 0.42, 0.26]);
 }

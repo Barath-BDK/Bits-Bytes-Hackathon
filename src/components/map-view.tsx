@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { KINDS, NOTICE_KINDS, clusterTitle, isLiveOutage, photoSrc, timeAgo, type Cluster, type Kind, type Notice } from "@/lib/issues";
-import { addOverlays, setNight } from "@/lib/map-layers";
+import { addOverlays } from "@/lib/map-layers";
 import { KindBadge, kindIconSvg } from "@/components/kind-icon";
 import { IssuePanel, applyFilters, type KindFilter, type SortBy, type StatusFilter } from "@/components/issue-list";
 import { ReportSheet, type Submitted } from "@/components/report-sheet";
@@ -30,7 +30,6 @@ function currentMode() {
 export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notices: Notice[] }) {
   // power-cut reports older than six hours are history, not live pins
   const clusters = useMemo(() => all.filter((c) => c.kind !== "outage" || c.status === "resolved" || isLiveOutage(c)), [all]);
-  const liveOutages = clusters.filter(isLiveOutage).length;
   const router = useRouter();
   const params = useSearchParams();
   // ?report=1 opens the form; ?report=<kind> also picks the kind (e.g. ?report=request from the requests board)
@@ -63,14 +62,13 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   useEffect(() => { reportingRef.current = reporting; }, [reporting]);
   const draftRef = useRef(draft);
   useEffect(() => { draftRef.current = draft; }, [draft]);
-  const [night, setNightView] = useState(false);
   const [legend, setLegend] = useState(false);
-  const overlay = useRef({ notices, clusters, night });
+  const overlay = useRef({ notices, clusters });
   useEffect(() => {
-    overlay.current = { notices, clusters, night };
+    overlay.current = { notices, clusters };
     const m = map.current;
-    if (m?.isStyleLoaded()) addOverlays(m, notices, clusters, night);
-  }, [notices, clusters, night]);
+    if (m?.isStyleLoaded()) addOverlays(m, notices, clusters);
+  }, [notices, clusters]);
 
   const visible = useMemo(() => applyFilters(clusters, kind, status, sort), [clusters, kind, status, sort]);
   const sel = clusters.find((c) => c.id === selected) ?? null;
@@ -91,7 +89,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
     });
     m.on("click", (e) => { if (reportingRef.current && !draftRef.current) setDraft({ lat: e.lngLat.lat, lng: e.lngLat.lng }); });
     // overlays are wiped by every style change (light/dark), so re-add them each time a style loads
-    m.on("style.load", () => { const o = overlay.current; addOverlays(m, o.notices, o.clusters, o.night); });
+    m.on("style.load", () => { const o = overlay.current; addOverlays(m, o.notices, o.clusters); });
     const open = clusters.filter((c) => c.status === "open");
     if (open.length > 4 && !focusId) { // with only a few pins, stay on the city rather than zooming out to fit them
       const b = new maplibregl.LngLatBounds();
@@ -255,13 +253,6 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
           </motion.button>
         )}
         <PlaceSearch onPick={setPlace} />
-        <button onClick={() => { setNightView((v) => !v); if (map.current) setNight(map.current, !night); }} aria-pressed={night}
-          title="Night view: dims the city and blacks out areas where residents report no power"
-          className={`panel flex h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium transition ${night ? "!border-outage text-outage" : ""}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z" /></svg>
-          <span className="hidden sm:inline">Night view</span>
-          {liveOutages > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-outage px-1 font-mono text-[11px] text-white">{liveOutages}</span>}
-        </button>
         <button onClick={() => setLegend((v) => !v)} aria-expanded={legend} aria-controls="map-legend" title="What the shapes on the map mean"
           className={`panel flex h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-medium transition ${legend ? "!border-fg-3" : ""}`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /></svg>

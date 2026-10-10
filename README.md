@@ -31,7 +31,7 @@ A resident who wants to know "what is happening on my street, and who do I ask?"
 | **Resident reports** (`/map`) | Report a pothole, waterlogging, a work site or a power cut, with a photo from the camera or the gallery. Reports of the same thing merge (25 m potholes, 75 m waterlogging, 50 m work sites, 300 m power cuts). Priority is a formula anyone can read (below). A fix closes only when two or more residents confirm it. |
 | **Community requests** (`/requests`) | Ask for a streetlight, garbage clearance, a drain, a fallen tree, stray-animal help or water, in public. Neighbours **vouch** ("I need this too") instead of filing the same complaint again; each vouch counts as one more resident and raises priority. A request shows Raised, Supported and Resolved, and closes only when two neighbours confirm it was done. No account and no phone number, unlike complaint apps that pass the complainant's number to field staff. |
 | **Parking hotspots** | Mark a spot that keeps getting blocked (footpath, lane, junction or gate). Repeated reports build a hotspot routed to the traffic police. It marks places, not people: the form asks for no number plates or faces, and points to the GCTP Citizen Services app for a specific vehicle. |
-| **Night view and key** | The map dims and live power cuts glow, so an outage area reads at a glance. A key explains every shape on the map. |
+| **Map key** | Live power cuts are shaded on the map, and a key explains every shape on it. |
 
 **Priority score** (computed in the database): `20 × severity + 8 × distinct reporters (max 10) + 3 per day open (max 21) + 15 if within 60 m of an active work site`.
 
