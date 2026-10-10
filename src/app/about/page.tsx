@@ -53,7 +53,7 @@ export default function About() {
           <p><span className="tag tag-news mr-2">News report</span>Incidents published by news outlets, with a link to the article.</p>
           <p><span className="tag tag-official mr-2">Official record</span>Published permissions, completions and shutdown schedules, each with its source link and import date. Live government feeds are not integrated: TNPDCL publishes planned shutdowns behind a captcha, so they are entered from published lists.</p>
           <p><span className="tag tag-osm mr-2">OpenStreetMap</span>Roads, flyovers and metro lines mapped as under construction (Chennai Metro Phase 2, the Port to Maduravoyal expressway and others), cut into stretches of about 800 m, each linked to the map way it came from. OpenStreetMap records that works exist, not when they began or end, so these show as ongoing.</p>
-          <p><span className="tag tag-demo mr-2">Demo data</span>None at present. Road-cutting permissions and completion records are not published as open data, so the permission-matching rules wait for real records. If synthetic records are ever loaded to show the rules working, they carry this label wherever they appear.</p>
+          <p><span className="tag tag-demo mr-2">Demo data</span>A small set of illustrative resident reports, placed beside real mapped works so the rules can be seen working. They carry this label wherever they appear, and so does any finding that relies on one. Road-cutting permissions and completion records are not published as open data, so the permission-matching rules wait for real records.</p>
           <p>Rain comes from the Open-Meteo forecast. Place search uses Photon and Nominatim, both built on OpenStreetMap.</p>
         </Sheet>
 
@@ -104,7 +104,7 @@ export default function About() {
         </Sheet>
 
         <Sheet label="Photo credits" no="08" bodyClassName="p-6">
-          <p className="text-fg-2">Photos in the sample reports used for local development (supabase/seed.sql) are from Wikimedia Commons under the licenses below.</p>
+          <p className="text-fg-2">Photos in the sample reports are from Wikimedia Commons under the licenses below.</p>
           <ul className="mt-4 divide-y divide-line text-sm">
             {credits.map((c) => (
               <li key={c.file} className="grid gap-1 py-2.5 sm:grid-cols-[1fr_auto]">

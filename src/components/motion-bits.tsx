@@ -27,9 +27,9 @@ export function WordReveal({ text, className, delay = 0, accent = [] }: { text: 
   return (
     <span className={className} aria-label={text}>
       {text.split(" ").map((w, i) => (
-        <motion.span key={i} aria-hidden className={`inline-block whitespace-pre ${accent.includes(w) ? "accent-word" : ""}`}
+        <motion.span key={i} aria-hidden className={`word inline-block whitespace-pre ${accent.includes(w) ? "accent-word" : ""}`}
           initial={reduce ? false : { opacity: 0, y: "0.4em", rotate: 2, filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, rotate: 0, filter: "blur(0px)" }}
+          animate={{ opacity: 1, y: 0, rotate: 0, filter: "blur(0px)", transitionEnd: { filter: "none", transform: "none" } }}
           transition={{ duration: 0.9, delay: delay + i * 0.07, ease: EASE }}>
           {w}{" "}
         </motion.span>

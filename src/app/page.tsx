@@ -28,7 +28,9 @@ export default async function Home() {
   const strike = findings.find((f) => f.type === "possible_cable_strike");
   const ticker = [
     ...(live.length ? [`Power reported off in ${live.length} ${live.length === 1 ? "area" : "areas"} right now`] : []),
-    ...findings.slice(0, 4).map((f) => `${f.label}: ${f.title.toLowerCase()}`),
+    // at most two of each kind of finding, each naming the agency involved
+    ...findings.filter((f, i) => findings.slice(0, i).filter((g) => g.type === f.type).length < 2).slice(0, 5)
+      .map((f) => `${f.label}: ${f.title.toLowerCase()}${typeof f.refs.agency === "string" ? `, ${f.refs.agency}` : ""}`),
     ...upcoming.slice(0, 6).map((n) => `${NOTICE_KINDS[n.kind].label}, ${n.area_text?.split(/[.(]/)[0] ?? n.title}: ${dayWord(new Date(n.starts_at))} ${hhmm(new Date(n.starts_at))}`),
     ...[...open].sort((x, y) => y.last_reported_at.localeCompare(x.last_reported_at)).slice(0, 6).map((c) =>
       c.kind === "worksite"

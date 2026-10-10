@@ -63,7 +63,7 @@ Every record carries its provenance, shown as a tag wherever it appears:
 - Locations of notices are approximate: the centre of the named locality (placed with OpenStreetMap Nominatim) plus a radius.
 - Road-cut permissions and completions are not published as open data, so the permission-matching rules run only when such records are added.
 - The zone lookup uses the nearest GCC zone office, not official ward boundaries. Zonal phone numbers come from a public directory.
-- No demo data is loaded. `supabase/seed.sql` holds illustrative sample reports (with Wikimedia Commons photos) for local development only; anything synthetic is labelled *Demo data* wherever it appears.
+- Real resident reports are still few, so 11 illustrative sample reports (`supabase/seed-sample.sql`, Wikimedia Commons photos) sit beside the real works to show the rules working. Each is labelled *Demo data* wherever it appears, and so is every finding that depends on one. The sample power cut is timed to the moment the script runs, so re-run it shortly before a demo.
 - OpenStreetMap shows that works exist, not when they started or will end, so mapped works appear as ongoing.
 - A finding says what the records show. "Completion record not found" describes the record, not the road.
 
@@ -154,7 +154,7 @@ Known, accepted: Supabase's advisor warns that the read functions are callable a
 
    Never commit `.env.local`. It is in `.gitignore`.
 
-4. **Data (optional).** Run `supabase/seed-real.sql` for the real notices and `supabase/seed-osm-works.sql` for mapped construction. `supabase/seed.sql` adds illustrative sample reports for local development.
+4. **Data (optional).** Run `supabase/seed-real.sql` for the real notices, `supabase/seed-osm-works.sql` for mapped construction and `supabase/seed-sample.sql` for the labelled sample reports.
 
 5. **Run**
    ```bash

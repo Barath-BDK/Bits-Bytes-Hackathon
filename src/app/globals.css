@@ -167,14 +167,14 @@ body {
 html[data-headline="serif"] .display .accent-word {
   font-family: var(--font-serif), Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; padding-right: 0.06em;
 }
-html[data-headline="gradient"] .display span:not(.accent-word),
+/* Clip the gradient onto each animated word (.word), never onto the line's wrapper: a clipped wrapper repaints its
+   children's glyphs at stale positions while they move (reveal and parallax), leaving ghost fragments.  */
+html[data-headline="gradient"] .display .word:not(.accent-word),
 html[data-headline="gradient"] .display:not(:has(span)) {
   background: linear-gradient(180deg, var(--display-fg) 30%, color-mix(in oklab, var(--display-fg) 58%, transparent));
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
-/* the accent word sits inside a gradient-clipped wrapper and would inherit its transparent fill */
-html[data-headline="gradient"] .display .accent-word { -webkit-text-fill-color: var(--display-accent); background: none; }
-html[data-headline="tinted"] .display, html[data-headline="tinted"] .display span {
+html[data-headline="tinted"] .display:not(:has(.word)), html[data-headline="tinted"] .display:not(:has(.word)) span, html[data-headline="tinted"] .display .word {
   background: linear-gradient(100deg, var(--display-fg) 15%, var(--display-accent) 85%);
   background-attachment: fixed; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
