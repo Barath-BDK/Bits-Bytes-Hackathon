@@ -4,7 +4,7 @@ import { Archivo, Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SiteHeader } from "@/components/site-header";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { DEFAULTS, themeBootScript } from "@/lib/themes";
+import { DEFAULT_MODE, themeBootScript } from "@/lib/themes";
 import { SITE } from "@/lib/site";
 import "./globals.css";
 
@@ -22,8 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme={DEFAULTS.theme} data-mode={DEFAULTS.mode} data-backdrop={DEFAULTS.backdrop} data-headline={DEFAULTS.headline}
-      data-transition={DEFAULTS.transition} suppressHydrationWarning
+    <html lang="en" data-mode={DEFAULT_MODE} suppressHydrationWarning
       className={`${instrument.variable} ${serif.variable} ${fragment.variable} ${archivo.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />

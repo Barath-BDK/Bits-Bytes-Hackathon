@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { ThemeControls } from "@/components/theme-controls";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const NAV = [
   { href: "/street", label: "Your street", hint: "Look up any street's record" },
@@ -42,7 +42,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1.5">
-          <div className="hidden md:block"><ThemeControls /></div>
+          <div className="hidden md:block"><ModeToggle /></div>
           <Link href="/map?report=1" className="whitespace-nowrap rounded-[8px] bg-accent px-3.5 py-2 text-sm font-medium text-accent-fg transition hover:opacity-90 focus-visible:outline-offset-2 sm:px-4">
             <span className="sm:hidden">Report</span><span className="hidden sm:inline">Report a problem</span>
           </Link>
@@ -71,8 +71,8 @@ export function SiteHeader() {
               ))}
             </ul>
             <div className="flex items-center justify-between border-t border-line px-5 py-3">
-              <span className="text-sm text-fg-2">Appearance</span>
-              <ThemeControls />
+              <span className="text-sm text-fg-2">Light or dark mode</span>
+              <ModeToggle />
             </div>
           </motion.nav>
         )}
