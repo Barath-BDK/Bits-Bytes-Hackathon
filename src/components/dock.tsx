@@ -8,11 +8,11 @@ import { motion } from "motion/react";
 import { ThemeControls } from "@/components/theme-controls";
 
 const NAV = [
-  { href: "/street", label: "Your street", short: "Street", icon: "M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6" },
-  { href: "/map", label: "Map", short: "Map", icon: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" },
-  { href: "/requests", label: "Requests", short: "Requests", icon: "M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4a1.5 1.5 0 0 1 3 0v6M14 10V5.5a1.5 1.5 0 0 1 3 0V13M8 11.5a1.5 1.5 0 0 0-3 0V14a7 7 0 0 0 7 7h.5a6.5 6.5 0 0 0 4.5-6.5V12" },
-  { href: "/records", label: "Records", short: "Records", icon: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7" },
-  { href: "/about", label: "Method", short: "Method", icon: "M12 3v18M3 12h18M5.6 5.6l12.8 12.8", desktopOnly: true },
+  { href: "/street", label: "Your street", short: "Street", hint: "Look up any street's record", icon: "M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6" },
+  { href: "/map", label: "Map", short: "Map", hint: "Live map of reports and works", icon: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" },
+  { href: "/requests", label: "Requests", short: "Requests", hint: "What residents are asking for", icon: "M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4a1.5 1.5 0 0 1 3 0v6M14 10V5.5a1.5 1.5 0 0 1 3 0V13M8 11.5a1.5 1.5 0 0 0-3 0V14a7 7 0 0 0 7 7h.5a6.5 6.5 0 0 0 4.5-6.5V12" },
+  { href: "/records", label: "Records", short: "Records", hint: "Findings and published notices", icon: "M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7" },
+  { href: "/about", label: "Method", short: "Method", hint: "Sources, rules and limits", icon: "M12 3v18M3 12h18M5.6 5.6l12.8 12.8", desktopOnly: true },
 ];
 
 const Lane = () => <span aria-hidden className="lane-mark mx-1 hidden h-6 w-[2px] shrink-0 self-center md:block" />;
@@ -30,7 +30,9 @@ export function Dock() {
         <Lane />
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} aria-current={active === n.href ? "page" : undefined}
-            className={`relative min-w-0 flex-1 flex-col items-center justify-center gap-1 whitespace-nowrap rounded-md px-1 py-1.5 text-[11px] leading-none transition md:h-9 md:flex-none md:flex-row md:gap-2 md:px-2.5 md:py-0 md:text-sm lg:px-3 ${"desktopOnly" in n ? "hidden lg:flex" : "flex"} ${active === n.href ? "text-fg" : "text-fg-3 hover:text-fg"}`}>
+            className={`group relative min-w-0 flex-1 flex-col items-center justify-center gap-1 whitespace-nowrap rounded-md px-1 py-1.5 text-[11px] leading-none transition md:h-9 md:flex-none md:flex-row md:gap-2 md:px-2.5 md:py-0 md:text-sm lg:px-3 ${"desktopOnly" in n ? "hidden lg:flex" : "flex"} ${active === n.href ? "font-medium text-fg md:bg-surface-2" : "text-fg-2 hover:text-fg"}`}>
+            {/* what the tab is for, above it on hover or keyboard focus (desktop) */}
+            <span role="tooltip" className="pointer-events-none absolute bottom-full left-1/2 mb-3 hidden -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md border border-line bg-surface px-2.5 py-1.5 text-xs font-normal text-fg-2 opacity-0 shadow-xl transition duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 md:block">{n.hint}</span>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="md:hidden"><path d={n.icon} /></svg>
             <span className="md:hidden">{n.short}</span>
             <span className="hidden md:inline">{n.label}</span>
