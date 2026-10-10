@@ -37,6 +37,7 @@ export function RecordsExplorer({ findings, notices }: { findings: Finding[]; no
   const [type, setType] = useState<string>("all");
   const [kind, setKind] = useState<NoticeKind | "all">("all");
   const [q, setQ] = useState("");
+  const [limit, setLimit] = useState(15);
   const shownF = findings.filter((f) => type === "all" || f.type === type);
   const shownN = notices.filter((n) => (kind === "all" || n.kind === kind) &&
     (!q || `${n.title} ${n.agency} ${n.area_text ?? ""} ${n.reference ?? ""}`.toLowerCase().includes(q.toLowerCase())));
@@ -65,18 +66,18 @@ export function RecordsExplorer({ findings, notices }: { findings: Finding[]; no
             </button>
           ))}
         </div>
-        <motion.ul layout className="mt-6 divide-y divide-line border-y border-line">
+        <motion.ul layout className="sheet mt-6 divide-y divide-line">
           <AnimatePresence initial={false}>
             {shownF.map((f) => (
               <motion.li key={f.id} layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: EASE }}
-                className="grid gap-2 py-4 md:grid-cols-[13rem_1fr_auto] md:gap-6">
+                className="grid grid-cols-1 gap-2 px-5 py-4 md:grid-cols-[13rem_1fr_auto] md:gap-6">
                 <span className="flex flex-wrap items-start gap-1.5">
                   <span className="tag tag-gap">{f.label}</span>
                   {f.demo && <span className="tag tag-demo">Demo</span>}
                 </span>
                 <span>
                   <span className="block font-medium">{f.title}</span>
-                  <span className="mt-1 block text-sm leading-relaxed text-fg-2">{f.explanation}</span>
+                  <span className="mt-1 line-clamp-3 text-sm leading-relaxed text-fg-2 md:line-clamp-none">{f.explanation}</span>
                 </span>
                 <Link href={streetHref({ lat: f.lat, lng: f.lng, name: f.title })} className="self-start whitespace-nowrap text-sm underline decoration-line underline-offset-4 hover:decoration-fg">Street record</Link>
               </motion.li>
@@ -89,40 +90,41 @@ export function RecordsExplorer({ findings, notices }: { findings: Finding[]; no
         <h2 className="text-2xl font-semibold tracking-[-0.03em]">Records</h2>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search agency, place or reference" aria-label="Search records"
-            className="min-w-0 flex-1 rounded-[8px] border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent md:max-w-sm" />
+            className="min-w-0 flex-1 basis-full rounded-[8px] border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent sm:basis-auto md:max-w-sm" />
           <select value={kind} onChange={(e) => setKind(e.target.value as NoticeKind | "all")} aria-label="Record type"
             className="rounded-[8px] border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent">
             <option value="all">All types</option>
             {(Object.keys(NOTICE_KINDS) as NoticeKind[]).map((k) => <option key={k} value={k}>{NOTICE_KINDS[k].label}</option>)}
           </select>
         </div>
-        <div className="mt-4 overflow-x-auto" data-lenis-prevent>
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="label text-fg-3">
-              <tr className="border-b border-line">
-                <th className="py-2 pr-4 font-normal">Type</th><th className="py-2 pr-4 font-normal">Record</th>
-                <th className="py-2 pr-4 font-normal">Dates</th><th className="py-2 pr-4 font-normal">Reference</th><th className="py-2 font-normal">Source</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shownN.map((n) => (
-                <tr key={n.id} className="border-b border-line align-top">
-                  <td className="py-3 pr-4"><span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-[2px]" style={{ background: NOTICE_KINDS[n.kind].color }} />{NOTICE_KINDS[n.kind].label}</span></td>
-                  <td className="py-3 pr-4">
-                    <Link href={streetHref({ lat: n.lat, lng: n.lng, name: n.area_text ?? n.title })} className="font-medium underline decoration-line underline-offset-4 hover:decoration-fg">{n.title}</Link>
-                    <span className="block text-fg-3">{n.agency}</span>
-                  </td>
-                  <td className="py-3 pr-4 font-mono text-[12px] text-fg-2">{fmt(n.starts_at)}{n.ends_at && <><br />to {fmt(n.ends_at)}</>}</td>
-                  <td className="py-3 pr-4 font-mono text-[12px] text-fg-2">{n.reference ?? <span className="text-fg-3">Not recorded</span>}</td>
-                  <td className="py-3">
-                    <span className={`tag tag-${n.provenance}`}>{PROVENANCE[n.provenance]}</span>
-                    {n.source_url && <a href={n.source_url} target="_blank" rel="noreferrer" className="mt-1 block text-[12px] underline decoration-line underline-offset-4 hover:decoration-fg">{n.source_name}</a>}
-                  </td>
-                </tr>
-              ))}
-              {shownN.length === 0 && <tr><td colSpan={5} className="py-6 text-fg-3">No records match.</td></tr>}
-            </tbody>
-          </table>
+        {/* a plain card of rows: readable on a phone, columns from md up, fifteen at a time */}
+        <div className="sheet mt-4">
+          <div className="flex items-center justify-between border-b border-line px-5 py-3 text-sm">
+            <h3 className="font-semibold">{kind === "all" ? "All records" : NOTICE_KINDS[kind].label}</h3>
+            <span className="tabular-nums text-fg-2">{shownN.length}</span>
+          </div>
+          <ul>
+            {shownN.slice(0, limit).map((n) => (
+              <li key={n.id} className="grid grid-cols-1 gap-1.5 border-b border-line px-5 py-3.5 text-sm last:border-0 md:grid-cols-[minmax(0,1fr)_11rem_9rem] md:items-start md:gap-6">
+                <div className="min-w-0">
+                  <span className="mb-1 flex items-center gap-2 text-xs text-fg-2"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: NOTICE_KINDS[n.kind].color }} />{NOTICE_KINDS[n.kind].label}</span>
+                  <Link href={streetHref({ lat: n.lat, lng: n.lng, name: n.area_text ?? n.title })} className="font-medium underline decoration-line underline-offset-4 hover:text-accent hover:decoration-accent">{n.title}</Link>
+                  <span className="block text-fg-2">{n.agency}{n.reference && <span className="font-mono text-xs">, ref {n.reference}</span>}</span>
+                </div>
+                <span className="font-mono text-xs text-fg-2 md:pt-5">{n.kind === "works" ? "Ongoing" : <>{fmt(n.starts_at)}{n.ends_at && <> to {fmt(n.ends_at)}</>}</>}</span>
+                <span className="flex flex-wrap items-center gap-2 md:block md:pt-4">
+                  <span className={`tag tag-${n.provenance}`}>{PROVENANCE[n.provenance]}</span>
+                  {n.source_url && <a href={n.source_url} target="_blank" rel="noreferrer" className="text-xs text-fg-2 underline decoration-line underline-offset-4 hover:text-accent md:mt-1 md:block">{n.source_name}</a>}
+                </span>
+              </li>
+            ))}
+            {shownN.length === 0 && <li className="px-5 py-6 text-fg-3">No records match.</li>}
+          </ul>
+          {shownN.length > limit && (
+            <button onClick={() => setLimit((l) => l + 15)} className="w-full border-t border-line px-5 py-3 text-sm font-medium text-fg-2 transition hover:bg-surface-2 hover:text-fg">
+              Show {Math.min(15, shownN.length - limit)} more of {shownN.length - limit}
+            </button>
+          )}
         </div>
       </section>
     </div>

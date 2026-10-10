@@ -1,5 +1,9 @@
 // Palettes, each paired with a backdrop drawn from the city's own infrastructure. Keep ids in sync with globals.css.
 export const THEMES = [
+  { id: "paper", name: "Paper", note: "Black, white, a line of cobalt", swatch: ["#ffffff", "#0a0a0a", "#0047ab"] },
+  { id: "ink", name: "Ink", note: "Pure black, signal yellow", swatch: ["#000000", "#ffffff", "#ffd60a"] },
+  { id: "graphite", name: "Graphite", note: "Charcoal and orange", swatch: ["#141414", "#f5f5f5", "#ff8a3d"] },
+  { id: "midnight", name: "Midnight", note: "Navy and sky blue", swatch: ["#0b1020", "#f4f6ff", "#38bdf8"] },
   { id: "mono", name: "Mono", note: "Etched street plan", swatch: ["#031211", "#e8e4d3", "#75736a"] },
   { id: "utilities", name: "Utilities", note: "What lies under the road", swatch: ["#111214", "#ff7a1a", "#ffd23f"] },
   { id: "blueprint", name: "Blueprint", note: "Resurfacing drawing", swatch: ["#0a2342", "#e4efff", "#7fd1ff"] },
@@ -23,10 +27,10 @@ export type SettingKey = keyof typeof SETTINGS;
 
 // Theme switch style used by "Match theme".
 export const SWITCH_FOR: Record<ThemeId, string> = {
-  mono: "etch", utilities: "lanes", blueprint: "sweep", drainage: "ripple", transit: "lanes", lumora: "ripple", field: "horizon",
+  paper: "sweep", ink: "lanes", graphite: "etch", midnight: "ripple", mono: "etch", utilities: "lanes", blueprint: "sweep", drainage: "ripple", transit: "lanes", lumora: "ripple", field: "horizon",
 };
 
-export const DEFAULTS = { theme: "mono", mode: "dark", backdrop: "art", headline: "serif", transition: "blur", switch: "auto" } as const;
+export const DEFAULTS = { theme: "paper", mode: "light", backdrop: "art", headline: "serif", transition: "blur", switch: "auto" } as const;
 export const DEFAULT_THEME: ThemeId = DEFAULTS.theme;
 export const DEFAULT_MODE: Mode = DEFAULTS.mode;
 

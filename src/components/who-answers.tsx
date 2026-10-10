@@ -15,7 +15,7 @@ export function WhoAnswers({ j, contacts, message, subject, ladder, daysOpen }: 
       <p className="text-sm text-fg-2">
         {j.inGcc && j.zone
           ? <>Greater Chennai Corporation, <strong className="text-fg">Zone {j.zone.no} ({j.zone.name})</strong>, {j.region} region. <span className="text-fg-3">Approximate: nearest zone office, not the official ward boundary.</span></>
-          : <>Outside Greater Chennai Corporation limits (approximate). The local body falls under the district administration.</>}
+          : <>Theru has ward and zone contacts for Greater Chennai so far. Here, start with the district administration and the national grievance portal; the local corporation or municipality is the usual first stop.</>}
       </p>
 
       <ul className="mt-4 divide-y divide-line border-y border-line">

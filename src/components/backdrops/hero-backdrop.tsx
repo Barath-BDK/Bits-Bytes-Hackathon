@@ -17,10 +17,14 @@ const readBackdrop = attr("data-backdrop", DEFAULTS.backdrop);
 
 const CANVAS: Partial<Record<ThemeId, CanvasKind>> = { lumora: "water" };
 const SVG: Partial<Record<ThemeId, () => React.JSX.Element>> = {
-  mono: () => <StreetPlan live />, field: () => <StreetPlan />, utilities: UtilityPlan, blueprint: BlueprintPlan, drainage: DrainagePlan, transit: TransitPlan,
+  paper: () => <StreetPlan live />, ink: () => <StreetPlan live />, graphite: () => <StreetPlan live />, midnight: () => <StreetPlan live />, mono: () => <StreetPlan live />, field: () => <StreetPlan />, utilities: UtilityPlan, blueprint: BlueprintPlan, drainage: DrainagePlan, transit: TransitPlan,
 };
 
 export const CAPTIONS: Record<ThemeId, string> = {
+  paper: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
+  ink: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
+  graphite: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
+  midnight: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
   mono: "Fig. 1  Street plan, live. Cuts open, get logged, get restored.",
   utilities: "Fig. 1  Under the road. Five departments, one carriageway.",
   blueprint: "Fig. 1  DWG 14. Junction resurfacing, Zone 13.",

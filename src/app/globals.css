@@ -97,6 +97,68 @@
   --pothole: #d9481c; --water: #0a6fd6; --works: #b98d00; --ok: #11914a; --alert: #c4262c;
 }
 
+
+/* ---------- Paper (default): white and black, cobalt only where it matters ---------- */
+[data-theme="paper"][data-mode="light"] {
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f3f4f6; --line: rgb(10 10 10 / 0.1);
+  --fg: #0a0a0a; --fg-2: #333333; --fg-3: #595959;
+  --accent: #0047ab; --accent-fg: #ffffff; --glow: rgb(0 71 171 / 0.12);
+  --pothole: #c2410c; --water: #0e7490; --works: #a16207; --ok: #15803d; --alert: #b91c1c;
+}
+[data-theme="paper"][data-mode="dark"] {
+  --bg: #0a0a0a; --surface: #121212; --surface-2: #1c1c1c; --line: rgb(255 255 255 / 0.12);
+  --fg: #fafafa; --fg-2: #d4d4d4; --fg-3: #a8a8a8;
+  --accent: #5b8cff; --accent-fg: #0a0a0a; --glow: rgb(91 140 255 / 0.16);
+  --pothole: #fb923c; --water: #22d3ee; --works: #facc15; --ok: #4ade80; --alert: #f87171;
+}
+/* ---------- Ink: pure black, white type, signal yellow ---------- */
+[data-theme="ink"][data-mode="dark"] {
+  --bg: #000000; --surface: #0b0b0b; --surface-2: #171717; --line: rgb(255 255 255 / 0.16);
+  --fg: #ffffff; --fg-2: #e5e5e5; --fg-3: #b5b5b5;
+  --accent: #ffd60a; --accent-fg: #000000; --glow: rgb(255 214 10 / 0.16);
+  --pothole: #ff8a4c; --water: #4cc9f0; --works: #ffd60a; --ok: #5ee08a; --alert: #ff6b6b;
+}
+[data-theme="ink"][data-mode="light"] {
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --line: rgb(0 0 0 / 0.14);
+  --fg: #000000; --fg-2: #262626; --fg-3: #4d4d4d;
+  --accent: #000000; --accent-fg: #ffd60a; --glow: rgb(0 0 0 / 0.08);
+  --pothole: #c2410c; --water: #0e7490; --works: #8a6500; --ok: #15803d; --alert: #b91c1c;
+}
+/* ---------- Graphite: charcoal and orange ---------- */
+[data-theme="graphite"][data-mode="dark"] {
+  --bg: #141414; --surface: #1c1c1c; --surface-2: #272727; --line: rgb(255 255 255 / 0.13);
+  --fg: #f5f5f5; --fg-2: #d9d9d9; --fg-3: #adadad;
+  --accent: #ff8a3d; --accent-fg: #141414; --glow: rgb(255 138 61 / 0.16);
+  --pothole: #ff8a3d; --water: #38bdf8; --works: #fbbf24; --ok: #4ade80; --alert: #f87171;
+}
+[data-theme="graphite"][data-mode="light"] {
+  --bg: #f5f5f5; --surface: #ffffff; --surface-2: #e9e9e9; --line: rgb(20 20 20 / 0.12);
+  --fg: #141414; --fg-2: #333333; --fg-3: #575757;
+  --accent: #c2410c; --accent-fg: #ffffff; --glow: rgb(194 65 12 / 0.12);
+  --pothole: #c2410c; --water: #0369a1; --works: #a16207; --ok: #15803d; --alert: #b91c1c;
+}
+/* ---------- Midnight: navy and sky blue ---------- */
+[data-theme="midnight"][data-mode="dark"] {
+  --bg: #0b1020; --surface: #111830; --surface-2: #19223f; --line: rgb(226 232 255 / 0.14);
+  --fg: #f4f6ff; --fg-2: #d5dbf2; --fg-3: #a9b3d4;
+  --accent: #38bdf8; --accent-fg: #0b1020; --glow: rgb(56 189 248 / 0.16);
+  --pothole: #fb923c; --water: #38bdf8; --works: #facc15; --ok: #4ade80; --alert: #fb7185;
+}
+[data-theme="midnight"][data-mode="light"] {
+  --bg: #f6f8ff; --surface: #ffffff; --surface-2: #e8edfb; --line: rgb(11 16 32 / 0.12);
+  --fg: #0b1020; --fg-2: #2a3352; --fg-3: #4d5878;
+  --accent: #0369a1; --accent-fg: #ffffff; --glow: rgb(3 105 161 / 0.12);
+  --pothole: #c2410c; --water: #0369a1; --works: #a16207; --ok: #15803d; --alert: #be123c;
+}
+[data-theme="paper"][data-mode="light"] { --display-fg: #0a0a0a; --display-accent: #0047ab; }
+[data-theme="paper"][data-mode="dark"] { --display-fg: #ffffff; --display-accent: #7ea6ff; }
+[data-theme="ink"][data-mode="dark"] { --display-fg: #ffffff; --display-accent: #ffd60a; }
+[data-theme="ink"][data-mode="light"] { --display-fg: #000000; --display-accent: #000000; }
+[data-theme="graphite"][data-mode="dark"] { --display-fg: #f5f5f5; --display-accent: #ff8a3d; }
+[data-theme="graphite"][data-mode="light"] { --display-fg: #141414; --display-accent: #c2410c; }
+[data-theme="midnight"][data-mode="dark"] { --display-fg: #f4f6ff; --display-accent: #38bdf8; }
+[data-theme="midnight"][data-mode="light"] { --display-fg: #0b1020; --display-accent: #0369a1; }
+
 /* Colours shared by every theme: power cuts, parking, requests */
 :root { --outage: #a78bfa; --parking: #f0739f; --request: #4fd1b5; }
 :root[data-mode="light"] { --outage: #6d4fd8; --parking: #c23b6c; --request: #0e8a73; }
@@ -345,21 +407,13 @@ html.theme-vt[data-vt="fade"]::view-transition-new(root) { animation: 500ms ease
   }
 }
 
-/* Drawing sheet: square-cornered card with crop marks at each corner */
+/* Card: one plain border, soft corners, nothing decorative */
 .sheet {
   position: relative;
   border: 1px solid var(--line);
-  border-radius: 4px;
-  background: color-mix(in oklab, var(--surface) 90%, transparent);
-}
-.sheet::before {
-  content: ""; position: absolute; inset: -7px; pointer-events: none;
-  --m: color-mix(in oklab, var(--fg) 45%, transparent);
-  background:
-    linear-gradient(var(--m), var(--m)) left top / 14px 1px no-repeat, linear-gradient(var(--m), var(--m)) left top / 1px 14px no-repeat,
-    linear-gradient(var(--m), var(--m)) right top / 14px 1px no-repeat, linear-gradient(var(--m), var(--m)) right top / 1px 14px no-repeat,
-    linear-gradient(var(--m), var(--m)) left bottom / 14px 1px no-repeat, linear-gradient(var(--m), var(--m)) left bottom / 1px 14px no-repeat,
-    linear-gradient(var(--m), var(--m)) right bottom / 14px 1px no-repeat, linear-gradient(var(--m), var(--m)) right bottom / 1px 14px no-repeat;
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
 }
 
 /* Dock: dashed lane markings and a zebra crossing for the current page */
@@ -451,3 +505,12 @@ html[data-mode="light"] .ground svg { opacity: 0.2; }
 .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.6s cubic-bezier(0.6, 0, 0.3, 1); }
 .in-view .draw-line { stroke-dashoffset: 0; }
 @media (prefers-reduced-motion: reduce) { .tab-progress { animation: none; } .draw-line { stroke-dashoffset: 0; transition: none; } }
+
+/* phones: 16px fields so iOS does not zoom the page when a field is tapped */
+@media (max-width: 639px) { input, select, textarea { font-size: 16px !important; } }
+/* every interactive element shows where focus is */
+a:focus-visible, button:focus-visible, [role="tab"]:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* the new themes stay clean: the page ground is barely there */
+html:is([data-theme="paper"], [data-theme="ink"], [data-theme="graphite"], [data-theme="midnight"]) .ground svg { opacity: 0.07; }
+html:is([data-theme="paper"], [data-theme="ink"], [data-theme="graphite"], [data-theme="midnight"])[data-mode="light"] .ground svg { opacity: 0.09; }

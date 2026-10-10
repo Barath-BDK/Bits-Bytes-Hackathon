@@ -30,11 +30,14 @@ export function StreetPicker({ examples }: { examples: Spot[] }) {
   return (
     <div>
       <div className="max-w-xl"><PlaceSearch onPick={(p: Place) => go({ name: p.name, area: p.area, lat: p.lat, lng: p.lng })} /></div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="label self-center text-fg-3">{recent.length ? "Recent searches" : "Popular streets"}</span>
+      <p className="label mt-4 text-fg-2">{recent.length ? "Recent searches" : "Popular streets"}</p>
+      {/* one swipeable row on phones, wrapping on wider screens */}
+      <div className="-mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
         {showing.map((e) => (
           <button key={e.name} onClick={() => go(e)}
-            className="max-w-[16rem] truncate rounded-[6px] border border-line px-3 py-1.5 text-sm text-fg-2 transition hover:border-fg-3 hover:text-fg">{e.name}</button>
+            className="max-w-[16rem] shrink-0 truncate rounded-[6px] border border-line bg-bg/60 px-3 py-1.5 text-sm text-fg transition hover:border-accent hover:text-accent focus-visible:border-accent">
+            {e.name}{!recent.length && <span className="text-fg-2">, {e.area}</span>}
+          </button>
         ))}
         {recent.length > 0 && <button onClick={clear} className="label self-center px-1 text-fg-3 transition hover:text-fg">Clear</button>}
       </div>

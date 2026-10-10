@@ -52,7 +52,7 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
     <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6">
       <BackLink href={`/map?c=${c.id}`}>Back to the map</BackLink>
 
-      <header className="mt-8 grid gap-8 border-b border-line pb-10 lg:grid-cols-[1fr_auto]">
+      <header className="grid-cols-1 mt-8 grid gap-8 border-b border-line pb-10 lg:grid-cols-[1fr_auto]">
         <BlurFade>
           <div className="flex flex-wrap items-center gap-2">
             <KindBadge kind={c.kind} size={30} />
@@ -108,7 +108,7 @@ export default async function ClusterPage({ params }: PageProps<"/c/[id]">) {
         </section>
       )}
 
-      <div className="mt-14 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid-cols-1 mt-14 grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <section>
           <h2 className="text-2xl font-semibold tracking-[-0.03em]">Evidence</h2>
           {photos.length > 0 ? (

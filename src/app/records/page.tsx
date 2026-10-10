@@ -3,7 +3,8 @@ import { getClusters, getFindings, getNotices } from "@/lib/data";
 import { NOTICE_KINDS, type NoticeKind } from "@/lib/issues";
 import { dayMonth } from "@/lib/time";
 import { Sheet } from "@/components/sheet";
-import { BlurFade, NumberTicker } from "@/components/motion-bits";
+import { StatRow } from "@/components/stat-row";
+import { BlurFade } from "@/components/motion-bits";
 import { RecordsExplorer } from "@/components/records-explorer";
 
 export const metadata: Metadata = { title: "Records" };
@@ -35,22 +36,16 @@ export default async function RecordsPage() {
         </p>
       </BlurFade>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-4">
-        {[
+      <BlurFade delay={0.1}>
+        <StatRow className="mt-10" stats={[
           ["Permissions recorded", permits.length],
-          ["Completion matched by reference", matchedByRef],
+          ["Matched by reference", matchedByRef],
           ["Findings to check", findings.length],
           ["Live resident reports", clusters.filter((c) => c.status === "open").length],
-        ].map(([label, n], i) => (
-          <BlurFade key={String(label)} inView delay={i * 0.05}>
-            <Sheet label={String(label)} bodyClassName="px-5 py-4">
-              <NumberTicker value={Number(n)} className="text-5xl font-semibold tracking-[-0.05em]" />
-            </Sheet>
-          </BlurFade>
-        ))}
-      </div>
+        ]} />
+      </BlurFade>
 
-      <BlurFade inView className="mt-6">
+      <BlurFade inView className="mt-8">
         <Sheet label="Records by type" bodyClassName="space-y-2 p-5">
           {byKind.map(([k, n]) => (
             <div key={k} className="grid grid-cols-[12rem_1fr_2rem] items-center gap-3 text-sm">

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getClusters } from "@/lib/data";
 import { locate } from "@/lib/jurisdiction";
-import { BlurFade, NumberTicker } from "@/components/motion-bits";
+import { BlurFade } from "@/components/motion-bits";
 import { RequestsBoard } from "@/components/requests-board";
-import { Sheet } from "@/components/sheet";
+import { StatRow } from "@/components/stat-row";
 
 export const metadata: Metadata = { title: "Requests" };
 export const revalidate = 60;
@@ -23,7 +23,7 @@ export default async function RequestsPage() {
     <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-14 sm:px-6">
       <BlurFade>
         <p className="label text-fg-3">Community requests</p>
-        <div className="mt-3 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="grid-cols-1 mt-3 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <h1 className="display max-w-3xl text-[clamp(2.4rem,6vw,4.4rem)]">Ask once. Let the street <span className="accent-word">back you.</span></h1>
             <p className="mt-5 max-w-2xl text-lg text-fg-2">
@@ -38,15 +38,9 @@ export default async function RequestsPage() {
         </div>
       </BlurFade>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {[["Open requests", open.length], ["Residents backing them", backers], ["Done, confirmed by neighbours", done]].map(([label, n], i) => (
-          <BlurFade key={String(label)} inView delay={i * 0.05}>
-            <Sheet label={String(label)} bodyClassName="px-5 py-4">
-              <NumberTicker value={Number(n)} className="text-5xl font-semibold tracking-[-0.05em]" />
-            </Sheet>
-          </BlurFade>
-        ))}
-      </div>
+      <BlurFade delay={0.1}>
+        <StatRow className="mt-10" stats={[["Open requests", open.length], ["Residents backing them", backers], ["Confirmed done", done]]} />
+      </BlurFade>
 
       <div className="mt-10"><RequestsBoard rows={rows} /></div>
     </main>

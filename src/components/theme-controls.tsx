@@ -80,7 +80,7 @@ export function ThemeControls({ up = false }: { up?: boolean }) {
             exit={{ opacity: 0, y: up ? 6 : -6, scale: 0.98, filter: "blur(4px)" }} transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
             className={`panel z-50 max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[12px] !bg-surface p-3 shadow-2xl ${up
               ? "fixed inset-x-3 bottom-[74px] md:absolute md:inset-x-auto md:bottom-14 md:right-0 md:w-[340px] md:origin-bottom-right"
-              : "absolute right-0 top-11 w-[340px] origin-top-right"}`}>
+              : "fixed inset-x-3 top-[68px] md:absolute md:inset-x-auto md:right-0 md:top-11 md:w-[340px] md:origin-top-right"}`}>
             <p className="label px-1 text-fg-3">Mode</p>
             <Segmented id="mode" value={mode} options={[["dark", "Dark"], ["light", "Light"]]} onPick={(v, e) => setSetting("mode", v, at(e))} />
 

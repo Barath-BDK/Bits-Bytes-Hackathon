@@ -61,6 +61,8 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   }
   const reportingRef = useRef(reporting);
   useEffect(() => { reportingRef.current = reporting; }, [reporting]);
+  const draftRef = useRef(draft);
+  useEffect(() => { draftRef.current = draft; }, [draft]);
   const [night, setNightView] = useState(false);
   const [legend, setLegend] = useState(false);
   const overlay = useRef({ notices, clusters, night });
@@ -87,7 +89,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
       a?.classList.remove("maplibregl-compact-show");
       a?.removeAttribute("open");
     });
-    m.on("click", (e) => { if (reportingRef.current) setDraft({ lat: e.lngLat.lat, lng: e.lngLat.lng }); });
+    m.on("click", (e) => { if (reportingRef.current && !draftRef.current) setDraft({ lat: e.lngLat.lat, lng: e.lngLat.lng }); });
     // overlays are wiped by every style change (light/dark), so re-add them each time a style loads
     m.on("style.load", () => { const o = overlay.current; addOverlays(m, o.notices, o.clusters, o.night); });
     const open = clusters.filter((c) => c.status === "open");
@@ -142,21 +144,24 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
     if (sel && map.current) map.current.flyTo({ center: [sel.lng, sel.lat], zoom: Math.max(map.current.getZoom(), 15), duration: 1100, essential: true });
   }, [sel]);
 
-  // Draft pin for a new report (draggable).
+  // Draft pin for a new report. The first tap places it; after that it moves only by dragging the pin itself
+  // (or "Re-place pin" in the form), so panning the map never drops it somewhere else.
   useEffect(() => {
     const m = map.current;
     if (!m) return;
-    draftMarker.current?.remove();
-    draftMarker.current = null;
-    if (!reporting || !draft) return;
+    if (!reporting || !draft) { draftMarker.current?.remove(); draftMarker.current = null; return; }
+    if (draftMarker.current) { draftMarker.current.setLngLat([draft.lng, draft.lat]); return; }
     const root = document.createElement("div");
     root.className = "gw-marker";
-    root.innerHTML = `<div class="gw-pin gw-pulse" style="width:30px;height:30px;background:var(--fg);color:var(--bg)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>`;
+    root.setAttribute("aria-label", "Report location; drag to adjust");
+    root.innerHTML = `<div class="gw-pin gw-pulse" style="width:34px;height:34px;background:var(--accent);color:var(--accent-fg);cursor:grab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>`;
+    // taps on the pin are for dragging it, not for the map underneath
+    root.addEventListener("click", (e) => e.stopPropagation());
     const mk = new maplibregl.Marker({ element: root, draggable: true }).setLngLat([draft.lng, draft.lat]).addTo(m);
-    mk.on("dragend", () => { const p = mk.getLngLat(); setDraft({ lat: p.lat, lng: p.lng }); });
+    mk.on("dragend", () => { const pos = mk.getLngLat(); setDraft({ lat: pos.lat, lng: pos.lng }); });
     draftMarker.current = mk;
-    // keep the pin clear of the form panel on wide screens
-    m.easeTo({ center: [draft.lng, draft.lat], zoom: Math.max(m.getZoom(), 16), duration: 700, padding: { left: innerWidth >= 640 ? 420 : 0, top: 0, right: 0, bottom: innerWidth < 640 ? 320 : 0 } });
+    // bring the new pin into view once, clear of the form panel
+    m.easeTo({ center: [draft.lng, draft.lat], zoom: Math.max(m.getZoom(), 16), duration: 700, padding: { left: innerWidth >= 640 ? 420 : 0, top: 0, right: 0, bottom: innerWidth < 640 ? Math.round(innerHeight * 0.45) : 0 } });
   }, [reporting, draft]);
 
   // Searched place marker.
@@ -191,7 +196,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
+    <div className="fixed inset-x-0 bottom-0 top-16 overflow-hidden">
       {/* isolate: marker z-indexes stay inside the map layer and never cover panels */}
       <div className="absolute inset-0 isolate z-0"><div ref={mapEl} className="h-full w-full" /></div>
 
@@ -200,7 +205,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
         {sidebar && !reporting && (
           <motion.aside key="sidebar" data-lenis-prevent
             initial={{ x: -420, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -420, opacity: 0 }} transition={{ duration: 0.45, ease: EASE }}
-            className="panel absolute bottom-24 left-3 top-3 z-20 hidden w-[372px] flex-col overflow-hidden rounded-[6px] shadow-2xl md:flex">
+            className="panel absolute bottom-3 left-3 top-3 z-20 hidden w-[372px] flex-col overflow-hidden rounded-[6px] shadow-2xl md:flex">
             <div className="flex items-center justify-between px-4 pb-2 pt-3">
               <p className="label text-fg-3">Chennai live ledger</p>
               <button onClick={() => setSidebar(false)} aria-label="Collapse sidebar" className="grid h-7 w-7 place-items-center rounded-lg text-fg-3 transition hover:bg-surface-2 hover:text-fg">
@@ -215,7 +220,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
 
       {/* Mobile: list in a bottom drawer */}
       {!reporting && !sel && !place && (
-        <button onClick={() => setDrawer(true)} className="panel absolute bottom-[84px] left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-2xl md:hidden">
+        <button onClick={() => setDrawer(true)} className="panel absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-2xl md:hidden">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
           {openCount} open issues, sort and filter
         </button>
@@ -292,7 +297,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
         {place && !reporting && !sel && (
           <motion.div initial={{ opacity: 0, y: 16, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.35, ease: EASE }}
-            className="panel absolute bottom-[84px] left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-2xl py-2 pl-4 pr-2 shadow-2xl md:bottom-24">
+            className="panel absolute bottom-4 left-1/2 z-20 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-3 rounded-2xl py-2 pl-4 pr-2 shadow-2xl">
             <span className="max-w-[46vw] truncate text-sm"><span className="font-medium">{place.name}</span> <span className="text-fg-3">{place.area}</span></span>
             <button onClick={() => startReport({ lat: place.lat, lng: place.lng })} className="rounded-xl bg-accent px-3 py-2 text-sm font-medium text-accent-fg">Report here</button>
             <button onClick={() => setPlace(null)} aria-label="Clear search" className="grid h-8 w-8 place-items-center rounded-lg text-fg-3 hover:bg-surface-2">
@@ -308,7 +313,7 @@ export function MapView({ clusters: all, notices }: { clusters: Cluster[]; notic
           <motion.div key={sel.id}
             initial={{ opacity: 0, y: 24, scale: 0.98, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: 16, scale: 0.98, filter: "blur(6px)" }} transition={{ duration: 0.4, ease: EASE }}
-            className="panel absolute bottom-[84px] right-4 z-20 w-[min(360px,calc(100%-2rem))] md:bottom-24 overflow-hidden rounded-2xl shadow-2xl">
+            className="panel absolute bottom-4 right-4 z-20 w-[min(360px,calc(100%-2rem))] overflow-hidden rounded-2xl shadow-2xl">
             {photoSrc(sel.cover_photo) && (
               <ViewTransition name={`photo-${sel.id}`} share="morph" default="none">
                 <div className="relative h-40 w-full bg-surface-2">

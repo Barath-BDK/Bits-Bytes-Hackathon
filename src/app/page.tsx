@@ -44,22 +44,22 @@ export default async function Home() {
 
   const today = (
     <div className="sheet">
-      <div className="grid overflow-hidden md:grid-cols-[1.4fr_1fr]">
+      <div className="grid grid-cols-1 overflow-hidden md:grid-cols-[1.4fr_1fr]">
         <div className="border-b border-line md:border-b-0 md:border-r">
           <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-            <span className="label text-fg-3">{findings.length ? "What the records show" : "In force and coming up"}</span>
-            <Link href="/records" className="label text-fg-3 hover:text-fg">{findings.length ? `All ${findings.length} findings` : "All records"}</Link>
+            <h3 className="text-sm font-semibold">{findings.length ? "What the records show" : "In force and coming up"}</h3>
+            <Link href="/records" className="text-sm text-fg-2 underline-offset-4 hover:text-accent hover:underline">{findings.length ? `All ${findings.length} findings` : "All records"}</Link>
           </div>
           <ol>
             {findings.length > 0 ? findings.slice(0, 4).map((f) => (
               <li key={f.id} className="border-b border-line last:border-0">
-                <Link href={streetHref({ lat: f.lat, lng: f.lng, name: f.title })} className="group flex items-start gap-4 px-5 py-3.5 transition hover:bg-surface-2/60">
-                  <span className="tag tag-gap mt-0.5 shrink-0">{f.label}</span>
+                <Link href={streetHref({ lat: f.lat, lng: f.lng, name: f.title })} className="group flex flex-col gap-1.5 px-4 py-3.5 transition hover:bg-surface-2/60 focus-visible:bg-surface-2/60 sm:flex-row sm:items-start sm:gap-4 sm:px-5">
+                  <span className="tag tag-gap shrink-0 self-start sm:mt-0.5">{f.label}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium tracking-[-0.01em]">{f.title}</span>
                     <span className="line-clamp-1 text-sm text-fg-3">{f.explanation}</span>
                   </span>
-                  {f.demo && <span className="tag tag-demo shrink-0">Demo</span>}
+                  {f.demo && <span className="tag tag-demo shrink-0 self-start">Demo</span>}
                 </Link>
               </li>
             )) : upcoming.slice(0, 4).map((n) => (
@@ -87,7 +87,7 @@ export default async function Home() {
   );
 
   const requests = (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:items-start">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.3fr] lg:items-start">
       <div>
         <p className="text-lg leading-relaxed text-fg-2">
           Streetlights, garbage, drains, fallen trees. Raise it in public and neighbours vouch instead of filing the same complaint again;
@@ -119,7 +119,7 @@ export default async function Home() {
 
   // One idea per tab: the drawing, a sentence of what it is, and where to see it.
   const feature = (sheet: string, no: string, art: React.ReactNode, title: string, body: string, link?: { href: string; label: string }) => (
-    <div className="grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-center">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-[1.1fr_1fr] md:items-center">
       <Sheet label={sheet} no={no} bodyClassName="p-5">{art}</Sheet>
       <div>
         <h3 className="text-2xl font-semibold leading-tight tracking-[-0.03em]">{title}</h3>
@@ -134,11 +134,11 @@ export default async function Home() {
       <Hero ticker={ticker} />
 
       {/* How it works: the whole idea in three steps */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 md:pb-20 md:pt-20">
         <BlurFade inView>
           <p className="label text-fg-3">How it works</p>
         </BlurFade>
-        <ol className="relative mt-8 grid gap-10 md:grid-cols-3 md:gap-8">
+        <ol className="grid-cols-1 relative mt-8 grid gap-7 md:grid-cols-3 md:gap-8">
           <span aria-hidden className="lane-mark absolute left-[19px] top-10 hidden h-[2px] w-[calc(100%-40px)] md:block [background:repeating-linear-gradient(to_right,var(--fg-3)_0_10px,transparent_10px_20px)]" />
           {[
             { n: "01", t: "Look up a street", d: "Works and their permissions, power and water cuts, the next 48 hours, and what the records leave out.", href: "/street", cta: "Find yours" },
@@ -146,11 +146,13 @@ export default async function Home() {
             { n: "03", t: "Send it to who answers", d: "The zone office and the right department, ready to send from your own email or WhatsApp, with an escalation ladder after.", href: "/requests", cta: "See requests" },
           ].map((s, i) => (
             <BlurFade key={s.n} inView delay={i * 0.1}>
-              <li className="relative">
+              <li className="relative grid grid-cols-[2.5rem_1fr] gap-x-4 md:block">
                 <span className="relative grid h-10 w-10 place-items-center rounded-[10px] border border-line bg-bg font-mono text-sm text-fg">{s.n}</span>
-                <h3 className="mt-5 text-xl font-semibold tracking-[-0.03em]">{s.t}</h3>
-                <p className="mt-2 max-w-xs leading-relaxed text-fg-2">{s.d}</p>
-                <Link href={s.href} className="group mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-fg-2 transition hover:text-fg">{s.cta} <Arrow /></Link>
+                <div>
+                  <h3 className="text-lg font-semibold tracking-[-0.03em] md:mt-5 md:text-xl">{s.t}</h3>
+                  <p className="mt-1.5 max-w-xs leading-relaxed text-fg-2 md:mt-2">{s.d}</p>
+                  <Link href={s.href} className="group mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-fg-2 transition hover:text-accent md:mt-3">{s.cta} <Arrow /></Link>
+                </div>
               </li>
             </BlurFade>
           ))}
@@ -219,7 +221,7 @@ export default async function Home() {
       <section className="relative isolate overflow-hidden border-t border-line">
         <div className="absolute inset-0 -z-10 opacity-35 [mask-image:linear-gradient(90deg,transparent,#000_55%)]"><HeroBackdrop /></div>
         <div className="stripes h-1.5 opacity-80" />
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-28 sm:px-6 lg:grid-cols-2 lg:items-end">
+        <div className="grid-cols-1 mx-auto grid max-w-6xl gap-12 px-4 py-28 sm:px-6 lg:grid-cols-2 lg:items-end">
           <BlurFade inView>
             <p className="label text-works">The coordination gap</p>
             <h2 className="display mt-4 text-[clamp(2rem,4.5vw,3.5rem)]">The same road, dug up by three agencies in three months.</h2>
@@ -251,10 +253,11 @@ export default async function Home() {
 
 function Figure({ n, label, tone }: { n: number; label: string; tone?: string }) {
   return (
-    <div className="relative flex flex-col justify-center border-line px-5 py-6 [&:not(:last-child)]:border-r md:[&:not(:last-child)]:border-b md:[&:not(:last-child)]:border-r-0">
-      {tone && <span className="absolute inset-x-0 top-0 h-1" style={{ background: tone }} />}
-      <NumberTicker value={n} className="text-4xl font-semibold tracking-[-0.05em] sm:text-5xl" />
-      <span className="label mt-1.5 text-fg-3">{label}</span>
+    <div className="flex min-w-0 flex-col justify-center border-line px-4 py-5 sm:px-5 [&:not(:last-child)]:border-r md:[&:not(:last-child)]:border-b md:[&:not(:last-child)]:border-r-0">
+      <span className="flex items-center gap-1.5 truncate text-xs text-fg-2 sm:text-sm">
+        {tone && <span aria-hidden className="h-2 w-2 shrink-0 rounded-full" style={{ background: tone }} />}{label}
+      </span>
+      <NumberTicker value={n} className="mt-1 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl" />
     </div>
   );
 }

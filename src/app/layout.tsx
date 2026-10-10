@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { Instrument_Sans, Instrument_Serif, Fragment_Mono } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { Dock } from "@/components/dock";
+import { SiteHeader } from "@/components/site-header";
 import { Chainage, Ground } from "@/components/ground";
 import { ScrollProgress } from "@/components/scroll-progress";
 import { DEFAULTS, themeBootScript } from "@/lib/themes";
@@ -30,14 +30,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <SmoothScroll />
         <ScrollProgress />
+        <SiteHeader />
         <Ground />
         <ViewTransition default="page">
-          <div className="relative flex flex-1 flex-col pb-20 md:pb-24">
+          <div className="relative flex flex-1 flex-col">
             <Chainage />
             {children}
           </div>
         </ViewTransition>
-        <Dock />
       </body>
     </html>
   );

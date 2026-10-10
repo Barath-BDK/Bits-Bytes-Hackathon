@@ -19,11 +19,14 @@ import { BackLink } from "@/components/back-link";
 export const metadata: Metadata = { title: "Your street" };
 
 const EXAMPLES = [
-  { name: "Velachery Main Road", area: "Velachery, Chennai", lat: 12.9793, lng: 80.2189 },
-  { name: "Arcot Road", area: "Vadapalani, Chennai", lat: 13.0505, lng: 80.2121 },
-  { name: "2nd Avenue", area: "Anna Nagar, Chennai", lat: 13.0872, lng: 80.2103 },
-  { name: "KK Nagar", area: "Chennai", lat: 13.0392, lng: 80.1992 },
-  { name: "IIITDM Kancheepuram", area: "Vandalur-Kelambakkam Road", lat: 12.8373, lng: 80.137 },
+  { name: "MG Road", area: "Bengaluru", lat: 12.9756, lng: 77.605 },
+  { name: "Connaught Place", area: "New Delhi", lat: 28.6315, lng: 77.2167 },
+  { name: "Linking Road", area: "Mumbai", lat: 19.064, lng: 72.834 },
+  { name: "Velachery Main Road", area: "Chennai", lat: 12.9793, lng: 80.2189 },
+  { name: "Park Street", area: "Kolkata", lat: 22.553, lng: 88.352 },
+  { name: "Banjara Hills Road 1", area: "Hyderabad", lat: 17.4126, lng: 78.4482 },
+  { name: "FC Road", area: "Pune", lat: 18.5236, lng: 73.8411 },
+  { name: "CG Road", area: "Ahmedabad", lat: 23.03, lng: 72.56 },
 ];
 
 function Lamps({ off }: { off: boolean }) {
@@ -87,13 +90,13 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
     <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6">
       <BackLink href="/street">Look up another street</BackLink>
 
-      <header className="mt-6 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+      <header className="grid-cols-1 mt-6 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <BlurFade>
           <p className="label text-fg-3">Street record, 500 m radius</p>
           <h1 className="display mt-3 text-[clamp(2.4rem,6vw,4.8rem)]">{name}</h1>
           <p className="mt-3 text-fg-2">
             {area && <>{area}. </>}
-            {j.zone ? <>Zone {j.zone.no}, {j.zone.name}. </> : <>Outside GCC limits. </>}
+            {j.zone ? <>Zone {j.zone.no}, {j.zone.name}. </> : <>Zone data covers Greater Chennai so far. </>}
             <span className="font-mono text-sm text-fg-3">{lat.toFixed(5)}, {lng.toFixed(5)}</span>
           </p>
         </BlurFade>
@@ -118,7 +121,7 @@ export default async function StreetPage({ searchParams }: PageProps<"/street">)
         </BlurFade>
       )}
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid-cols-1 mt-10 grid gap-8 lg:grid-cols-[1.35fr_1fr]">
         <div className="min-w-0 space-y-8">
           <BlurFade inView>
             <Sheet label="Next 48 hours" no="01" bodyClassName="p-5">

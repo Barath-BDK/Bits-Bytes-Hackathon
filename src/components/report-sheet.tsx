@@ -9,7 +9,7 @@ export type Submitted = { cluster_id: string; joined_existing: boolean; report_c
 
 type Props = {
   point: { lat: number; lng: number } | null;
-  onPoint: (p: { lat: number; lng: number }) => void;
+  onPoint: (p: { lat: number; lng: number } | null) => void;
   onCancel: () => void;
   onSubmitted: (r: Submitted) => void;
 };
@@ -109,7 +109,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted, initialKind
   if (mini) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ duration: 0.3, ease: EASE }}
-        className="panel absolute inset-x-3 bottom-[78px] z-40 flex items-center gap-3 rounded-[10px] !bg-surface p-3 shadow-2xl">
+        className="panel absolute inset-x-3 bottom-3 z-40 flex items-center gap-3 rounded-[10px] !bg-surface p-3 shadow-2xl">
         <span className="min-w-0 flex-1 text-sm">
           <span className="block font-medium">{point ? "Pin placed" : "Tap the map to place the pin"}</span>
           <span className="block truncate text-xs text-fg-3">{point ? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}. Drag it to adjust.` : "You can also search above."}</span>
@@ -123,7 +123,7 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted, initialKind
     <motion.div data-lenis-prevent
       initial={{ opacity: 0, x: -24, filter: "blur(8px)" }} animate={{ opacity: 1, x: 0, filter: "blur(0px)" }} exit={{ opacity: 0, x: -20, filter: "blur(6px)" }}
       transition={{ duration: 0.4, ease: EASE }}
-      className="panel absolute inset-x-3 bottom-[78px] z-40 !bg-surface max-h-[64%] overflow-y-auto overscroll-contain rounded-[10px] p-5 shadow-2xl sm:bottom-24 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px]">
+      className="panel absolute inset-x-3 bottom-3 z-40 !bg-surface max-h-[70%] overflow-y-auto overscroll-contain rounded-[12px] p-4 shadow-2xl sm:bottom-3 sm:left-3 sm:right-auto sm:top-3 sm:max-h-none sm:w-[390px] sm:p-5">
       <AnimatePresence mode="wait">
         {done ? (
           <motion.div key="done" role="status" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35, ease: EASE }}>
@@ -177,7 +177,8 @@ export function ReportSheet({ point, onPoint, onCancel, onSubmitted, initialKind
               <AnimatePresence>
                 {point && (
                   <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="label mt-2 text-accent">
-                    Pinned at {point.lat.toFixed(5)}, {point.lng.toFixed(5)}. Drag to adjust.
+                    Pinned at {point.lat.toFixed(5)}, {point.lng.toFixed(5)}. Drag the pin to adjust, or{" "}
+                    <button type="button" onClick={() => onPoint(null)} className="underline underline-offset-2 hover:text-fg">re-place it</button>.
                   </motion.p>
                 )}
               </AnimatePresence>

@@ -51,8 +51,8 @@ export function RequestsBoard({ rows }: { rows: Row[] }) {
       </div>
 
       <div className="sheet mt-6">
-        <div className="label flex items-center justify-between border-b border-line px-5 py-2.5 text-fg-3">
-          <span>{status === "open" ? "Open requests" : "Done"}</span><span>{list.length}</span>
+        <div className="flex items-center justify-between border-b border-line px-5 py-3 text-sm">
+          <h3 className="font-semibold">{status === "open" ? "Open requests" : "Done"}</h3><span className="tabular-nums text-fg-2">{list.length}</span>
         </div>
         <motion.ol layout>
           <AnimatePresence mode="popLayout" initial={false}>

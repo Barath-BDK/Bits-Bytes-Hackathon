@@ -1,12 +1,12 @@
-// A drawing sheet: the card style used across the site. Crop marks and a sheet number instead of a pill box.
-export function Sheet({ label, no, className = "", bodyClassName = "", children }: {
-  label: string; no?: string; className?: string; bodyClassName?: string; children: React.ReactNode;
+// The card used across the site: a plain bordered panel with a short title row.
+export function Sheet({ label, action, className = "", bodyClassName = "", children }: {
+  label: string; no?: string; action?: React.ReactNode; className?: string; bodyClassName?: string; children: React.ReactNode;
 }) {
   return (
     <div className={`sheet ${className}`}>
-      <div className="label flex items-center justify-between border-b border-line px-5 py-2.5 text-fg-3">
-        <span>{label}</span>
-        {no && <span>Sheet {no}</span>}
+      <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+        <h3 className="text-sm font-semibold tracking-[-0.01em] text-fg">{label}</h3>
+        {action}
       </div>
       <div className={bodyClassName}>{children}</div>
     </div>

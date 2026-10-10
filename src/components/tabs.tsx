@@ -54,7 +54,7 @@ export function Tabs({ items, vertical = false, autoAdvance, className = "" }: {
 
   const cur = items[active];
   return (
-    <div ref={root} className={`${vertical ? "grid gap-8 lg:grid-cols-[17rem_1fr]" : ""} ${className}`}
+    <div ref={root} className={`${vertical ? "grid grid-cols-1 gap-8 lg:grid-cols-[17rem_1fr]" : ""} ${className}`}
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)} onBlurCapture={() => setPaused(false)}>
       <div role="tablist" aria-orientation={vertical ? "vertical" : "horizontal"} onKeyDown={onKey}

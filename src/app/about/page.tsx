@@ -60,7 +60,7 @@ export default function About() {
         <Sheet label="What the records show: the rules" no="02" bodyClassName="p-6">
           <ul className="divide-y divide-line">
             {RULES.map(([name, label, rule]) => (
-              <li key={name} className="grid gap-2 py-4 md:grid-cols-[14rem_1fr]">
+              <li key={name} className="grid grid-cols-1 gap-2 py-4 md:grid-cols-[14rem_1fr]">
                 <span><span className="block font-medium">{name}</span><span className="tag tag-gap mt-1">{label}</span></span>
                 <span className="leading-relaxed text-fg-2">{rule}</span>
               </li>
@@ -107,7 +107,7 @@ export default function About() {
           <p className="text-fg-2">Photos in the sample reports are from Wikimedia Commons under the licenses below.</p>
           <ul className="mt-4 divide-y divide-line text-sm">
             {credits.map((c) => (
-              <li key={c.file} className="grid gap-1 py-2.5 sm:grid-cols-[1fr_auto]">
+              <li key={c.file} className="grid grid-cols-1 gap-1 py-2.5 sm:grid-cols-[1fr_auto]">
                 <span>
                   <a href={c.source} className="underline decoration-line underline-offset-4 hover:decoration-fg">{c.title}</a>
                   {c.author && <span className="text-fg-3">, {c.author}</span>}

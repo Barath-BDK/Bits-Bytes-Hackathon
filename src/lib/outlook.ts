@@ -29,7 +29,12 @@ export function buildOutlook(clusters: Cluster[], notices: Notice[], rain: RainH
 
   for (const n of notices) {
     // mapped construction has no dates: it is ongoing, so it shades the road row at a lower level for the whole window
-    if (n.kind === "works") { mark(rows.road, now.getTime(), end, 1); continue; }
+    if (n.kind === "works") {
+      mark(rows.road, now.getTime(), end, 1);
+      // one line per mapped project, not one per stretch
+      if (!items.some((it) => it.what === n.title)) items.push({ when: [now, null], what: n.title, who: n.agency, demo: false, source: n.source_url, kind: "road" });
+      continue;
+    }
     const from = new Date(n.starts_at).getTime();
     const to = n.ends_at ? new Date(n.ends_at).getTime() : from + 4 * 3_600_000;
     if (to < now.getTime() || from > end) continue;
