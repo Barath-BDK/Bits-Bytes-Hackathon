@@ -60,18 +60,23 @@ export function RequestsBoard({ rows }: { rows: Row[] }) {
               <motion.li key={r.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-4 last:border-0">
                 <KindBadge kind="request" size={32} />
-                <div className="min-w-0 flex-1">
+                {/* phones: the title takes the first line, the count and vouch sit under it */}
+                <div className="min-w-0 flex-1 max-sm:basis-[calc(100%-3rem)]">
                   <Link href={`/c/${r.id}`} className="block truncate font-medium tracking-[-0.01em] underline-offset-4 hover:underline">
                     {REQUEST_CATEGORIES[r.category ?? "other"].label}
                   </Link>
                   <p className="text-sm text-fg-3">{r.zone}, raised {timeAgo(r.first_reported_at)}</p>
                 </div>
-                <div className="w-28 shrink-0">
-                  <p className="text-sm"><span className="font-semibold tabular-nums">{r.reporter_count}</span> <span className="text-fg-3">asking</span></p>
-                  <span className="mt-1 block h-1.5 rounded-[2px] bg-surface-2"><span className="block h-full rounded-[2px] bg-request" style={{ width: `${(r.reporter_count / max) * 100}%` }} /></span>
+                <div className="flex items-center gap-3 max-sm:w-full max-sm:pl-12 sm:contents">
+                  <div className="w-20 shrink-0 sm:w-28">
+                    <p className="text-sm"><span className="font-semibold tabular-nums">{r.reporter_count}</span> <span className="text-fg-3">asking</span></p>
+                    <span className="mt-1 block h-1.5 rounded-[2px] bg-surface-2"><span className="block h-full rounded-[2px] bg-request" style={{ width: `${(r.reporter_count / max) * 100}%` }} /></span>
+                  </div>
+                  {r.demo && <span className="tag tag-demo shrink-0">Demo</span>}
+                  <span className="max-sm:ml-auto">
+                    {r.status === "open" ? <VouchButton id={r.id} initial={r.vouches} compact label="Vouch" /> : <span className="tag tag-official shrink-0">Done</span>}
+                  </span>
                 </div>
-                {r.demo && <span className="tag tag-demo shrink-0">Demo</span>}
-                {r.status === "open" ? <VouchButton id={r.id} initial={r.vouches} compact label="Vouch" /> : <span className="tag tag-official shrink-0">Done</span>}
               </motion.li>
             ))}
           </AnimatePresence>

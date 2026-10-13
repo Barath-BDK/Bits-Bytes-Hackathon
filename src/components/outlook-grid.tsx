@@ -41,7 +41,7 @@ export function OutlookGrid({ outlook }: { outlook: Outlook }) {
         {items.length === 0 && <li className="py-4 text-fg-3">Nothing recorded or forecast for the next 48 hours within 500 m.</li>}
         {items.map((it, i) => (
           <li key={i} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3">
-            <span className="w-52 shrink-0 font-mono text-[12px] text-fg-2">{it.source?.includes("openstreetmap.org") ? "Ongoing, mapped works" : span(it.when[0], it.when[1])}</span>
+            <span className="w-full shrink-0 font-mono text-[12px] text-fg-2 sm:w-52">{it.source?.includes("openstreetmap.org") ? "Ongoing, mapped works" : span(it.when[0], it.when[1])}</span>
             <span className="min-w-0 flex-1">
               <span className="font-medium">{it.what}</span>
               <span className="text-fg-3">, {it.who}</span>
